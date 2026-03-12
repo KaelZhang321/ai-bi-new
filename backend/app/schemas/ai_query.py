@@ -18,3 +18,8 @@ class AiQueryResponse(BaseModel):
     rows: list[dict[str, Any]]
     answer: str
     chart: ChartConfig | None = None
+
+
+class SseEvent(BaseModel):
+    event: str  # "sql" | "data" | "chart" | "answer" | "error"
+    data: dict[str, Any]

@@ -152,6 +152,6 @@ QA_PAIRS = [
     },
     {
         "question": "客户金额等级分布是什么？",
-        "sql": "SELECT customer_level_name, COUNT(*) AS cnt FROM meeting_registration WHERE customer_level_name IS NOT NULL GROUP BY customer_level_name ORDER BY cnt DESC",
+        "sql": "SELECT COALESCE(customer_level_name, '未分类') AS level_name, COUNT(*) AS customer_count, ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM meeting_customer_analysis), 2) AS percentage FROM meeting_customer_analysis GROUP BY customer_level_name ORDER BY customer_count DESC",
     },
 ]

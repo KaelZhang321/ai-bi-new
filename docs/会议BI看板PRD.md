@@ -109,38 +109,24 @@ customer_level_name字段取值：
 **3.3.1.4 SQL参考**
 
 ```sql
--- 基础字段清洗（可改为视图/临时表）
-WITH base AS (
-    SELECT
-        SUBSTRING_INDEX(market_service_attribution, ',', 1) AS region,
-        CASE
-            WHEN customer_level_name LIKE '%千万%' THEN '千万'
-            WHEN customer_level_name LIKE '%300万%' THEN '300万'
-            WHEN customer_level_name LIKE '%百万%' THEN '百万'
-            ELSE '百万以下'
-        END AS level_group,
-        customer_unique_id,
-        sign_in_status
-    FROM meeting_registration
-    WHERE market_service_attribution IS NOT NULL
-)
-
 -- 获取各区域各等级报名人数
 SELECT
-    region,
-    level_group,
+    SUBSTRING_INDEX(market_service_attribution, ',', 1) AS region,
+    customer_level_name,
     COUNT(DISTINCT customer_unique_id) AS register_count
-FROM base
-GROUP BY region, level_group;
+FROM meeting_registration
+WHERE market_service_attribution IS NOT NULL
+GROUP BY region, customer_level_name;
 
 -- 获取各区域各等级抵达人数
 SELECT
-    region,
-    level_group,
+    SUBSTRING_INDEX(market_service_attribution, ',', 1) AS region,
+    customer_level_name,
     COUNT(DISTINCT customer_unique_id) AS arrive_count
-FROM base
-WHERE sign_in_status = '已签到'
-GROUP BY region, level_group;
+FROM meeting_registration
+WHERE market_service_attribution IS NOT NULL
+    AND sign_in_status = '已签到'
+GROUP BY region, customer_level_name;
 ```
 
 **3.3.1.5 交互需求**
@@ -180,33 +166,18 @@ GROUP BY region, level_group;
 **3.3.2.3 SQL参考**
 
 ```sql
-WITH level_data AS (
-    SELECT
-        SUBSTRING_INDEX(market_service_attribution, ',', 1) AS region,
-        CASE
-            WHEN customer_level_name LIKE '%千万%' THEN '千万'
-            WHEN customer_level_name LIKE '%300万%' THEN '300万'
-            WHEN customer_level_name LIKE '%百万%' THEN '百万'
-            ELSE '百万以下'
-        END AS level_group,
-        sign_in_status,
-        customer_unique_id
-    FROM meeting_registration
-    WHERE market_service_attribution IS NOT NULL
-)
 SELECT
-    region,
-    SUM(CASE WHEN level_group = '千万' THEN 1 ELSE 0 END) AS lvl_10m_register,
-    SUM(CASE WHEN level_group = '千万' AND sign_in_status = '已签到' THEN 1 ELSE 0 END) AS lvl_10m_arrive,
-    SUM(CASE WHEN level_group = '300万' THEN 1 ELSE 0 END) AS lvl_3m_register,
-    SUM(CASE WHEN level_group = '300万' AND sign_in_status = '已签到' THEN 1 ELSE 0 END) AS lvl_3m_arrive,
-    SUM(CASE WHEN level_group = '百万' THEN 1 ELSE 0 END) AS lvl_1m_register,
-    SUM(CASE WHEN level_group = '百万' AND sign_in_status = '已签到' THEN 1 ELSE 0 END) AS lvl_1m_arrive,
-    SUM(CASE WHEN level_group = '百万以下' THEN 1 ELSE 0 END) AS sub_1m_register,
-    SUM(CASE WHEN level_group = '百万以下' AND sign_in_status = '已签到' THEN 1 ELSE 0 END) AS sub_1m_arrive,
+    SUBSTRING_INDEX(market_service_attribution, ',', 1) AS region,
+    SUM(CASE WHEN customer_level_name LIKE '%千万%' THEN 1 ELSE 0 END) AS qianwan_register,
+    SUM(CASE WHEN customer_level_name LIKE '%千万%' AND sign_in_status = '已签到' THEN 1 ELSE 0 END) AS qianwan_arrive,
+    SUM(CASE WHEN customer_level_name LIKE '%百万%' OR customer_level_name LIKE '%300万%' THEN 1 ELSE 0 END) AS baiwan_register,
+    SUM(CASE WHEN (customer_level_name LIKE '%百万%' OR customer_level_name LIKE '%300万%') AND sign_in_status = '已签到' THEN 1 ELSE 0 END) AS baiwan_arrive,
+    SUM(CASE WHEN customer_level_name IS NULL OR (customer_level_name NOT LIKE '%千万%' AND customer_level_name NOT LIKE '%百万%' AND customer_level_name NOT LIKE '%300万%') THEN 1 ELSE 0 END) AS putong_register,
+    SUM(CASE WHEN (customer_level_name IS NULL OR (customer_level_name NOT LIKE '%千万%' AND customer_level_name NOT LIKE '%百万%' AND customer_level_name NOT LIKE '%300万%')) AND sign_in_status = '已签到' THEN 1 ELSE 0 END) AS putong_arrive,
     COUNT(DISTINCT customer_unique_id) AS total_register,
     COUNT(DISTINCT CASE WHEN sign_in_status = '已签到' THEN customer_unique_id END) AS total_arrive
-FROM level_data
+FROM meeting_registration
+WHERE market_service_attribution IS NOT NULL
 GROUP BY region
 ORDER BY total_register DESC;
 ```
@@ -238,28 +209,13 @@ ORDER BY total_register DESC;
 **3.4.1.3 SQL参考**
 
 ```sql
-WITH level_mapping AS (
-    SELECT
-        CASE
-            WHEN customer_level_name LIKE '%千万%' THEN '千万'
-            WHEN customer_level_name LIKE '%300万%' THEN '300万'
-            WHEN customer_level_name LIKE '%百万%' THEN '百万'
-            ELSE '百万以下'
-        END AS level_group,
-        customer_unique_id
-    FROM meeting_registration
-),
-agg AS (
-    SELECT level_group, COUNT(DISTINCT customer_unique_id) AS customer_count
-    FROM level_mapping
-    GROUP BY level_group
-)
 SELECT
-    level_group,
-    customer_count,
-    ROUND(customer_count * 100.0 / (SELECT SUM(customer_count) FROM agg), 2) AS percentage
-FROM agg
-ORDER BY FIELD(level_group, '千万', '300万', '百万', '百万以下');
+    COALESCE(customer_level_name, '未分类') AS level_name,
+    COUNT(*) AS customer_count,
+    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM meeting_customer_analysis), 2) AS percentage
+FROM meeting_customer_analysis
+GROUP BY customer_level_name
+ORDER BY customer_count DESC;
 ```
 
 **3.4.1.4 验收标准**
@@ -410,25 +366,22 @@ SELECT
     region,
     COUNT(*) AS target_count
 FROM meeting_customer_analysis
-WHERE (min_deal > 0 OR consumption_target > 0)
+WHERE (min_deal >= 100)
     AND region IS NOT NULL
-    AND region != '细胞。和王艳红夫妻'
 GROUP BY region;
 
--- 抵达的目标客户（需通过 customer_name 关联）
+-- 抵达的目标客户（需通过 customer_unique_id 关联）
 SELECT
     mca.region,
     COUNT(*) AS arrive_count
 FROM meeting_customer_analysis mca
-INNER JOIN meeting_registration mr ON mca.customer_name = mr.customer_name
-WHERE (mca.min_deal > 0 OR mca.consumption_target > 0)
+INNER JOIN meeting_registration mr ON mca.customer_unique_id = mr.customer_unique_id
+WHERE (mca.min_deal >= 100)
     AND mr.sign_in_status = '已签到'
     AND mca.region IS NOT NULL
-    AND mca.region != '细胞。和王艳红夫妻'
 GROUP BY mca.region;
 ```
 
-> 注：meeting_customer_analysis 表的 customer_unique_id 当前全部为 NULL，跨表关联暂使用 customer_name 字段。待 customer_unique_id 数据补充后应切换回标准关联方式。
 
 **3.5.2.4 验收标准**
 
@@ -490,7 +443,7 @@ SELECT
 
 **3.6.2.1 功能描述**
 
-展示会议期间各时段的人流变化趋势，以多折线图形式呈现。标题：时间维度数据分析。
+展示会议期间各时段的人流变化趋势，以多折线图形式呈现。标题：时间维度数据分析。增加场景维度的筛选器，可以展示单场景的变化趋势。
 
 **3.6.2.2 图表配置**
 
@@ -539,9 +492,9 @@ SELECT
         WHEN time_period LIKE '%听课%' THEN '听课'
         WHEN time_period LIKE '%抵达%' THEN '抵达'
         WHEN time_period LIKE '%离开%' THEN '离开'
-        WHEN time_period LIKE '%午餐%' THEN '午餐'
+        WHEN time_period LIKE '%午餐%' THEN '用餐'
         WHEN time_period LIKE '%晚餐%' THEN '用餐'
-        WHEN time_period LIKE '%体检%' THEN '到院体检'
+        WHEN time_period LIKE '%医院人数合计%' THEN '到院'
         ELSE '其他'
     END AS scene_label,
     SUM(people_count) AS people_count
@@ -560,30 +513,8 @@ ORDER BY schedule_date, day_time_period;
 
 ---
 
-#### 3.6.3 筛选面板
 
-**3.6.3.1 功能描述**
-
-支持多维度数据筛选，实现数据下钻分析。
-
-**3.6.3.2 筛选维度**
-
-| 筛选字段 | 数据来源 | 说明 |
-|---------|---------|------|
-| 区域 | meeting_registration.market_service_attribution | 大区筛选 |
-| 门店 | meeting_registration.store_name | 店铺筛选 |
-| 日期 | meeting_schedule_stats.schedule_date | 日期范围 |
-| 时段 | meeting_schedule_stats.time_period | 时间段筛选 |
-| 场景 | meeting_schedule_stats.scene | 场景筛选 |
-
-**3.6.3.3 验收标准**
-
-- [ ] 筛选器正常工作
-- [ ] 筛选后图表数据同步更新
-
----
-
-### 3.7 议题 VS 目标达成
+### 3.7 目标 VS 达成
 
 #### 3.7.1 目标VS达成柱状图
 

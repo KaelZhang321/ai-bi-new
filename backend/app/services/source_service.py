@@ -31,22 +31,20 @@ def get_target_arrival(db: Session) -> list[TargetArrival]:
     target_sql = text("""
         SELECT region, COUNT(*) AS target_count
         FROM meeting_customer_analysis
-        WHERE (min_deal > 0 OR consumption_target > 0)
+        WHERE (min_deal >= 100)
             AND region IS NOT NULL
-            AND region != '细胞。和王艳红夫妻'
         GROUP BY region
     """)
     targets = {r["region"]: int(r["target_count"]) for r in db.execute(target_sql).mappings().all()}
 
-    # 已抵达的目标客户
+    # 已抵达的目标客户（通过 customer_unique_id 关联）
     arrive_sql = text("""
         SELECT mca.region, COUNT(*) AS arrive_count
         FROM meeting_customer_analysis mca
-        INNER JOIN meeting_registration mr ON mca.customer_name = mr.customer_name
-        WHERE (mca.min_deal > 0 OR mca.consumption_target > 0)
+        INNER JOIN meeting_registration mr ON mca.customer_unique_id = mr.customer_unique_id
+        WHERE (mca.min_deal >= 100)
             AND mr.sign_in_status = '已签到'
             AND mca.region IS NOT NULL
-            AND mca.region != '细胞。和王艳红夫妻'
         GROUP BY mca.region
     """)
     arrivals = {r["region"]: int(r["arrive_count"]) for r in db.execute(arrive_sql).mappings().all()}

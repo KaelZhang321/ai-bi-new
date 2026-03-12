@@ -41,7 +41,7 @@ const HeaderBar: React.FC<HeaderBarProps> = ({ activeTab, onTabChange }) => (
               lineHeight: 1.2,
             }}
           >
-            会议 BI 总览
+            大会数据分析看板
           </h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={theme.colors.textSecondary} strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>

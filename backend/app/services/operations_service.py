@@ -49,9 +49,9 @@ def get_trend_data(db: Session) -> list[TrendPoint]:
                 WHEN time_period LIKE '%听课%' THEN '听课'
                 WHEN time_period LIKE '%抵达%' THEN '抵达'
                 WHEN time_period LIKE '%离开%' THEN '离开'
-                WHEN time_period LIKE '%午餐%' THEN '午餐'
+                WHEN time_period LIKE '%午餐%' THEN '用餐'
                 WHEN time_period LIKE '%晚餐%' THEN '用餐'
-                WHEN time_period LIKE '%体检%' THEN '到院体检'
+                WHEN time_period LIKE '%医院人数合计%' THEN '到院'
                 ELSE '其他'
             END AS scene_label,
             SUM(people_count) AS people_count

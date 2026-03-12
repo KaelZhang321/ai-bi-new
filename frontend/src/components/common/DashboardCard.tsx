@@ -8,9 +8,11 @@ interface DashboardCardProps {
   noPadding?: boolean
   title?: string
   subtitle?: string
+  extra?: React.ReactNode
+  fill?: boolean
 }
 
-const DashboardCard: React.FC<DashboardCardProps> = ({ children, style, glowColor, noPadding, title, subtitle }) => {
+const DashboardCard: React.FC<DashboardCardProps> = ({ children, style, glowColor, noPadding, title, subtitle, extra, fill }) => {
   const color = glowColor || theme.colors.accentCyan
   const colorAttr = color === theme.colors.accentRed ? 'red'
     : color === theme.colors.accentAmber ? 'amber'
@@ -29,6 +31,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ children, style, glowColo
         boxShadow: `${theme.shadows.card}, 0 0 20px ${color}08`,
         position: 'relative',
         overflow: 'hidden',
+        ...(fill ? { display: 'flex', flexDirection: 'column' as const } : {}),
         ...style,
       }}
     >
@@ -41,15 +44,18 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ children, style, glowColo
       <div style={{ position: 'absolute', top: 0, left: 16, right: 16, height: 1, background: `linear-gradient(90deg, transparent, ${color}35, transparent)` }} />
       {/* 标题区域 */}
       {title && (
-        <div style={{ marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 3, height: 14, borderRadius: 1, background: color, boxShadow: `0 0 6px ${color}` }} />
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: theme.colors.textPrimary }}>{title}</div>
-            {subtitle && <div style={{ fontSize: 10, color: theme.colors.textSecondary, marginTop: 2 }}>{subtitle}</div>}
+        <div style={{ marginBottom: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 3, height: 14, borderRadius: 1, background: color, boxShadow: `0 0 6px ${color}` }} />
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: theme.colors.textPrimary }}>{title}</div>
+              {subtitle && <div style={{ fontSize: 10, color: theme.colors.textSecondary, marginTop: 2 }}>{subtitle}</div>}
+            </div>
           </div>
+          {extra}
         </div>
       )}
-      {children}
+      {fill ? <div style={{ flex: 1, minHeight: 0 }}>{children}</div> : children}
     </div>
   )
 }

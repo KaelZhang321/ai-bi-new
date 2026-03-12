@@ -5,7 +5,7 @@ import { baseOption, axisStyle, chartPalette } from './echarts-config'
 interface StackedBarChartProps {
   categories: string[]
   series: { name: string; data: number[] }[]
-  height?: number
+  height?: number | string
 }
 
 const StackedBarChart: React.FC<StackedBarChartProps> = ({ categories, series, height = 320 }) => {

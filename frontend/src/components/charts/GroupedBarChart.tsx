@@ -5,7 +5,7 @@ import { baseOption, axisStyle, chartPalette } from './echarts-config'
 interface GroupedBarChartProps {
   categories: string[]
   series: { name: string; data: number[] }[]
-  height?: number
+  height?: number | string
 }
 
 const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ categories, series, height = 320 }) => {

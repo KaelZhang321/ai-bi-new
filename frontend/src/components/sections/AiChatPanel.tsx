@@ -1,10 +1,14 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react'
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ReactECharts from 'echarts-for-react'
+import { Table, Input, Button } from 'antd'
+import { SearchOutlined, DownloadOutlined, DeleteOutlined } from '@ant-design/icons'
+import type { ColumnsType } from 'antd/es/table'
 import { theme } from '../../styles/theme'
-import { postAiQuery, type AiQueryResponse, type ChartConfig } from '../../api/ai'
+import { streamAiQuery, type AiQueryResponse, type ChartConfig } from '../../api/ai'
 
 const PALETTE = theme.chartPalette
+const STORAGE_KEY = 'ai-chat-history'
 
 interface ChatMessage {
   id: number
@@ -13,6 +17,19 @@ interface ChatMessage {
   data?: AiQueryResponse
   loading?: boolean
   error?: boolean
+  stage?: string // 当前阶段提示
+}
+
+function loadHistory(): ChatMessage[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return []
+    const parsed = JSON.parse(raw) as ChatMessage[]
+    // 恢复时清除残留的 loading 状态
+    return parsed.map((m) => ({ ...m, loading: false, stage: undefined }))
+  } catch {
+    return []
+  }
 }
 
 const EXAMPLES = [
@@ -93,30 +110,144 @@ function AiChart({ chart }: { chart: ChartConfig }) {
   )
 }
 
+/* ========== 数据表格 ========== */
+function DataTable({ columns, rows }: { columns: string[]; rows: Record<string, any>[] }) {
+  const [search, setSearch] = useState('')
+
+  const filteredRows = useMemo(() => {
+    if (!search.trim()) return rows
+    const keyword = search.trim().toLowerCase()
+    return rows.filter((row) =>
+      columns.some((col) => String(row[col] ?? '').toLowerCase().includes(keyword))
+    )
+  }, [rows, columns, search])
+
+  const tableColumns: ColumnsType<Record<string, any>> = useMemo(
+    () =>
+      columns.map((col) => ({
+        title: col,
+        dataIndex: col,
+        key: col,
+        ellipsis: true,
+        sorter: (a: Record<string, any>, b: Record<string, any>) => {
+          const va = a[col]
+          const vb = b[col]
+          if (typeof va === 'number' && typeof vb === 'number') return va - vb
+          return String(va ?? '').localeCompare(String(vb ?? ''))
+        },
+        render: (v: any) => (v == null ? '-' : String(v)),
+      })),
+    [columns]
+  )
+
+  const exportCsv = useCallback(() => {
+    const header = columns.join(',')
+    const body = rows.map((row) => columns.map((c) => `"${String(row[c] ?? '').replace(/"/g, '""')}"`).join(',')).join('\n')
+    const csv = '\uFEFF' + header + '\n' + body
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `data_${Date.now()}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [columns, rows])
+
+  return (
+    <div style={{ marginTop: 8 }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+        <Input.Search
+          placeholder="搜索数据..."
+          size="small"
+          allowClear
+          prefix={<SearchOutlined style={{ color: theme.colors.textSecondary }} />}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ flex: 1 }}
+        />
+        <Button size="small" icon={<DownloadOutlined />} onClick={exportCsv}>
+          导出 CSV
+        </Button>
+      </div>
+      <Table
+        columns={tableColumns}
+        dataSource={filteredRows}
+        rowKey={(_, i) => String(i)}
+        size="small"
+        scroll={{ y: 240 }}
+        pagination={filteredRows.length > 50 ? { pageSize: 50, size: 'small' } : false}
+      />
+    </div>
+  )
+}
+
 /* ========== 面板 ========== */
 const AiChatPanel: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [messages, setMessages] = useState<ChatMessage[]>(loadHistory)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  // 持久化到 localStorage
+  useEffect(() => {
+    const toSave = messages.filter((m) => !m.loading)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave))
+  }, [messages])
+
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
   useEffect(() => { if (open) inputRef.current?.focus() }, [open])
+
+  const clearHistory = () => {
+    setMessages([])
+    localStorage.removeItem(STORAGE_KEY)
+  }
 
   const sendQuery = async (question: string) => {
     if (!question.trim() || loading) return
     const userMsg: ChatMessage = { id: Date.now(), role: 'user', content: question }
-    const aiMsg: ChatMessage = { id: Date.now() + 1, role: 'ai', content: '', loading: true }
+    const aiMsgId = Date.now() + 1
+    const aiMsg: ChatMessage = { id: aiMsgId, role: 'ai', content: '', loading: true, stage: '正在生成 SQL...' }
     setMessages((p) => [...p, userMsg, aiMsg])
     setInput('')
     setLoading(true)
+
+    // 累积的响应数据
+    const partial: Partial<AiQueryResponse> = { sql: '', columns: [], rows: [], answer: '', chart: null }
+
+    const updateAiMsg = (updates: Partial<ChatMessage>) => {
+      setMessages((p) =>
+        p.map((m) => (m.id === aiMsgId ? { ...m, ...updates } : m))
+      )
+    }
+
     try {
-      const result = await postAiQuery(question)
-      setMessages((p) => p.map((m) => m.id === aiMsg.id ? { ...m, content: result.answer, data: result, loading: false } : m))
+      await streamAiQuery(question, {
+        onSql: (sql) => {
+          partial.sql = sql
+          updateAiMsg({ stage: '正在查询数据...', data: { ...partial } as AiQueryResponse })
+        },
+        onData: (columns, rows) => {
+          partial.columns = columns
+          partial.rows = rows
+          updateAiMsg({ stage: '正在分析结果...', data: { ...partial } as AiQueryResponse })
+        },
+        onChart: (chart) => {
+          partial.chart = chart
+          updateAiMsg({ stage: '正在生成回答...', data: { ...partial } as AiQueryResponse })
+        },
+        onAnswer: (answer) => {
+          partial.answer = answer
+          updateAiMsg({ content: answer, data: { ...partial } as AiQueryResponse, loading: false, stage: undefined })
+        },
+        onError: (message) => {
+          updateAiMsg({ content: `查询失败: ${message}`, loading: false, error: true, stage: undefined })
+        },
+      })
     } catch (err: any) {
-      setMessages((p) => p.map((m) => m.id === aiMsg.id ? { ...m, content: `查询失败: ${err?.message || '网络错误'}`, loading: false, error: true } : m))
-    } finally { setLoading(false) }
+      updateAiMsg({ content: `查询失败: ${err?.message || '网络错误'}`, loading: false, error: true, stage: undefined })
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendQuery(input) } }
@@ -142,7 +273,12 @@ const AiChatPanel: React.FC<{ open: boolean; onClose: () => void }> = ({ open, o
                   <div style={{ fontSize: 10, color: theme.colors.textSecondary }}>Vanna.ai + DeepSeek-v3</div>
                 </div>
               </div>
-              <button onClick={onClose} style={{ width: 28, height: 28, borderRadius: 4, border: `1px solid ${theme.colors.borderSubtle}`, background: 'transparent', color: theme.colors.textSecondary, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>&times;</button>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button onClick={clearHistory} title="清空对话" style={{ width: 28, height: 28, borderRadius: 4, border: `1px solid ${theme.colors.borderSubtle}`, background: 'transparent', color: theme.colors.textSecondary, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>
+                  <DeleteOutlined />
+                </button>
+                <button onClick={onClose} style={{ width: 28, height: 28, borderRadius: 4, border: `1px solid ${theme.colors.borderSubtle}`, background: 'transparent', color: theme.colors.textSecondary, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>&times;</button>
+              </div>
             </div>
 
             {/* 消息 */}
@@ -173,7 +309,7 @@ const AiChatPanel: React.FC<{ open: boolean; onClose: () => void }> = ({ open, o
                       <div style={{ display: 'flex', gap: 4 }}>
                         {[0, 1, 2].map((i) => <motion.div key={i} animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }} style={{ width: 6, height: 6, borderRadius: '50%', background: theme.colors.accentCyan }} />)}
                       </div>
-                      <span style={{ fontSize: 11, color: theme.colors.textSecondary }}>正在分析并生成图表...</span>
+                      <span style={{ fontSize: 11, color: theme.colors.textSecondary }}>{msg.stage || '正在分析并生成图表...'}</span>
                     </div>
                   ) : (
                     <div style={{ padding: '12px 16px', borderRadius: '2px 8px 8px 8px', background: 'rgba(8,20,48,0.8)', border: `1px solid ${msg.error ? theme.colors.accentRed : theme.colors.borderSubtle}` }}>
@@ -191,16 +327,11 @@ const AiChatPanel: React.FC<{ open: boolean; onClose: () => void }> = ({ open, o
                         </details>
                       )}
 
-                      {/* 数据表 */}
+                      {/* 数据表 - Ant Design Table */}
                       {msg.data && msg.data.rows.length > 0 && (
                         <details style={{ marginTop: 6 }}>
                           <summary style={{ fontSize: 11, color: theme.colors.accentCyan, cursor: 'pointer', fontFamily: theme.fontFamily, userSelect: 'none' }}>原始数据 ({msg.data.rows.length} 行)</summary>
-                          <div style={{ marginTop: 6, overflow: 'auto', maxHeight: 240 }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 10, fontFamily: theme.fontFamily }}>
-                              <thead><tr>{msg.data.columns.map((c) => <th key={c} style={{ textAlign: 'left', padding: '5px 6px', borderBottom: `1px solid ${theme.colors.accentCyan}20`, color: theme.colors.accentCyan, fontWeight: 600, whiteSpace: 'nowrap' }}>{c}</th>)}</tr></thead>
-                              <tbody>{msg.data.rows.slice(0, 50).map((row, i) => <tr key={i}>{msg.data!.columns.map((c) => <td key={c} style={{ padding: '4px 6px', borderBottom: `1px solid ${theme.colors.borderSubtle}`, color: theme.colors.textPrimary, whiteSpace: 'nowrap' }}>{row[c] ?? '-'}</td>)}</tr>)}</tbody>
-                            </table>
-                          </div>
+                          <DataTable columns={msg.data.columns} rows={msg.data.rows} />
                         </details>
                       )}
                     </div>

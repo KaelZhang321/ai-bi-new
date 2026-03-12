@@ -9,6 +9,8 @@ from datetime import date, datetime
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+import json
+
 from app.schemas.ai_query import AiQueryResponse, ChartConfig
 
 logger = logging.getLogger(__name__)
@@ -147,3 +149,71 @@ def execute_ai_query(question: str, db: Session) -> AiQueryResponse:
     safe_rows = [{k: (str(v) if v is not None and not isinstance(v, (int, float)) else v) for k, v in row.items()} for row in rows]
 
     return AiQueryResponse(sql=sql, columns=columns, rows=safe_rows, answer=answer, chart=chart)
+
+
+async def execute_ai_query_stream(question: str, db: Session):
+    """SSE 流式执行 AI 查询，分阶段 yield 事件。"""
+
+    def _sse(event: str, data: dict) -> dict:
+        return {"event": event, "data": json.dumps(data, ensure_ascii=False)}
+
+    # 初始化 Vanna
+    try:
+        from app.ai.vanna_client import get_vanna
+        vn = get_vanna()
+    except Exception as e:
+        logger.error(f"Vanna init failed: {e}")
+        yield _sse("error", {"message": f"AI 服务初始化失败: {str(e)}"})
+        return
+
+    # 阶段 1: 生成 SQL
+    try:
+        sql = vn.generate_sql(question=question)
+        if not sql:
+            yield _sse("error", {"message": "无法生成 SQL，请尝试更具体的描述。"})
+            return
+        sql = _clean_sql(sql)
+        logger.info(f"Generated SQL: {sql}")
+    except Exception as e:
+        yield _sse("error", {"message": f"SQL 生成失败: {str(e)}"})
+        return
+
+    if not validate_sql(sql):
+        yield _sse("error", {"message": "生成的 SQL 不安全，已拒绝执行。"})
+        return
+
+    yield _sse("sql", {"sql": sql})
+
+    # 阶段 2: 执行 SQL
+    try:
+        result = db.execute(text(sql))
+        columns = list(result.keys())
+        raw_rows = result.fetchall()
+        rows = [{col: _serialize_value(val) for col, val in zip(columns, row)} for row in raw_rows]
+        safe_rows = [
+            {k: (str(v) if v is not None and not isinstance(v, (int, float)) else v) for k, v in row.items()}
+            for row in rows
+        ]
+    except Exception as e:
+        yield _sse("error", {"message": f"SQL 执行失败: {str(e)}"})
+        return
+
+    yield _sse("data", {"columns": columns, "rows": safe_rows})
+
+    # 阶段 3: 生成图表
+    chart = _build_chart(columns, rows)
+    if chart:
+        yield _sse("chart", {"chart": chart.model_dump()})
+
+    # 阶段 4: 生成自然语言回答
+    try:
+        display_rows = rows[:30]
+        answer_prompt = (
+            f"用户问题：{question}\nSQL：{sql}\n结果（共{len(rows)}行）：{display_rows}\n\n"
+            f"请用简洁中文回答，直接给出关键数据和结论。"
+        )
+        answer = vn.submit_prompt([{"role": "user", "content": answer_prompt}])
+    except Exception:
+        answer = f"查询成功，共返回 {len(rows)} 条数据。"
+
+    yield _sse("answer", {"answer": answer})

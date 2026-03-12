@@ -41,8 +41,8 @@ const RegistrationSection: React.FC = () => {
     <div>
       <SectionTitle title="报名 VS 签到情况" subtitle="各区域按金额等级的报名与抵达对比" accentColor={theme.colors.accentCyan} />
       <div style={{ display: 'grid', gridTemplateColumns: '5fr 7fr', gap: 20 }}>
-        <DashboardCard title="报名/抵达统计" subtitle="按大区·金额等级">
-          <StackedBarChart categories={categories} series={series} height={340} />
+        <DashboardCard title="报名/抵达统计" subtitle="按大区·金额等级" fill>
+          <StackedBarChart categories={categories} series={series} height="100%" />
         </DashboardCard>
         <DashboardCard title="金额等级矩阵" subtitle="各大区报名与抵达明细">
           {matrixLoading ? <LoadingSkeleton /> : <DataTable<MatrixRow> columns={columns} dataSource={matrixData || []} rowKey="region" />}
