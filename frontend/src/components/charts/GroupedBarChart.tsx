@@ -48,7 +48,8 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ categories, series, h
     })),
   }
 
-  return <ReactECharts option={option} style={{ height }} />
+  const isFluid = height === '100%'
+  return <ReactECharts option={option} style={{ height }} {...(isFluid ? { opts: { height: 'auto' } } : {})} />
 }
 
 export default GroupedBarChart
