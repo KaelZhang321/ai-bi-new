@@ -1,0 +1,209 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --bg-page: #030b1a;
+  --bg-card: rgba(8, 20, 48, 0.75);
+  --bg-card-solid: #081430;
+  --accent-cyan: #22D3EE;
+  --accent-blue: #3B82F6;
+  --accent-red: #F87171;
+  --accent-amber: #FBBF24;
+  --accent-green: #34D399;
+  --accent-purple: #A78BFA;
+  --text-primary: #E2E8F0;
+  --text-secondary: #64748B;
+  --border-glow: rgba(34, 211, 238, 0.35);
+  --border-subtle: rgba(34, 211, 238, 0.1);
+  --font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+  --font-display: 'Orbitron', 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  font-family: var(--font-family);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* === 多层背景 === */
+#root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 100% 80% at 50% -20%, rgba(34, 100, 238, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 50% at 85% 90%, rgba(99, 60, 200, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 50% at 15% 80%, rgba(34, 211, 238, 0.04) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 科技网格 */
+#root::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0,0,0,0.5) 20%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0,0,0,0.5) 20%, transparent 80%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* === 滚动条 === */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(34, 211, 238, 0.2); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(34, 211, 238, 0.5); }
+
+/* === 分隔线 === */
+.bi-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 5%, rgba(34, 211, 238, 0.25) 50%, transparent 95%);
+  margin: 16px 0;
+  position: relative;
+}
+.bi-divider::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  background: var(--accent-cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent-cyan), 0 0 16px rgba(34, 211, 238, 0.3);
+}
+
+/* === 发光文字 === */
+.glow-text {
+  text-shadow: 0 0 10px rgba(34, 211, 238, 0.6), 0 0 30px rgba(34, 211, 238, 0.3), 0 0 60px rgba(34, 211, 238, 0.1);
+}
+
+/* === 卡片系统 === */
+.dashboard-card {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+.dashboard-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(34, 211, 238, 0.5) !important;
+}
+
+/* HUD 角标 */
+.hud-corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+.hud-corner--tl { top: 0; left: 0; border-top: 2px solid var(--accent-cyan); border-left: 2px solid var(--accent-cyan); }
+.hud-corner--tr { top: 0; right: 0; border-top: 2px solid var(--accent-cyan); border-right: 2px solid var(--accent-cyan); }
+.hud-corner--bl { bottom: 0; left: 0; border-bottom: 2px solid var(--accent-cyan); border-left: 2px solid var(--accent-cyan); }
+.hud-corner--br { bottom: 0; right: 0; border-bottom: 2px solid var(--accent-cyan); border-right: 2px solid var(--accent-cyan); }
+
+/* 动态角标颜色 */
+.hud-corner[data-color="red"] { border-color: var(--accent-red); }
+.hud-corner[data-color="amber"] { border-color: var(--accent-amber); }
+.hud-corner[data-color="green"] { border-color: var(--accent-green); }
+.hud-corner[data-color="purple"] { border-color: var(--accent-purple); }
+
+/* === 导航菜单 === */
+.nav-tab {
+  padding: 8px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  transition: all 0.3s ease;
+  font-family: var(--font-family);
+  position: relative;
+}
+.nav-tab:hover {
+  color: var(--accent-cyan);
+  background: rgba(34, 211, 238, 0.06);
+}
+.nav-tab.active {
+  color: var(--accent-cyan);
+  background: rgba(34, 211, 238, 0.1);
+  border-color: rgba(34, 211, 238, 0.3);
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.1), inset 0 0 12px rgba(34, 211, 238, 0.05);
+}
+.nav-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan);
+  border-radius: 1px;
+}
+
+/* === Antd 暗色覆盖 === */
+.ant-table { background: transparent !important; }
+.ant-table-thead > tr > th {
+  background: rgba(8, 20, 48, 0.95) !important;
+  color: var(--accent-cyan) !important;
+  border-bottom: 1px solid rgba(34, 211, 238, 0.15) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 10px 12px !important;
+}
+.ant-table-tbody > tr > td {
+  border-bottom: 1px solid rgba(34, 211, 238, 0.04) !important;
+  font-size: 12px !important;
+  padding: 8px 12px !important;
+  color: var(--text-primary) !important;
+}
+.ant-table-tbody > tr:hover > td {
+  background: rgba(34, 211, 238, 0.06) !important;
+}
+.ant-table-tbody > tr:nth-child(even) > td {
+  background: rgba(34, 211, 238, 0.015) !important;
+}
+.ant-pagination .ant-pagination-item-active {
+  border-color: var(--accent-cyan) !important;
+}
+.ant-pagination .ant-pagination-item-active a {
+  color: var(--accent-cyan) !important;
+}
+
+/* === 动画 === */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 4px rgba(52, 211, 153, 0.6); }
+  50% { box-shadow: 0 0 12px rgba(52, 211, 153, 0.9), 0 0 20px rgba(52, 211, 153, 0.3); }
+}
+
+@keyframes skeleton-pulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.ant-skeleton .ant-skeleton-content .ant-skeleton-paragraph > li {
+  background: linear-gradient(90deg, rgba(34, 211, 238, 0.04) 25%, rgba(34, 211, 238, 0.1) 50%, rgba(34, 211, 238, 0.04) 75%) !important;
+  background-size: 200% 100% !important;
+  animation: skeleton-pulse 1.5s ease-in-out infinite !important;
+}

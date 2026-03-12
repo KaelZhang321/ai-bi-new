@@ -1,0 +1,55 @@
+export const theme = {
+  colors: {
+    bgPage: '#030b1a',
+    bgCard: 'rgba(8, 20, 48, 0.75)',
+    bgCardSolid: '#081430',
+    bgHeader: '#040d20',
+    accentCyan: '#22D3EE',
+    accentBlue: '#3B82F6',
+    accentRed: '#F87171',
+    accentAmber: '#FBBF24',
+    accentGreen: '#34D399',
+    accentPurple: '#A78BFA',
+    textPrimary: '#E2E8F0',
+    textSecondary: '#64748B',
+    border: 'rgba(34, 211, 238, 0.3)',
+    borderSubtle: 'rgba(34, 211, 238, 0.1)',
+  },
+  fontFamily: "'JetBrains Mono', 'SF Mono', Consolas, monospace",
+  fontDisplay: "'Orbitron', 'JetBrains Mono', monospace",
+  cardRadius: 6,
+  chartPalette: ['#22D3EE', '#F87171', '#34D399', '#FBBF24', '#A78BFA', '#FB923C', '#38BDF8'],
+  shadows: {
+    card: '0 2px 12px rgba(0,0,0,0.5)',
+    glow: (color: string) => `0 0 15px ${color}25, 0 0 30px ${color}10`,
+  },
+} as const
+
+export const antdDarkTheme = {
+  token: {
+    colorPrimary: '#22D3EE',
+    colorBgContainer: '#081430',
+    colorBgElevated: '#081430',
+    colorBgLayout: '#030b1a',
+    colorText: '#E2E8F0',
+    colorTextSecondary: '#64748B',
+    colorBorder: 'rgba(34, 211, 238, 0.1)',
+    colorBorderSecondary: 'rgba(34, 211, 238, 0.05)',
+    borderRadius: 6,
+    fontFamily: "'JetBrains Mono', 'SF Mono', Consolas, monospace",
+    fontSize: 13,
+  },
+  components: {
+    Table: {
+      headerBg: 'rgba(8, 20, 48, 0.95)',
+      headerColor: '#22D3EE',
+      rowHoverBg: 'rgba(34, 211, 238, 0.06)',
+      borderColor: 'rgba(34, 211, 238, 0.04)',
+      colorBgContainer: 'transparent',
+      cellFontSize: 12,
+      headerFontSize: 11,
+    },
+    Card: { colorBgContainer: '#081430' },
+    Skeleton: { color: 'rgba(34, 211, 238, 0.04)', colorGradientEnd: 'rgba(34, 211, 238, 0.1)' },
+  },
+}

@@ -1,0 +1,54 @@
+import React from 'react'
+import ReactECharts from 'echarts-for-react'
+import { baseOption, axisStyle, chartPalette } from './echarts-config'
+
+interface GroupedBarChartProps {
+  categories: string[]
+  series: { name: string; data: number[] }[]
+  height?: number
+}
+
+const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ categories, series, height = 320 }) => {
+  const option = {
+    ...baseOption,
+    color: chartPalette,
+    tooltip: { ...baseOption.tooltip, trigger: 'axis' as const },
+    legend: { ...baseOption.legend, top: 0, itemGap: 14 },
+    xAxis: {
+      type: 'category' as const,
+      data: categories,
+      ...axisStyle,
+      axisLabel: { ...axisStyle.axisLabel, rotate: categories.length > 8 ? 30 : 0, interval: 0 },
+    },
+    yAxis: { type: 'value' as const, ...axisStyle },
+    series: series.map((s, i) => ({
+      ...s,
+      type: 'bar' as const,
+      barWidth: '22%',
+      barGap: '30%',
+      itemStyle: {
+        borderRadius: [4, 4, 0, 0],
+        color: {
+          type: 'linear' as const,
+          x: 0, y: 0, x2: 0, y2: 1,
+          colorStops: [
+            { offset: 0, color: chartPalette[i % chartPalette.length] },
+            { offset: 1, color: `${chartPalette[i % chartPalette.length]}60` },
+          ],
+        },
+        shadowBlur: 8,
+        shadowColor: `${chartPalette[i % chartPalette.length]}20`,
+      },
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 16,
+          shadowColor: `${chartPalette[i % chartPalette.length]}40`,
+        },
+      },
+    })),
+  }
+
+  return <ReactECharts option={option} style={{ height }} />
+}
+
+export default GroupedBarChart
