@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect } from 'react'
 import { motion, useSpring, useTransform } from 'framer-motion'
 
 interface AnimatedNumberProps {
@@ -7,6 +7,7 @@ interface AnimatedNumberProps {
   unit?: string
   duration?: number
   style?: React.CSSProperties
+  unitStyle?: React.CSSProperties
 }
 
 const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
@@ -15,23 +16,39 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
   unit = '',
   duration = 1.5,
   style,
+  unitStyle,
 }) => {
   const spring = useSpring(0, { duration: duration * 1000 })
   const display = useTransform(spring, (v) => {
     if (value >= 10000) {
-      return `${prefix}${(v / 10000).toFixed(2)}万${unit}`
+      return `${prefix}${(v / 10000).toFixed(2)}`
     }
     if (Number.isInteger(value)) {
-      return `${prefix}${Math.round(v).toLocaleString()}${unit}`
+      return `${prefix}${Math.round(v).toLocaleString()}`
     }
-    return `${prefix}${v.toFixed(2)}${unit}`
+    return `${prefix}${v.toFixed(2)}`
   })
+
+  const displayUnit = value >= 10000 ? `万${unit}` : unit
 
   useEffect(() => {
     spring.set(value)
   }, [value, spring])
 
-  return <motion.span style={style}>{display}</motion.span>
+  if (!unitStyle) {
+    return (
+      <span style={style}>
+        <motion.span>{display}</motion.span>{displayUnit}
+      </span>
+    )
+  }
+
+  return (
+    <span style={{ display: 'flex', alignItems: 'baseline' }}>
+      <motion.span style={style}>{display}</motion.span>
+      {displayUnit && <span style={unitStyle}>{displayUnit}</span>}
+    </span>
+  )
 }
 
 export default AnimatedNumber

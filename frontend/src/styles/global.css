@@ -1,5 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
 
+@font-face {
+  font-family: 'MiSans-Heavy';
+  src: url('./MiSans-Heavy.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --bg-page: #030b1a;
   --bg-card: rgba(8, 20, 48, 0.75);
@@ -15,7 +23,7 @@
   --border-glow: rgba(34, 211, 238, 0.35);
   --border-subtle: rgba(34, 211, 238, 0.1);
   --font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
-  --font-display: 'Orbitron', 'JetBrains Mono', monospace;
+  --font-display: 'MiSans-Heavy', 'Orbitron', 'JetBrains Mono', monospace;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }

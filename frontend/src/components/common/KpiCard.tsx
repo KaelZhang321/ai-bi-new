@@ -31,7 +31,7 @@ const KpiCard: React.FC<KpiCardProps> = ({
         background: theme.colors.bgCard,
         borderRadius: theme.cardRadius,
         border: `1px solid ${color}25`,
-        padding: '18px 16px',
+        padding: '20px 18px',
         flex: 1,
         minWidth: 0,
         position: 'relative',
@@ -46,10 +46,10 @@ const KpiCard: React.FC<KpiCardProps> = ({
       {/* 顶部色条 */}
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${color}, ${color}30)`, boxShadow: `0 0 10px ${color}30` }} />
       {/* 背景装饰 */}
-      <div style={{ position: 'absolute', bottom: -20, right: -10, fontSize: 60, fontWeight: 900, fontFamily: theme.fontDisplay, color: `${color}04`, lineHeight: 1, userSelect: 'none', pointerEvents: 'none' }}>
+      <div style={{ position: 'absolute', bottom: -20, right: -10, fontSize: 72, fontWeight: 900, fontFamily: theme.fontDisplay, color: `${color}06`, lineHeight: 1, userSelect: 'none', pointerEvents: 'none' }}>
         {Math.round(value)}
       </div>
-      <div style={{ fontSize: 11, color: theme.colors.textSecondary, marginBottom: 14, fontWeight: 500, letterSpacing: 0.5 }}>
+      <div style={{ fontSize: 11, color: theme.colors.textSecondary, marginBottom: 16, fontWeight: 500, letterSpacing: 0.5 }}>
         {label}
       </div>
       <AnimatedNumber
@@ -57,13 +57,22 @@ const KpiCard: React.FC<KpiCardProps> = ({
         prefix={prefix}
         unit={unit}
         style={{
-          fontSize: 28,
+          fontSize: 36,
           fontWeight: 700,
           fontFamily: theme.fontDisplay,
-          color,
+          background: `linear-gradient(180deg, ${color}, ${color}90)`,
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
           letterSpacing: -0.5,
-          textShadow: `0 0 16px ${color}40`,
-          display: 'block',
+          filter: `drop-shadow(0 0 12px ${color}40)`,
+        }}
+        unitStyle={{
+          fontSize: 14,
+          fontWeight: 600,
+          color,
+          opacity: 0.65,
+          marginLeft: 3,
         }}
       />
     </div>

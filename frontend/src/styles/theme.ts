@@ -16,7 +16,7 @@ export const theme = {
     borderSubtle: 'rgba(34, 211, 238, 0.1)',
   },
   fontFamily: "'JetBrains Mono', 'SF Mono', Consolas, monospace",
-  fontDisplay: "'Orbitron', 'JetBrains Mono', monospace",
+  fontDisplay: "'MiSans-Heavy', 'Orbitron', 'JetBrains Mono', monospace",
   cardRadius: 6,
   chartPalette: ['#22D3EE', '#F87171', '#34D399', '#FBBF24', '#A78BFA', '#FB923C', '#38BDF8'],
   shadows: {
