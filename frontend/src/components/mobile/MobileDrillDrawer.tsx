@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Drawer, Table, Spin } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import { theme } from '../../styles/theme'
 
 interface MobileDrillDrawerProps<T> {
   open: boolean
@@ -35,11 +34,11 @@ function MobileDrillDrawer<T extends object>({ open, title, onClose, fetchData, 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{
             width: 3,
-            height: 14,
+            height: 16,
             borderRadius: 2,
-            background: `linear-gradient(180deg, ${theme.colors.accentCyan}, ${theme.colors.accentCyan}50)`,
+            background: '#3B82F6',
           }} />
-          <span style={{ color: theme.colors.textPrimary, fontSize: 14, fontWeight: 600 }}>{title}</span>
+          <span style={{ color: '#1A1D2E', fontSize: 15, fontWeight: 600 }}>{title}</span>
         </div>
       }
       placement="bottom"
@@ -48,12 +47,12 @@ function MobileDrillDrawer<T extends object>({ open, title, onClose, fetchData, 
       destroyOnClose
       styles={{
         header: {
-          background: theme.colors.bgCardSolid,
-          borderBottom: `1px solid rgba(34, 211, 238, 0.1)`,
-          padding: '12px 16px',
+          background: '#FFFFFF',
+          borderBottom: '1px solid #F3F4F6',
+          padding: '14px 16px',
         },
         body: {
-          background: theme.colors.bgCardSolid,
+          background: '#FFFFFF',
           padding: '12px 8px',
         },
       }}

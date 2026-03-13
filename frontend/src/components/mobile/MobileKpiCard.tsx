@@ -1,5 +1,4 @@
 import React from 'react'
-import { theme } from '../../styles/theme'
 import AnimatedNumber from '../common/AnimatedNumber'
 
 interface MobileKpiCardProps {
@@ -15,14 +14,13 @@ const MobileKpiCard: React.FC<MobileKpiCardProps> = ({
   value,
   prefix = '',
   unit = '',
-  color = theme.colors.accentCyan,
+  color = '#3B82F6',
 }) => (
-  <div className="mobile-kpi-card" style={{ border: `1px solid ${color}20` }}>
+  <div className="mobile-kpi-card" style={{ border: `1px solid rgba(0,0,0,0.04)` }}>
     <div className="mobile-kpi-card__top-bar" style={{
-      background: `linear-gradient(90deg, ${color}cc, ${color}40, transparent)`,
-      boxShadow: `0 0 6px ${color}20`,
+      background: `linear-gradient(90deg, ${color}, ${color}80)`,
     }} />
-    <div className="mobile-kpi-card__bg-num" style={{ color: `${color}05` }}>
+    <div className="mobile-kpi-card__bg-num" style={{ color }}>
       {Math.round(value)}
     </div>
     <div className="mobile-kpi-card__label">{label}</div>
@@ -31,24 +29,20 @@ const MobileKpiCard: React.FC<MobileKpiCardProps> = ({
       prefix={prefix}
       unit={unit}
       style={{
-        fontSize: 22,
-        fontWeight: 700,
-        fontFamily: theme.fontDisplay,
-        background: `linear-gradient(175deg, ${color}, ${color}80)`,
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        backgroundClip: 'text',
+        fontSize: 24,
+        fontWeight: 800,
+        fontFamily: "'MiSans-Heavy', 'Orbitron', 'JetBrains Mono', monospace",
+        color,
         letterSpacing: -0.5,
-        filter: `drop-shadow(0 0 8px ${color}30)`,
         lineHeight: 1.1,
       }}
       unitStyle={{
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: 600,
         color,
-        opacity: 0.6,
+        opacity: 0.65,
         marginLeft: 3,
-        fontFamily: theme.fontFamily,
+        fontFamily: "'Noto Sans SC', 'Inter', sans-serif",
       }}
     />
   </div>

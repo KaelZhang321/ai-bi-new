@@ -7,14 +7,13 @@ import LoadingSkeleton from '../../common/LoadingSkeleton'
 import StackedBarChart from '../../charts/StackedBarChart'
 import GroupedBarChart from '../../charts/GroupedBarChart'
 import { fetchTargetCustomerDetail, type TargetCustomerDetail } from '../../../api/source'
-import { theme } from '../../../styles/theme'
 
 const detailColumns = [
   { title: '客户姓名', dataIndex: 'customer_name', key: 'name', width: 80 },
   { title: '客户等级', dataIndex: 'customer_level', key: 'level', width: 70 },
   { title: '新老客户', dataIndex: 'new_or_old_customer', key: 'newold', width: 70 },
   { title: '铺垫成熟度', dataIndex: 'prep_maturity', key: 'prep', width: 80 },
-  { title: '是否抵达', dataIndex: 'is_arrived', key: 'arrived', width: 70, render: (v: boolean) => <span style={{ color: v ? theme.colors.accentGreen : theme.colors.accentRed, fontWeight: 600 }}>{v ? '已抵达' : '未抵达'}</span> },
+  { title: '是否抵达', dataIndex: 'is_arrived', key: 'arrived', width: 70, render: (v: boolean) => <span style={{ color: v ? '#10B981' : '#EF4444', fontWeight: 600 }}>{v ? '已抵达' : '未抵达'}</span> },
 ]
 
 const MobileCustomerSourceSection: React.FC = () => {
@@ -61,12 +60,12 @@ const MobileCustomerSourceSection: React.FC = () => {
 
   return (
     <div>
-      <MobileSectionTitle title="客户来源 + 任务进展" subtitle="来源渠道与目标客户抵达" accentColor={theme.colors.accentGreen} />
-      <MobileCard glowColor={theme.colors.accentCyan} title="客户报名统计" subtitle="按大区·来源类型">
+      <MobileSectionTitle title="客户来源 + 任务进展" subtitle="来源渠道与目标客户抵达" accentColor="#10B981" />
+      <MobileCard glowColor="#3B82F6" title="客户报名统计" subtitle="按大区·来源类型">
         <StackedBarChart categories={sourceChart.categories} series={sourceChart.series} height={260} />
       </MobileCard>
       <div style={{ height: 12 }} />
-      <MobileCard glowColor={theme.colors.accentGreen} title="优质目标客户抵达" subtitle="点击柱体查看明细">
+      <MobileCard glowColor="#10B981" title="优质目标客户抵达" subtitle="点击柱体查看明细">
         {tgtLoading ? <LoadingSkeleton /> : <GroupedBarChart categories={targetChart.categories} series={targetChart.series} height={260} onBarClick={handleTargetClick} />}
       </MobileCard>
       <MobileDrillDrawer<TargetCustomerDetail>

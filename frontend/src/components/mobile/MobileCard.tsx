@@ -1,5 +1,4 @@
 import React from 'react'
-import { theme } from '../../styles/theme'
 
 interface MobileCardProps {
   children: React.ReactNode
@@ -11,24 +10,12 @@ interface MobileCardProps {
 }
 
 const MobileCard: React.FC<MobileCardProps> = ({ children, title, subtitle, glowColor, extra, style }) => {
-  const color = glowColor || theme.colors.accentCyan
+  const color = glowColor || '#3B82F6'
   return (
-    <div
-      className="mobile-card"
-      style={{ borderColor: `${color}18`, ...style }}
-    >
-      {/* 顶部光线 */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 14,
-        right: 14,
-        height: 1,
-        background: `linear-gradient(90deg, transparent, ${color}25, transparent)`,
-      }} />
+    <div className="mobile-card" style={style}>
       {title && (
         <div style={{
-          marginBottom: 12,
+          marginBottom: 14,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -36,17 +23,17 @@ const MobileCard: React.FC<MobileCardProps> = ({ children, title, subtitle, glow
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
             <div style={{
               width: 3,
-              height: 14,
+              height: 16,
               borderRadius: 2,
-              background: `linear-gradient(180deg, ${color}, ${color}50)`,
+              background: color,
               flexShrink: 0,
             }} />
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: theme.colors.textPrimary, letterSpacing: 0.2 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#1A1D2E', letterSpacing: 0.2 }}>
                 {title}
               </div>
               {subtitle && (
-                <div style={{ fontSize: 10, color: theme.colors.textSecondary, marginTop: 2, letterSpacing: 0.1 }}>
+                <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2, letterSpacing: 0.1 }}>
                   {subtitle}
                 </div>
               )}

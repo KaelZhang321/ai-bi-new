@@ -4,7 +4,6 @@ import MobileSectionTitle from '../MobileSectionTitle'
 import MobileCard from '../MobileCard'
 import LoadingSkeleton from '../../common/LoadingSkeleton'
 import HorizontalBarChart from '../../charts/HorizontalBarChart'
-import { theme } from '../../../styles/theme'
 
 const MobileProgressSection: React.FC = () => {
   const { data, isLoading } = useProgress()
@@ -24,8 +23,8 @@ const MobileProgressSection: React.FC = () => {
 
   return (
     <div>
-      <MobileSectionTitle title="完成进度排行" subtitle="前景柱=成交金额 | 底条=高限" accentColor={theme.colors.accentAmber} />
-      <MobileCard glowColor={theme.colors.accentAmber} title="各区域完成度" subtitle={`平均完成率: ${data.avg_completion_rate ?? 0}%`}>
+      <MobileSectionTitle title="完成进度排行" subtitle="前景柱=成交金额 | 底条=高限" accentColor="#F59E0B" />
+      <MobileCard glowColor="#F59E0B" title="各区域完成度" subtitle={`平均完成率: ${data.avg_completion_rate ?? 0}%`}>
         <HorizontalBarChart categories={chart.categories} series={chart.series} height={Math.max(240, data.items.length * 32)} />
       </MobileCard>
     </div>

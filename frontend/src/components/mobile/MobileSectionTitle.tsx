@@ -1,5 +1,4 @@
 import React from 'react'
-import { theme } from '../../styles/theme'
 
 interface MobileSectionTitleProps {
   title: string
@@ -10,15 +9,12 @@ interface MobileSectionTitleProps {
 const MobileSectionTitle: React.FC<MobileSectionTitleProps> = ({
   title,
   subtitle,
-  accentColor = theme.colors.accentCyan,
+  accentColor = '#3B82F6',
 }) => (
   <div className="mobile-section-title">
     <div
       className="mobile-section-title__bar"
-      style={{
-        background: `linear-gradient(180deg, ${accentColor}, ${accentColor}40)`,
-        boxShadow: `0 0 6px ${accentColor}40`,
-      }}
+      style={{ background: accentColor }}
     />
     <div>
       <div className="mobile-section-title__text">{title}</div>

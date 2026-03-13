@@ -8,7 +8,6 @@ import MobileCard from '../MobileCard'
 import MobileKpiCard from '../MobileKpiCard'
 import LoadingSkeleton from '../../common/LoadingSkeleton'
 import MultiLineChart from '../../charts/MultiLineChart'
-import { theme } from '../../../styles/theme'
 
 const MobileOperationsSection: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<string>(dayjs().format('YYYY-MM-DD'))
@@ -45,26 +44,26 @@ const MobileOperationsSection: React.FC = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-        <MobileSectionTitle title="会议运营数据" subtitle="实时运营概况" accentColor={theme.colors.accentGreen} />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <MobileSectionTitle title="会议运营数据" subtitle="实时运营概况" accentColor="#10B981" />
         <DatePicker
           defaultValue={dayjs()}
           onChange={handleDateChange}
           allowClear={false}
           size="small"
-          style={{ flexShrink: 0 }}
+          style={{ flexShrink: 0, borderRadius: 8 }}
         />
       </div>
       {kpiLoading ? <LoadingSkeleton /> : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
-          <MobileKpiCard label="签到人数" value={kpiData?.checkin_count ?? 0} unit="人" color={theme.colors.accentCyan} />
-          <MobileKpiCard label="接机人数" value={kpiData?.pickup_count ?? 0} unit="人" color={theme.colors.accentGreen} />
-          <MobileKpiCard label="离开人数" value={kpiData?.leave_count ?? 0} unit="人" color={theme.colors.accentRed} />
-          <MobileKpiCard label="到院人数" value={kpiData?.hospital_count ?? 0} unit="人" color={theme.colors.accentPurple} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+          <MobileKpiCard label="签到人数" value={kpiData?.checkin_count ?? 0} unit="人" color="#3B82F6" />
+          <MobileKpiCard label="接机人数" value={kpiData?.pickup_count ?? 0} unit="人" color="#10B981" />
+          <MobileKpiCard label="离开人数" value={kpiData?.leave_count ?? 0} unit="人" color="#EF4444" />
+          <MobileKpiCard label="到院人数" value={kpiData?.hospital_count ?? 0} unit="人" color="#8B5CF6" />
         </div>
       )}
       <MobileCard
-        glowColor={theme.colors.accentGreen}
+        glowColor="#10B981"
         title="时间维度数据分析"
         subtitle="人流趋势 · 按场景"
         extra={

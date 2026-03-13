@@ -6,23 +6,24 @@ import MobileDataTable from '../MobileDataTable'
 import MobileDrillDrawer from '../MobileDrillDrawer'
 import LoadingSkeleton from '../../common/LoadingSkeleton'
 import { fetchProposalDetail, type ProposalDetailRow } from '../../../api/proposal'
-import { theme } from '../../../styles/theme'
 import type { ProposalRow, ProposalCrossRow } from '../../../api/proposal'
+
+const mono = "'JetBrains Mono', monospace"
 
 const EmptyPlaceholder = () => (
   <div style={{ textAlign: 'center', padding: 32 }}>
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={theme.colors.textSecondary} strokeWidth="1.5" style={{ opacity: 0.25, marginBottom: 8 }}>
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="1.5" style={{ marginBottom: 8 }}>
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
     </svg>
-    <div style={{ color: theme.colors.textSecondary, fontSize: 12 }}>方案目标数据待录入</div>
+    <div style={{ color: '#9CA3AF', fontSize: 13 }}>方案目标数据待录入</div>
   </div>
 )
 
 const detailColumns = [
   { title: '客户姓名', dataIndex: 'customer_name', key: 'name', width: 80 },
   { title: '成交内容', dataIndex: 'deal_content', key: 'content', width: 120 },
-  { title: '新成交', dataIndex: 'new_deal_amount', key: 'amount', width: 80, render: (v: number) => <span style={{ color: theme.colors.accentCyan, fontWeight: 600, fontFamily: theme.fontMono }}>¥{v.toLocaleString()}</span> },
-  { title: '收款', dataIndex: 'received_amount', key: 'received', width: 80, render: (v: number) => <span style={{ fontFamily: theme.fontMono }}>¥{v.toLocaleString()}</span> },
+  { title: '新成交', dataIndex: 'new_deal_amount', key: 'amount', width: 80, render: (v: number) => <span style={{ color: '#3B82F6', fontWeight: 600, fontFamily: mono }}>¥{v.toLocaleString()}</span> },
+  { title: '收款', dataIndex: 'received_amount', key: 'received', width: 80, render: (v: number) => <span style={{ fontFamily: mono }}>¥{v.toLocaleString()}</span> },
   { title: '日期', dataIndex: 'record_date', key: 'date', width: 80 },
 ]
 
@@ -55,7 +56,7 @@ const MobileProposalSection: React.FC = () => {
       width: 50,
       render: (v: number, record: ProposalRow) => (
         <span
-          style={{ color: v >= record.target_count ? theme.colors.accentGreen : theme.colors.accentRed, fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 3 }}
+          style={{ color: v >= record.target_count ? '#10B981' : '#EF4444', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 3 }}
           onClick={() => handleDrill(record.region, record.proposal_type)}
         >
           {v}
@@ -74,7 +75,7 @@ const MobileProposalSection: React.FC = () => {
         key: pt,
         dataIndex: ['proposals', pt] as [string, string],
         width: 60,
-        render: (v: number) => <span style={{ color: v > 0 ? theme.colors.accentCyan : theme.colors.textSecondary, fontWeight: v > 0 ? 600 : 400, fontFamily: theme.fontMono }}>{v ?? 0}</span>,
+        render: (v: number) => <span style={{ color: v > 0 ? '#3B82F6' : '#9CA3AF', fontWeight: v > 0 ? 600 : 400, fontFamily: mono }}>{v ?? 0}</span>,
       })),
     ]
   }, [crossData])
@@ -83,8 +84,8 @@ const MobileProposalSection: React.FC = () => {
 
   return (
     <div>
-      <MobileSectionTitle title="VS方案情报" subtitle="各方案目标与达成" accentColor={theme.colors.accentAmber} />
-      <MobileCard glowColor={theme.colors.accentAmber} title="方案概览表" subtitle="点击达成数量查看明细">
+      <MobileSectionTitle title="VS方案情报" subtitle="各方案目标与达成" accentColor="#F59E0B" />
+      <MobileCard glowColor="#F59E0B" title="方案概览表" subtitle="点击达成数量查看明细">
         {overviewLoading ? <LoadingSkeleton /> : overviewData && overviewData.length > 0 ? (
           <MobileDataTable<ProposalRow> columns={overviewColumns} dataSource={overviewData} rowKey={(r) => `${r.region}-${r.proposal_type}`} />
         ) : (
@@ -92,7 +93,7 @@ const MobileProposalSection: React.FC = () => {
         )}
       </MobileCard>
       <div style={{ height: 12 }} />
-      <MobileCard glowColor={theme.colors.accentAmber} title="多维交叉明细表" subtitle="各方案在各区域的达成矩阵">
+      <MobileCard glowColor="#F59E0B" title="多维交叉明细表" subtitle="各方案在各区域的达成矩阵">
         {crossLoading ? <LoadingSkeleton /> : crossData && crossData.length > 0 ? (
           <MobileDataTable<ProposalCrossRow> columns={crossColumns} dataSource={crossData} rowKey="region" />
         ) : (
