@@ -8,11 +8,20 @@ def get_customer_profile(db: Session) -> CustomerProfile:
     # 金额等级分布 (meeting_customer_analysis)
     level_rows = db.execute(text("""
         SELECT
-            COALESCE(customer_level, '未分类') AS name,
-            COUNT(*) AS value
-        FROM meeting_customer_analysis
-        GROUP BY name
-        ORDER BY value DESC
+          t.`name`,
+          COUNT(DISTINCT t.customer_unique_id) AS `value`
+        FROM
+          (SELECT
+            CASE
+              WHEN (TRIM(customer_level_name) = '' OR customer_level_name IS NULL) THEN '未分类' 
+              WHEN customer_level_name LIKE '%千万%' THEN '千万客户'
+              WHEN (customer_level_name LIKE '%百万%' OR customer_level_name LIKE '%300万%') THEN '百万客户'
+              ELSE '普通客户'
+            END AS `name`,
+            customer_unique_id
+          FROM
+            meeting_registration) AS t
+        GROUP BY t.`name`
     """)).mappings().all()
     total_level = sum(r["value"] for r in level_rows) or 1
     level_dist = [

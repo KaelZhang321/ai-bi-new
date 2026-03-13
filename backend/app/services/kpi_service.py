@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.schemas.kpi import KpiItem, KpiOverview
 
-TOTAL_BUDGET = 6_000_000
+TOTAL_BUDGET = 6000000
 
 
 def get_kpi_overview(db: Session) -> KpiOverview:
