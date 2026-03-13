@@ -17,3 +17,15 @@ class AchievementRow(BaseModel):
     max_limit: float
     achievement_rate: float | None
     difference: float
+
+
+class AchievementDetail(BaseModel):
+    customer_name: str | None
+    region: str | None
+    branch: str | None
+    deal_type: str | None
+    deal_content: str | None
+    new_deal_amount: float
+    received_amount: float
+    plan_type: str | None
+    record_date: str | None

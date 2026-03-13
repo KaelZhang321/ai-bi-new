@@ -19,6 +19,17 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: list[str] = ["http://localhost:5173"]
 
+    # WeCom Long Connection
+    WECOM_ENABLE_LONG_CONN: bool = False
+    WECOM_CORP_ID: str = ""
+    WECOM_CORP_SECRET: str = ""
+    WECOM_BOT_ID: str = ""
+    WECOM_BOT_SECRET: str = ""
+    WECOM_WS_ENDPOINT: str = "wss://openws.work.weixin.qq.com"
+    WECOM_HEARTBEAT_INTERVAL_MS: int = 30000
+    WECOM_RECONNECT_INTERVAL_MS: int = 1000
+    WECOM_MAX_RECONNECT_ATTEMPTS: int = 10
+
     @property
     def database_url(self) -> str:
         password = quote_plus(self.DB_PASSWORD)

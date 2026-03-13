@@ -1,7 +1,7 @@
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.schemas.registration import RegionLevelCount, MatrixRow
+from app.schemas.registration import RegionLevelCount, MatrixRow, RegistrationDetail
 
 
 def get_region_level_chart(db: Session) -> list[RegionLevelCount]:
@@ -49,3 +49,34 @@ def get_matrix_table(db: Session) -> list[MatrixRow]:
     """)
     rows = db.execute(sql).mappings().all()
     return [MatrixRow(**{k: int(v) if k != "region" else v for k, v in r.items()}) for r in rows]
+
+
+def get_registration_detail(db: Session, region: str | None = None, level: str | None = None) -> list[RegistrationDetail]:
+    """签到柱状图下钻：客户明细"""
+    conditions = ["market_service_attribution IS NOT NULL"]
+    params: dict = {}
+    if region:
+        conditions.append("SUBSTRING_INDEX(market_service_attribution, ',', 1) = :region")
+        params["region"] = region
+    if level:
+        if level == "未分类":
+            conditions.append("customer_level_name IS NULL")
+        else:
+            conditions.append("customer_level_name = :level")
+            params["level"] = level
+    where = " AND ".join(conditions)
+    sql = text(f"""
+        SELECT
+            customer_name,
+            sign_in_status,
+            customer_category,
+            customer_level_name,
+            attendee_role,
+            store_name,
+            SUBSTRING_INDEX(market_service_attribution, ',', 1) AS region
+        FROM meeting_registration
+        WHERE {where}
+        ORDER BY sign_in_status DESC, customer_name
+    """)
+    rows = db.execute(sql, params).mappings().all()
+    return [RegistrationDetail(**r) for r in rows]

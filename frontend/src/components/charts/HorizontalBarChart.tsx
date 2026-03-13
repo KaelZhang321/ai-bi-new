@@ -42,7 +42,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({ categories, ser
       },
     },
     legend: { ...baseOption.legend, top: 0 },
-    grid: { ...baseOption.grid, left: 100, right: 24 },
+    grid: { ...baseOption.grid, left: 100, right: 28 },
     xAxis: { type: 'value' as const, ...axisStyle },
     yAxis: {
       type: 'category' as const,
@@ -65,12 +65,12 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({ categories, ser
               x: 0, y: 0, x2: 1, y2: 0,
               colorStops: [
                 { offset: 0, color: chartPalette[0] },
-                { offset: 1, color: `${chartPalette[0]}60` },
+                { offset: 1, color: `${chartPalette[0]}55` },
               ],
             }
-          : 'rgba(34,211,238,0.06)',
-        shadowBlur: i === 0 ? 8 : 0,
-        shadowColor: i === 0 ? 'rgba(34,211,238,0.15)' : 'transparent',
+          : 'rgba(34,211,238,0.05)',
+        shadowBlur: i === 0 ? 6 : 0,
+        shadowColor: i === 0 ? 'rgba(34,211,238,0.12)' : 'transparent',
       },
     })),
   }
