@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useEffect, useCallback } from 'react'
 import ReactECharts from 'echarts-for-react'
 import { baseOption, axisStyle, chartPalette } from './echarts-config'
 
@@ -10,6 +10,20 @@ interface GroupedBarChartProps {
 }
 
 const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ categories, series, height = 320, onBarClick }) => {
+  const chartRef = useRef<ReactECharts>(null)
+  const isFluid = height === '100%'
+
+  useEffect(() => {
+    if (!isFluid) return
+    const el = chartRef.current?.getEchartsInstance()?.getDom()
+    if (!el) return
+    const ro = new ResizeObserver(() => {
+      chartRef.current?.getEchartsInstance()?.resize()
+    })
+    ro.observe(el.parentElement || el)
+    return () => ro.disconnect()
+  }, [isFluid])
+
   const option = {
     ...baseOption,
     color: chartPalette,
@@ -49,9 +63,8 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ categories, series, h
     })),
   }
 
-  const isFluid = height === '100%'
   const onEvents = onBarClick ? { click: (p: { name?: string; seriesName?: string }) => onBarClick(p) } : undefined
-  return <ReactECharts option={option} style={{ height, cursor: onBarClick ? 'pointer' : undefined }} onEvents={onEvents} {...(isFluid ? { opts: { height: 'auto' } } : {})} />
+  return <ReactECharts ref={chartRef} option={option} notMerge style={{ height, cursor: onBarClick ? 'pointer' : undefined }} onEvents={onEvents} {...(isFluid ? { opts: { height: 'auto' } } : {})} />
 }
 
 export default GroupedBarChart
