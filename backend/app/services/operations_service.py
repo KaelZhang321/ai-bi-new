@@ -7,22 +7,23 @@ from app.schemas.operations import OperationsKpi, TrendPoint
 def get_operations_kpi(db: Session, date_from: str | None = None, date_to: str | None = None) -> OperationsKpi:
     date_filter = ""
     if date_from and date_to:
-        date_filter = f" AND sign_in_date_1 BETWEEN '{date_from}' AND '{date_to}'"
+        date_filter_1 = f" AND sign_in_date_1 BETWEEN '{date_from}' AND '{date_to}'"
+        date_filter_2 = f" AND schedule_date BETWEEN '{date_from}' AND '{date_to}'"
 
     checkin = db.execute(text(
-        f"SELECT COUNT(DISTINCT customer_unique_id) AS cnt FROM meeting_registration WHERE sign_in_date_1 IS NOT NULL{date_filter}"
+        f"SELECT COUNT(DISTINCT customer_unique_id) AS cnt FROM meeting_registration WHERE sign_in_date_1 IS NOT NULL{date_filter_1}"
     )).mappings().first()
 
     pickup = db.execute(text(
-        f"SELECT COUNT(DISTINCT customer_unique_id) AS cnt FROM meeting_registration WHERE flight_info IS NOT NULL AND sign_in_date_1 IS NOT NULL{date_filter}"
+        f"SELECT COUNT(DISTINCT customer_unique_id) AS cnt FROM meeting_registration WHERE flight_info IS NOT NULL AND sign_in_date_1 IS NOT NULL{date_filter_1}"
     )).mappings().first()
 
     leave = db.execute(text(
-        "SELECT COALESCE(SUM(people_count), 0) AS cnt FROM meeting_schedule_stats WHERE time_period = '离开人数'"
+        f"SELECT COALESCE(SUM(people_count), 0) AS cnt FROM meeting_schedule_stats WHERE time_period = '离开人数'{date_filter_2}"
     )).mappings().first()
 
     hospital = db.execute(text(
-        "SELECT COALESCE(SUM(people_count), 0) AS cnt FROM meeting_schedule_stats WHERE time_period = '医院人数合计'"
+        f"SELECT COALESCE(SUM(people_count), 0) AS cnt FROM meeting_schedule_stats WHERE time_period = '医院人数合计'{date_filter_2}"
     )).mappings().first()
 
     return OperationsKpi(
