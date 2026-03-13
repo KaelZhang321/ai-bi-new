@@ -1,0 +1,256 @@
+/* === 移动端专属样式 === */
+
+/* 移动端容器 */
+.mobile-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg-page);
+  overflow-x: hidden;
+}
+
+/* 固定头部 */
+.mobile-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: linear-gradient(180deg, rgba(4, 13, 32, 0.98) 0%, rgba(4, 13, 32, 0.92) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(34, 211, 238, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.mobile-header-title {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--accent-cyan);
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px rgba(34, 211, 238, 0.3);
+}
+
+.mobile-header-live {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* 可滚动内容区 */
+.mobile-content {
+  padding-top: calc(44px + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(52px + env(safe-area-inset-bottom, 0px) + 8px);
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+/* 固定底部 TabBar */
+.mobile-tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(52px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: linear-gradient(180deg, rgba(4, 13, 32, 0.96) 0%, rgba(2, 10, 24, 0.99) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(34, 211, 238, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 100;
+}
+
+.mobile-tabbar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-tabbar-item svg {
+  width: 20px;
+  height: 20px;
+  transition: all 0.2s ease;
+}
+
+.mobile-tabbar-item span {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: color 0.2s ease;
+}
+
+.mobile-tabbar-item--inactive svg {
+  stroke: var(--text-secondary);
+}
+.mobile-tabbar-item--inactive span {
+  color: var(--text-secondary);
+}
+
+.mobile-tabbar-item--active svg {
+  stroke: var(--accent-cyan);
+  filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.4));
+}
+.mobile-tabbar-item--active span {
+  color: var(--accent-cyan);
+  font-weight: 600;
+}
+
+/* KPI 网格 - 2x3 */
+.mobile-kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+/* 移动端卡片 */
+.mobile-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-subtle);
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.mobile-card--glow {
+  border-color: rgba(34, 211, 238, 0.12);
+}
+
+/* 移动端 Section 间距 */
+.mobile-section {
+  margin-bottom: 16px;
+}
+
+/* 移动端 Section 标题 */
+.mobile-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.mobile-section-title__bar {
+  width: 3px;
+  height: 16px;
+  border-radius: 2px;
+}
+
+.mobile-section-title__text {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+  line-height: 1;
+}
+
+.mobile-section-title__sub {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  letter-spacing: 0.1px;
+}
+
+/* 表格横向滚动容器 */
+.mobile-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -14px;
+  padding: 0 14px;
+}
+
+.mobile-table-scroll .ant-table {
+  min-width: 500px;
+}
+
+.mobile-table-scroll .ant-table-thead > tr > th,
+.mobile-table-scroll .ant-table-thead > tr > td {
+  font-size: 10px !important;
+  padding: 8px 10px !important;
+}
+
+.mobile-table-scroll .ant-table-tbody > tr > td {
+  font-size: 12px !important;
+  padding: 8px 10px !important;
+}
+
+/* 移动端 KPI 卡片紧凑版 */
+.mobile-kpi-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-card);
+  padding: 12px 14px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.mobile-kpi-card__label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  line-height: 1;
+}
+
+.mobile-kpi-card__top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+.mobile-kpi-card__bg-num {
+  position: absolute;
+  bottom: -10px;
+  right: -4px;
+  font-size: 44px;
+  font-weight: 900;
+  font-family: var(--font-display);
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* 页面切换过渡 */
+.mobile-page-enter {
+  opacity: 0;
+  transform: translateX(16px);
+}
+.mobile-page-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.mobile-page-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+.mobile-page-exit-active {
+  opacity: 0;
+  transform: translateX(-16px);
+  transition: all 0.15s ease-out;
+}
