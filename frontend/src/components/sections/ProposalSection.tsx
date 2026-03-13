@@ -51,7 +51,7 @@ const ProposalSection: React.FC = () => {
 
   return (
     <div>
-      <SectionTitle title="VS方案情报" subtitle="各成交方案目标与达成" accentColor={theme.colors.accentAmber} />
+      <SectionTitle title="方案目标 VS 达成" subtitle="各成交方案目标与达成" accentColor={theme.colors.accentAmber} />
       <DashboardCard glowColor={theme.colors.accentAmber} title="方案概览表" subtitle="各区域各方案目标与达成">
         {overviewLoading ? <LoadingSkeleton /> : overviewData && overviewData.length > 0 ? (
           <DataTable<ProposalRow> columns={overviewColumns} dataSource={overviewData} rowKey={(r) => `${r.region}-${r.proposal_type}`} />

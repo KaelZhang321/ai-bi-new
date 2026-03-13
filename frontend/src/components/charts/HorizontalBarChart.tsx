@@ -6,13 +6,41 @@ interface HorizontalBarChartProps {
   categories: string[]
   series: { name: string; data: number[] }[]
   height?: number
+  completionRates?: Array<number | null | undefined>
 }
 
-const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({ categories, series, height = 350 }) => {
+const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({ categories, series, height = 350, completionRates }) => {
   const option = {
     ...baseOption,
     color: chartPalette,
-    tooltip: { ...baseOption.tooltip, trigger: 'axis' as const },
+    tooltip: {
+      ...baseOption.tooltip,
+      trigger: 'axis' as const,
+      formatter: (params: Array<{ axisValue: string; seriesName: string; value: number; color: string; dataIndex: number }>) => {
+        const region = params[0]?.axisValue ?? ''
+        const completionRate = completionRates?.[params[0]?.dataIndex ?? 0]
+        const rows = params.map((item) => `
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:4px;">
+            <span style="display:flex;align-items:center;gap:6px;">
+              <span style="width:8px;height:8px;border-radius:999px;background:${item.color};box-shadow:0 0 8px ${item.color}55;"></span>
+              <span>${item.seriesName}</span>
+            </span>
+            <strong style="color:#E2E8F0;">${item.value.toLocaleString()}</strong>
+          </div>
+        `).join('')
+
+        return `
+          <div style="min-width:180px;">
+            <div style="font-weight:700;color:#E2E8F0;margin-bottom:8px;">${region}</div>
+            ${rows}
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(34,211,238,0.08);">
+              <span style="color:#94A3B8;">完成度</span>
+              <strong style="color:#FBBF24;">${completionRate == null ? '-' : `${completionRate.toFixed(2)}%`}</strong>
+            </div>
+          </div>
+        `
+      },
+    },
     legend: { ...baseOption.legend, top: 0 },
     grid: { ...baseOption.grid, left: 100, right: 24 },
     xAxis: { type: 'value' as const, ...axisStyle },
@@ -47,7 +75,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({ categories, ser
     })),
   }
 
-  return <ReactECharts option={option} style={{ height }} />
+  return <ReactECharts option={option} notMerge style={{ height }} />
 }
 
 export default HorizontalBarChart

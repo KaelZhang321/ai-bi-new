@@ -47,7 +47,7 @@ const MultiLineChart: React.FC<MultiLineChartProps> = ({ categories, series, hei
     })),
   }
 
-  return <ReactECharts option={option} style={{ height }} />
+  return <ReactECharts option={option} notMerge style={{ height }} />
 }
 
 export default MultiLineChart

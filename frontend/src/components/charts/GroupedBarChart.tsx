@@ -6,19 +6,32 @@ interface GroupedBarChartProps {
   categories: string[]
   series: { name: string; data: number[] }[]
   height?: number | string
+  showLegend?: boolean
+  xAxisLabelFormatter?: (value: string) => string
 }
 
-const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ categories, series, height = 320 }) => {
+const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
+  categories,
+  series,
+  height = 320,
+  showLegend = true,
+  xAxisLabelFormatter,
+}) => {
   const option = {
     ...baseOption,
     color: chartPalette,
     tooltip: { ...baseOption.tooltip, trigger: 'axis' as const },
-    legend: { ...baseOption.legend, top: 0, itemGap: 14 },
+    legend: { ...baseOption.legend, show: showLegend, top: 0, itemGap: 14 },
     xAxis: {
       type: 'category' as const,
       data: categories,
       ...axisStyle,
-      axisLabel: { ...axisStyle.axisLabel, rotate: categories.length > 8 ? 30 : 0, interval: 0 },
+      axisLabel: {
+        ...axisStyle.axisLabel,
+        rotate: xAxisLabelFormatter ? 0 : categories.length > 8 ? 30 : 0,
+        interval: 0,
+        formatter: xAxisLabelFormatter,
+      },
     },
     yAxis: { type: 'value' as const, ...axisStyle },
     series: series.map((s, i) => ({
@@ -49,7 +62,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ categories, series, h
   }
 
   const isFluid = height === '100%'
-  return <ReactECharts option={option} style={{ height }} {...(isFluid ? { opts: { height: 'auto' } } : {})} />
+  return <ReactECharts option={option} notMerge style={{ height }} {...(isFluid ? { opts: { height: 'auto' } } : {})} />
 }
 
 export default GroupedBarChart
