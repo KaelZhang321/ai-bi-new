@@ -63,5 +63,12 @@ export const antdDarkTheme = {
       contentBg: '#071230',
       headerBg: 'transparent',
     },
+    Select: {
+      optionSelectedBg: 'rgba(34, 211, 238, 0.15)',
+      optionSelectedColor: '#22D3EE',
+      optionActiveBg: 'rgba(34, 211, 238, 0.08)',
+      selectorBg: 'rgba(34, 211, 238, 0.06)',
+      colorBorder: 'rgba(34, 211, 238, 0.15)',
+    },
   },
 }
