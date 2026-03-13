@@ -67,7 +67,7 @@ const RegistrationSection: React.FC = () => {
   return (
     <div>
       <SectionTitle title="报名 VS 签到情况" subtitle="各区域按金额等级的报名与抵达对比" accentColor={theme.colors.accentCyan} />
-      <div style={{ display: 'grid', gridTemplateColumns: '5fr 7fr', gap: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '5fr 7fr', gap: 32 }}>
         <DashboardCard title="报名/抵达统计" subtitle="按大区·金额等级 | 点击柱体查看明细" fill style={{ minHeight: 420 }}>
           <StackedBarChart categories={categories} series={series} height="100%" onBarClick={handleChartClick} />
         </DashboardCard>

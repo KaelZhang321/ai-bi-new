@@ -69,7 +69,7 @@ const OperationsSection: React.FC = () => {
         />
       </div>
       {kpiLoading ? <LoadingSkeleton /> : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 32, marginBottom: 20 }}>
           <KpiCard label="签到人数" value={kpiData?.checkin_count ?? 0} unit="人" color={theme.colors.accentCyan} />
           <KpiCard label="接机人数" value={kpiData?.pickup_count ?? 0} unit="人" color={theme.colors.accentGreen} />
           <KpiCard label="离开人数" value={kpiData?.leave_count ?? 0} unit="人" color={theme.colors.accentRed} />

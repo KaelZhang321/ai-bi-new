@@ -31,8 +31,6 @@ const Dashboard: React.FC = () => {
         <CoreKpiRow />
       </div>
 
-      <div className="bi-divider" style={{ marginBottom: 20 }} />
-
       {/* 页面内容 */}
       <AnimatePresence mode="wait">
         <motion.div key={activeTab} initial="initial" animate="animate" exit="exit" variants={pageTransition}>

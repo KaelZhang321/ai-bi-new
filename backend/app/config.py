@@ -21,6 +21,8 @@ class Settings(BaseSettings):
 
     # WeCom Long Connection
     WECOM_ENABLE_LONG_CONN: bool = False
+    WECOM_CORP_ID: str = ""
+    WECOM_CORP_SECRET: str = ""
     WECOM_BOT_ID: str = ""
     WECOM_BOT_SECRET: str = ""
     WECOM_WS_ENDPOINT: str = "wss://openws.work.weixin.qq.com"

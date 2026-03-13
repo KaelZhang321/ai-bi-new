@@ -69,8 +69,6 @@ const HeaderBar: React.FC<HeaderBarProps> = ({ activeTab, onTabChange }) => (
       </div>
     </div>
 
-    {/* 底部装饰线 */}
-    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg, transparent 5%, rgba(34,211,238,0.2) 30%, rgba(34,211,238,0.35) 50%, rgba(34,211,238,0.2) 70%, transparent 95%)` }} />
   </div>
 )
 
