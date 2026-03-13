@@ -62,14 +62,12 @@ const OperationsSection: React.FC = () => {
           }
           style={{
             flexShrink: 0,
-            background: 'rgba(34, 211, 238, 0.06)',
-            border: `1px solid ${theme.colors.accentGreen}40`,
-            borderRadius: 4,
+            borderRadius: 6,
           }}
         />
       </div>
       {kpiLoading ? <LoadingSkeleton /> : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 32, marginBottom: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
           <KpiCard label="签到人数" value={kpiData?.checkin_count ?? 0} unit="人" color={theme.colors.accentCyan} />
           <KpiCard label="接机人数" value={kpiData?.pickup_count ?? 0} unit="人" color={theme.colors.accentGreen} />
           <KpiCard label="离开人数" value={kpiData?.leave_count ?? 0} unit="人" color={theme.colors.accentRed} />
@@ -83,7 +81,7 @@ const OperationsSection: React.FC = () => {
             onChange={setSelectedScene}
             options={sceneOptions}
             size="small"
-            style={{ width: 120, flexShrink: 0 }}
+            style={{ width: 130, flexShrink: 0 }}
           />
         }
       >

@@ -30,12 +30,13 @@ const KpiCard: React.FC<KpiCardProps> = ({
       style={{
         background: theme.colors.bgCard,
         borderRadius: theme.cardRadius,
-        border: `1px solid ${color}25`,
-        padding: '20px 18px',
+        border: `1px solid ${color}20`,
+        padding: '22px 20px 20px',
         flex: 1,
         minWidth: 0,
         position: 'relative',
         overflow: 'hidden',
+        boxShadow: theme.shadows.card,
       }}
     >
       {/* HUD角标 */}
@@ -43,36 +44,66 @@ const KpiCard: React.FC<KpiCardProps> = ({
       <div className="hud-corner hud-corner--tr" data-color={colorAttr} />
       <div className="hud-corner hud-corner--bl" data-color={colorAttr} />
       <div className="hud-corner hud-corner--br" data-color={colorAttr} />
-      {/* 顶部色条 */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${color}, ${color}30)`, boxShadow: `0 0 10px ${color}30` }} />
-      {/* 背景装饰 */}
-      <div style={{ position: 'absolute', bottom: -20, right: -10, fontSize: 72, fontWeight: 900, fontFamily: theme.fontDisplay, color: `${color}06`, lineHeight: 1, userSelect: 'none', pointerEvents: 'none' }}>
+      {/* 顶部色条 - 更柔和 */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 2,
+        background: `linear-gradient(90deg, ${color}cc, ${color}40, transparent)`,
+        boxShadow: `0 0 8px ${color}25`,
+      }} />
+      {/* 背景装饰数字 */}
+      <div style={{
+        position: 'absolute',
+        bottom: -16,
+        right: -6,
+        fontSize: 68,
+        fontWeight: 900,
+        fontFamily: theme.fontDisplay,
+        color: `${color}05`,
+        lineHeight: 1,
+        userSelect: 'none',
+        pointerEvents: 'none',
+      }}>
         {Math.round(value)}
       </div>
-      <div style={{ fontSize: 11, color: theme.colors.textSecondary, marginBottom: 16, fontWeight: 500, letterSpacing: 0.5 }}>
+      {/* 标签 */}
+      <div style={{
+        fontSize: 12,
+        color: theme.colors.textSecondary,
+        marginBottom: 14,
+        fontWeight: 500,
+        letterSpacing: 0.3,
+        lineHeight: 1,
+      }}>
         {label}
       </div>
+      {/* 数值 */}
       <AnimatedNumber
         value={value}
         prefix={prefix}
         unit={unit}
         style={{
-          fontSize: 36,
+          fontSize: 34,
           fontWeight: 700,
           fontFamily: theme.fontDisplay,
-          background: `linear-gradient(180deg, ${color}, ${color}90)`,
+          background: `linear-gradient(175deg, ${color}, ${color}80)`,
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',
           letterSpacing: -0.5,
-          filter: `drop-shadow(0 0 12px ${color}40)`,
+          filter: `drop-shadow(0 0 10px ${color}35)`,
+          lineHeight: 1.1,
         }}
         unitStyle={{
-          fontSize: 14,
+          fontSize: 13,
           fontWeight: 600,
           color,
-          opacity: 0.65,
-          marginLeft: 3,
+          opacity: 0.6,
+          marginLeft: 4,
+          fontFamily: theme.fontFamily,
         }}
       />
     </div>

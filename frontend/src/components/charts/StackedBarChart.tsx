@@ -18,8 +18,8 @@ const StackedBarChart: React.FC<StackedBarChartProps> = ({ categories, series, h
     legend: {
       ...baseOption.legend,
       top: 0,
-      itemGap: manyLegends ? 8 : 14,
-      ...(manyLegends ? { type: 'scroll' as const, pageIconColor: '#94A3B8', pageTextStyle: { color: '#94A3B8' } } : {}),
+      itemGap: manyLegends ? 10 : 16,
+      ...(manyLegends ? { type: 'scroll' as const, pageIconColor: '#8896B3', pageTextStyle: { color: '#8896B3' } } : {}),
     },
     grid: { ...baseOption.grid, top: manyLegends ? 36 : 40 },
     xAxis: {
@@ -36,13 +36,13 @@ const StackedBarChart: React.FC<StackedBarChartProps> = ({ categories, series, h
       barWidth: '50%',
       itemStyle: {
         borderRadius: i === series.length - 1 ? [4, 4, 0, 0] : 0,
-        shadowBlur: 6,
-        shadowColor: 'rgba(0,0,0,0.3)',
+        shadowBlur: 4,
+        shadowColor: 'rgba(0,0,0,0.2)',
       },
       emphasis: {
         itemStyle: {
-          shadowBlur: 16,
-          shadowColor: `${chartPalette[i % chartPalette.length]}40`,
+          shadowBlur: 14,
+          shadowColor: `${chartPalette[i % chartPalette.length]}35`,
         },
       },
     })),

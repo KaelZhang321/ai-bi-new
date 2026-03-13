@@ -12,7 +12,7 @@ const CustomerProfileSection: React.FC = () => {
   return (
     <div>
       <SectionTitle title="客户画像分析" subtitle="客户金额等级、身份类型、新老客户三维画像" accentColor={theme.colors.accentPurple} />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 32 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20 }}>
         <DashboardCard glowColor={theme.colors.accentCyan} title="金额等级分布">
           <PieChart data={data.level_distribution} height={280} />
         </DashboardCard>

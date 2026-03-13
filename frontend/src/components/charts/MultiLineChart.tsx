@@ -13,7 +13,7 @@ const MultiLineChart: React.FC<MultiLineChartProps> = ({ categories, series, hei
     ...baseOption,
     color: chartPalette,
     tooltip: { ...baseOption.tooltip, trigger: 'axis' as const },
-    legend: { ...baseOption.legend, top: 0, itemWidth: 16, itemHeight: 3, itemGap: 16 },
+    legend: { ...baseOption.legend, top: 0, itemWidth: 16, itemHeight: 3, itemGap: 18 },
     xAxis: {
       type: 'category' as const,
       data: categories,
@@ -26,19 +26,19 @@ const MultiLineChart: React.FC<MultiLineChartProps> = ({ categories, series, hei
       ...s,
       type: 'line' as const,
       smooth: 0.4,
-      symbolSize: 4,
+      symbolSize: 5,
       symbol: 'circle',
       lineStyle: {
         width: 2.5,
-        shadowBlur: 10,
-        shadowColor: `${chartPalette[i % chartPalette.length]}30`,
+        shadowBlur: 8,
+        shadowColor: `${chartPalette[i % chartPalette.length]}25`,
       },
       areaStyle: {
         color: {
           type: 'linear' as const,
           x: 0, y: 0, x2: 0, y2: 1,
           colorStops: [
-            { offset: 0, color: `${chartPalette[i % chartPalette.length]}20` },
+            { offset: 0, color: `${chartPalette[i % chartPalette.length]}18` },
             { offset: 1, color: `${chartPalette[i % chartPalette.length]}02` },
           ],
         },

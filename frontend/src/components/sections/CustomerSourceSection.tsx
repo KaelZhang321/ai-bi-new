@@ -66,7 +66,7 @@ const CustomerSourceSection: React.FC = () => {
   return (
     <div>
       <SectionTitle title="客户来源 + 任务进展" subtitle="按大区·来源维度分析客户报名渠道与目标客户抵达" accentColor={theme.colors.accentGreen} />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
         <DashboardCard glowColor={theme.colors.accentCyan} title="客户报名统计" subtitle="按大区·来源类型">
           <StackedBarChart categories={sourceChart.categories} series={sourceChart.series} />
         </DashboardCard>

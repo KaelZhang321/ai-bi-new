@@ -31,14 +31,25 @@ function DrillDownModal<T extends object>({ open, title, onClose, fetchData, col
   return (
     <Modal
       open={open}
-      title={<span style={{ color: theme.colors.textPrimary }}>{title}</span>}
+      title={
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            width: 3,
+            height: 16,
+            borderRadius: 2,
+            background: `linear-gradient(180deg, ${theme.colors.accentCyan}, ${theme.colors.accentCyan}50)`,
+            boxShadow: `0 0 6px ${theme.colors.accentCyan}40`,
+          }} />
+          <span style={{ color: theme.colors.textPrimary, fontSize: 15, fontWeight: 600 }}>{title}</span>
+        </div>
+      }
       onCancel={onClose}
       footer={null}
-      width={900}
+      width={960}
       destroyOnClose
     >
       {loading ? (
-        <div style={{ textAlign: 'center', padding: 40 }}><Spin /></div>
+        <div style={{ textAlign: 'center', padding: 48 }}><Spin /></div>
       ) : (
         <Table<T>
           columns={columns}

@@ -18,8 +18,8 @@ const CoreKpiRow: React.FC = () => {
   if (isLoading || !data) return <LoadingSkeleton />
   const items = [data.registered_customers, data.arrived_customers, data.deal_amount, data.consumed_budget, data.received_amount, data.roi]
   return (
-    <div style={{ marginBottom: 8 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 32 }}>
+    <div style={{ marginBottom: 4 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 16 }}>
         {items.map((item) => (
           <KpiCard key={item.label} label={item.label} value={item.value} prefix={item.prefix} unit={item.unit} color={colorMap[item.label]} />
         ))}

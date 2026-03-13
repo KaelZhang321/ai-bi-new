@@ -14,7 +14,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ categories, series, h
     ...baseOption,
     color: chartPalette,
     tooltip: { ...baseOption.tooltip, trigger: 'axis' as const },
-    legend: { ...baseOption.legend, top: 0, itemGap: 14 },
+    legend: { ...baseOption.legend, top: 0, itemGap: 16 },
     xAxis: {
       type: 'category' as const,
       data: categories,
@@ -34,16 +34,16 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ categories, series, h
           x: 0, y: 0, x2: 0, y2: 1,
           colorStops: [
             { offset: 0, color: chartPalette[i % chartPalette.length] },
-            { offset: 1, color: `${chartPalette[i % chartPalette.length]}60` },
+            { offset: 1, color: `${chartPalette[i % chartPalette.length]}55` },
           ],
         },
-        shadowBlur: 8,
-        shadowColor: `${chartPalette[i % chartPalette.length]}20`,
+        shadowBlur: 6,
+        shadowColor: `${chartPalette[i % chartPalette.length]}18`,
       },
       emphasis: {
         itemStyle: {
-          shadowBlur: 16,
-          shadowColor: `${chartPalette[i % chartPalette.length]}40`,
+          shadowBlur: 14,
+          shadowColor: `${chartPalette[i % chartPalette.length]}35`,
         },
       },
     })),
