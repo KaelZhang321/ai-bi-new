@@ -6,9 +6,10 @@ interface GroupedBarChartProps {
   categories: string[]
   series: { name: string; data: number[] }[]
   height?: number | string
+  onBarClick?: (params: { name?: string; seriesName?: string }) => void
 }
 
-const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ categories, series, height = 320 }) => {
+const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ categories, series, height = 320, onBarClick }) => {
   const option = {
     ...baseOption,
     color: chartPalette,
@@ -49,7 +50,8 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ categories, series, h
   }
 
   const isFluid = height === '100%'
-  return <ReactECharts option={option} style={{ height }} {...(isFluid ? { opts: { height: 'auto' } } : {})} />
+  const onEvents = onBarClick ? { click: (p: { name?: string; seriesName?: string }) => onBarClick(p) } : undefined
+  return <ReactECharts option={option} style={{ height, cursor: onBarClick ? 'pointer' : undefined }} onEvents={onEvents} {...(isFluid ? { opts: { height: 'auto' } } : {})} />
 }
 
 export default GroupedBarChart

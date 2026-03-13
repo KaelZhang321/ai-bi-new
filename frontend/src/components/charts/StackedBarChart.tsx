@@ -6,14 +6,22 @@ interface StackedBarChartProps {
   categories: string[]
   series: { name: string; data: number[] }[]
   height?: number | string
+  onBarClick?: (params: { name?: string; seriesName?: string }) => void
 }
 
-const StackedBarChart: React.FC<StackedBarChartProps> = ({ categories, series, height = 320 }) => {
+const StackedBarChart: React.FC<StackedBarChartProps> = ({ categories, series, height = 320, onBarClick }) => {
+  const manyLegends = series.length > 6
   const option = {
     ...baseOption,
     color: chartPalette,
     tooltip: { ...baseOption.tooltip, trigger: 'axis' as const },
-    legend: { ...baseOption.legend, top: 0, itemGap: 14 },
+    legend: {
+      ...baseOption.legend,
+      top: 0,
+      itemGap: manyLegends ? 8 : 14,
+      ...(manyLegends ? { type: 'scroll' as const, pageIconColor: '#94A3B8', pageTextStyle: { color: '#94A3B8' } } : {}),
+    },
+    grid: { ...baseOption.grid, top: manyLegends ? 36 : 40 },
     xAxis: {
       type: 'category' as const,
       data: categories,
@@ -41,7 +49,8 @@ const StackedBarChart: React.FC<StackedBarChartProps> = ({ categories, series, h
   }
 
   const isFluid = height === '100%'
-  return <ReactECharts option={option} style={{ height }} {...(isFluid ? { opts: { height: 'auto' } } : {})} />
+  const onEvents = onBarClick ? { click: (p: { name?: string; seriesName?: string }) => onBarClick(p) } : undefined
+  return <ReactECharts option={option} style={{ height, cursor: onBarClick ? 'pointer' : undefined }} onEvents={onEvents} {...(isFluid ? { opts: { height: 'auto' } } : {})} />
 }
 
 export default StackedBarChart

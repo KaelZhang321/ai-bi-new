@@ -17,3 +17,15 @@ export const fetchProposalOverview = () =>
 
 export const fetchProposalCrossTable = () =>
   client.get<ApiResponse<ProposalCrossRow[]>>('/v1/proposal/cross-table').then(r => r.data.data)
+
+export interface ProposalDetailRow {
+  customer_name: string | null
+  region: string | null
+  deal_content: string | null
+  new_deal_amount: number
+  received_amount: number
+  record_date: string | null
+}
+
+export const fetchProposalDetail = (region?: string, proposal_type?: string) =>
+  client.get<ApiResponse<ProposalDetailRow[]>>('/v1/proposal/detail', { params: { region, proposal_type } }).then(r => r.data.data)

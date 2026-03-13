@@ -1,25 +1,13 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useCallback } from 'react'
 import { useProposalOverview, useProposalCrossTable } from '../../hooks/useApi'
 import DashboardCard from '../common/DashboardCard'
 import SectionTitle from '../common/SectionTitle'
 import LoadingSkeleton from '../common/LoadingSkeleton'
 import DataTable from '../common/DataTable'
+import DrillDownModal from '../common/DrillDownModal'
+import { fetchProposalDetail, type ProposalDetailRow } from '../../api/proposal'
 import { theme } from '../../styles/theme'
 import type { ProposalRow, ProposalCrossRow } from '../../api/proposal'
-
-const overviewColumns = [
-  { title: '大区', dataIndex: 'region', key: 'region' },
-  { title: '方案类型', dataIndex: 'proposal_type', key: 'type' },
-  { title: '目标数量', dataIndex: 'target_count', key: 'target' },
-  {
-    title: '达成数量',
-    dataIndex: 'achieved_count',
-    key: 'achieved',
-    render: (v: number, record: ProposalRow) => (
-      <span style={{ color: v >= record.target_count ? theme.colors.accentGreen : theme.colors.accentRed, fontWeight: 600 }}>{v}</span>
-    ),
-  },
-]
 
 const EmptyPlaceholder = () => (
   <div style={{ textAlign: 'center', padding: 48 }}>
@@ -28,9 +16,51 @@ const EmptyPlaceholder = () => (
   </div>
 )
 
+const detailColumns = [
+  { title: '客户姓名', dataIndex: 'customer_name', key: 'name' },
+  { title: '区域', dataIndex: 'region', key: 'region' },
+  { title: '成交内容', dataIndex: 'deal_content', key: 'content', width: 250 },
+  { title: '新成交金额', dataIndex: 'new_deal_amount', key: 'amount', render: (v: number) => <span style={{ color: theme.colors.accentCyan, fontWeight: 600 }}>¥{v.toLocaleString()}</span> },
+  { title: '收款金额', dataIndex: 'received_amount', key: 'received', render: (v: number) => `¥${v.toLocaleString()}` },
+  { title: '日期', dataIndex: 'record_date', key: 'date' },
+]
+
 const ProposalSection: React.FC = () => {
   const { data: overviewData, isLoading: overviewLoading } = useProposalOverview()
   const { data: crossData, isLoading: crossLoading } = useProposalCrossTable()
+  const [drillOpen, setDrillOpen] = useState(false)
+  const [drillRegion, setDrillRegion] = useState<string>()
+  const [drillType, setDrillType] = useState<string>()
+
+  const handleDrill = useCallback((region: string, proposalType: string) => {
+    setDrillRegion(region)
+    setDrillType(proposalType)
+    setDrillOpen(true)
+  }, [])
+
+  const fetchDetail = useCallback(
+    () => fetchProposalDetail(drillRegion, drillType),
+    [drillRegion, drillType],
+  )
+
+  const overviewColumns = useMemo(() => [
+    { title: '大区', dataIndex: 'region', key: 'region' },
+    { title: '方案类型', dataIndex: 'proposal_type', key: 'type' },
+    { title: '目标数量', dataIndex: 'target_count', key: 'target' },
+    {
+      title: '达成数量',
+      dataIndex: 'achieved_count',
+      key: 'achieved',
+      render: (v: number, record: ProposalRow) => (
+        <span
+          style={{ color: v >= record.target_count ? theme.colors.accentGreen : theme.colors.accentRed, fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}
+          onClick={() => handleDrill(record.region, record.proposal_type)}
+        >
+          {v}
+        </span>
+      ),
+    },
+  ], [handleDrill])
 
   // 动态生成交叉表列定义
   const crossColumns = useMemo(() => {
@@ -52,7 +82,7 @@ const ProposalSection: React.FC = () => {
   return (
     <div>
       <SectionTitle title="VS方案情报" subtitle="各成交方案目标与达成" accentColor={theme.colors.accentAmber} />
-      <DashboardCard glowColor={theme.colors.accentAmber} title="方案概览表" subtitle="各区域各方案目标与达成">
+      <DashboardCard glowColor={theme.colors.accentAmber} title="方案概览表" subtitle="各区域各方案目标与达成 | 点击达成数量查看明细">
         {overviewLoading ? <LoadingSkeleton /> : overviewData && overviewData.length > 0 ? (
           <DataTable<ProposalRow> columns={overviewColumns} dataSource={overviewData} rowKey={(r) => `${r.region}-${r.proposal_type}`} />
         ) : (
@@ -66,6 +96,14 @@ const ProposalSection: React.FC = () => {
           <EmptyPlaceholder />
         )}
       </DashboardCard>
+      <DrillDownModal<ProposalDetailRow>
+        open={drillOpen}
+        title={`方案成交明细 — ${drillRegion || ''} · ${drillType || ''}`}
+        onClose={() => setDrillOpen(false)}
+        fetchData={fetchDetail}
+        columns={detailColumns}
+        rowKey={(r) => `${r.customer_name}-${r.deal_content}`}
+      />
     </div>
   )
 }

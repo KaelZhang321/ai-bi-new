@@ -11,3 +11,12 @@ class ProposalRow(BaseModel):
 class ProposalCrossRow(BaseModel):
     region: str
     proposals: dict[str, int]
+
+
+class ProposalDetail(BaseModel):
+    customer_name: str | None
+    region: str | None
+    deal_content: str | None
+    new_deal_amount: float
+    received_amount: float
+    record_date: str | None

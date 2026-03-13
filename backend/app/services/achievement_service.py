@@ -1,7 +1,7 @@
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.schemas.achievement import AchievementBar, AchievementRow
+from app.schemas.achievement import AchievementBar, AchievementRow, AchievementDetail
 
 
 def get_achievement_chart(db: Session) -> list[AchievementBar]:
@@ -63,3 +63,35 @@ def get_achievement_table(db: Session) -> list[AchievementRow]:
             difference=actual - target,
         ))
     return result
+
+
+def get_achievement_detail(db: Session, region: str | None = None) -> list[AchievementDetail]:
+    """目标达成下钻：成交明细"""
+    conditions = ["deal_type = '新成交'"]
+    params: dict = {}
+    if region:
+        conditions.append("region = :region")
+        params["region"] = region
+    where = " AND ".join(conditions)
+    sql = text(f"""
+        SELECT
+            customer_name,
+            region,
+            branch,
+            deal_type,
+            deal_content,
+            COALESCE(new_deal_amount, 0) AS new_deal_amount,
+            COALESCE(received_amount, 0) AS received_amount,
+            plan_type,
+            record_date
+        FROM meeting_transaction_details
+        WHERE {where}
+        ORDER BY new_deal_amount DESC
+    """)
+    rows = db.execute(sql, params).mappings().all()
+    return [
+        AchievementDetail(
+            **{k: (str(v) if k == "record_date" and v else v) for k, v in r.items()}
+        )
+        for r in rows
+    ]

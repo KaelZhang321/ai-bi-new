@@ -1,7 +1,7 @@
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.schemas.proposal import ProposalRow, ProposalCrossRow
+from app.schemas.proposal import ProposalRow, ProposalCrossRow, ProposalDetail
 
 
 def get_proposal_overview(db: Session) -> list[ProposalRow]:
@@ -44,3 +44,38 @@ def get_proposal_cross_table(db: Session) -> list[ProposalCrossRow]:
         region_map[row.region][row.proposal_type] = row.achieved_count
 
     return [ProposalCrossRow(region=region, proposals=proposals) for region, proposals in region_map.items()]
+
+
+def get_proposal_detail(db: Session, region: str | None = None, proposal_type: str | None = None) -> list[ProposalDetail]:
+    """方案情报下钻：成交明细"""
+    conditions = ["deal_type LIKE '%新成交%'"]
+    params: dict = {}
+    if region:
+        conditions.append("region = :region")
+        params["region"] = region
+    if proposal_type:
+        if "海心卡" in proposal_type or "细胞卡" in proposal_type:
+            conditions.append("(deal_content LIKE '%海心卡%' OR deal_content LIKE '%细胞卡%')")
+        else:
+            conditions.append("deal_content LIKE CONCAT('%', :proposal_type, '%')")
+            params["proposal_type"] = proposal_type
+    where = " AND ".join(conditions)
+    sql = text(f"""
+        SELECT
+            customer_name,
+            region,
+            deal_content,
+            COALESCE(new_deal_amount, 0) AS new_deal_amount,
+            COALESCE(received_amount, 0) AS received_amount,
+            record_date
+        FROM meeting_transaction_details
+        WHERE {where}
+        ORDER BY new_deal_amount DESC
+    """)
+    rows = db.execute(sql, params).mappings().all()
+    return [
+        ProposalDetail(
+            **{k: (str(v) if k == "record_date" and v else v) for k, v in r.items()}
+        )
+        for r in rows
+    ]

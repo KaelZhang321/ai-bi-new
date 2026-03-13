@@ -7,6 +7,7 @@ from sqlalchemy import text
 from app.config import settings
 from app.db.session import engine
 from app.api.router import api_router
+from app.wecom.longconn import wecom_manager
 
 
 @asynccontextmanager
@@ -18,8 +19,16 @@ async def lifespan(app: FastAPI):
         print("✓ Database connected")
     except Exception as e:
         print(f"✗ Database connection failed: {e}")
+
+    # Startup: 启动企业微信长连接
+    await wecom_manager.start()
+
     yield
-    # Shutdown
+
+    # Shutdown: 断开企业微信长连接
+    await wecom_manager.stop()
+
+    # Shutdown: 关闭数据库连接池
     engine.dispose()
 
 

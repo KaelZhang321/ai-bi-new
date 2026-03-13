@@ -18,3 +18,13 @@ class MatrixRow(BaseModel):
     putong_arrive: int
     total_register: int
     total_arrive: int
+
+
+class RegistrationDetail(BaseModel):
+    customer_name: str | None
+    sign_in_status: str | None
+    customer_category: str | None
+    customer_level_name: str | None
+    attendee_role: str | None
+    store_name: str | None
+    region: str | None
