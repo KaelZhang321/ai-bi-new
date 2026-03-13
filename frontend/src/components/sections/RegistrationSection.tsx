@@ -44,10 +44,12 @@ const RegistrationSection: React.FC = () => {
     const levelSet = [...new Set(chartData.map((d) => d.customer_level_name || '未分类'))]
     const registerSeries = levelSet.map((level) => ({
       name: `${level}(报名)`,
+      stack: 'register',
       data: regionSet.map((region) => chartData.find((d) => d.region === region && (d.customer_level_name || '未分类') === level)?.register_count || 0),
     }))
     const arriveSeries = levelSet.map((level) => ({
       name: `${level}(抵达)`,
+      stack: 'arrive',
       data: regionSet.map((region) => chartData.find((d) => d.region === region && (d.customer_level_name || '未分类') === level)?.arrive_count || 0),
     }))
     return { categories: regionSet, series: [...registerSeries, ...arriveSeries] }

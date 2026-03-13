@@ -46,8 +46,8 @@ const StackedBarChart: React.FC<StackedBarChartProps> = ({ categories, series, h
     series: series.map((s, i) => ({
       ...s,
       type: 'bar' as const,
-      stack: 'total',
-      barWidth: '50%',
+      stack: s.stack || 'total',
+      barWidth: '35%',
       itemStyle: {
         borderRadius: i === series.length - 1 ? [4, 4, 0, 0] : 0,
         shadowBlur: 4,
