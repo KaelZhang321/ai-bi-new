@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react'
-import { useProposalOverview, useProposalCrossTable } from '../../../hooks/useApi'
+import { useProposalOverview } from '../../../hooks/useApi'
 import MobileSectionTitle from '../MobileSectionTitle'
 import MobileCard from '../MobileCard'
 import MobileDataTable from '../MobileDataTable'
 import LoadingSkeleton from '../../common/LoadingSkeleton'
-import type { ProposalRow, ProposalCrossRow } from '../../../api/proposal'
+import type { ProposalRow } from '../../../api/proposal'
 
 const mono = "'JetBrains Mono', monospace"
 
@@ -19,13 +19,19 @@ const EmptyPlaceholder = () => (
 
 const MobileProposalSection: React.FC = () => {
   const { data: overviewData, isLoading: overviewLoading } = useProposalOverview()
-  const { data: crossData, isLoading: crossLoading } = useProposalCrossTable()
 
   const overviewColumns = useMemo(() => [
     { title: '方案', dataIndex: 'proposal_type', key: 'type', width: 70 },
-    { title: '目标', dataIndex: 'target_count', key: 'target', width: 50 },
+    { title: '目标数量', dataIndex: 'target_count', key: 'target', width: 56 },
     {
-      title: '实际数',
+      title: '目标金额(万)',
+      dataIndex: 'target_amount',
+      key: 'target_amount',
+      width: 88,
+      render: (v: number) => <span style={{ color: '#F59E0B', fontWeight: 600, fontFamily: mono }}>¥{Number(v ?? 0).toLocaleString()}</span>,
+    },
+    {
+      title: '实际数量',
       dataIndex: 'actual_count',
       key: 'actual_count',
       width: 60,
@@ -36,7 +42,7 @@ const MobileProposalSection: React.FC = () => {
       ),
     },
     {
-      title: '实际金额',
+      title: '实际金额(万)',
       dataIndex: 'actual_amount',
       key: 'actual_amount',
       width: 88,
@@ -44,37 +50,14 @@ const MobileProposalSection: React.FC = () => {
     },
   ], [])
 
-  const crossColumns = useMemo(() => {
-    if (!crossData || crossData.length === 0) return []
-    const proposalTypes = [...new Set(crossData.flatMap((r) => Object.keys(r.proposals)))]
-    return [
-      { title: '大区', dataIndex: 'region', key: 'region', fixed: 'left' as const, width: 60 },
-      ...proposalTypes.map((pt) => ({
-        title: pt,
-        key: pt,
-        dataIndex: ['proposals', pt] as [string, string],
-        width: 60,
-        render: (v: number) => <span style={{ color: v > 0 ? '#3B82F6' : '#9CA3AF', fontWeight: v > 0 ? 600 : 400, fontFamily: mono }}>{v ?? 0}</span>,
-      })),
-    ]
-  }, [crossData])
-
-  if (overviewLoading && crossLoading) return <LoadingSkeleton />
+  if (overviewLoading) return <LoadingSkeleton />
 
   return (
     <div>
-      <MobileSectionTitle title="VS方案情报" subtitle="各方案目标与达成" accentColor="#F59E0B" />
+      <MobileSectionTitle title="方案目标 VS 达成" subtitle="各成交方案目标与达成" accentColor="#F59E0B" />
       <MobileCard glowColor="#F59E0B" title="方案概览表" subtitle="各方案目标配置与实际达成">
-        {overviewLoading ? <LoadingSkeleton /> : overviewData && overviewData.length > 0 ? (
+        {overviewData && overviewData.length > 0 ? (
           <MobileDataTable<ProposalRow> columns={overviewColumns} dataSource={overviewData} rowKey={(r) => `${r.proposal_type}-${r.sub_proposal_type || 'default'}`} />
-        ) : (
-          <EmptyPlaceholder />
-        )}
-      </MobileCard>
-      <div style={{ height: 12 }} />
-      <MobileCard glowColor="#F59E0B" title="多维交叉明细表" subtitle="各方案在各区域的达成矩阵">
-        {crossLoading ? <LoadingSkeleton /> : crossData && crossData.length > 0 ? (
-          <MobileDataTable<ProposalCrossRow> columns={crossColumns} dataSource={crossData} rowKey="region" />
         ) : (
           <EmptyPlaceholder />
         )}

@@ -29,8 +29,8 @@ COPY backend/ ./
 # 复制 aibot-python-sdk（后端通过 sys.path 加载）
 COPY aibot-python-sdk/ /app/aibot-python-sdk/
 
-# 复制前端构建产物到 nginx
-COPY --from=frontend-build /app/frontend/dist /usr/share/nginx/html
+# 复制前端构建产物到 nginx（放到 /meeting/ 子目录）
+COPY --from=frontend-build /app/frontend/dist /usr/share/nginx/html/meeting
 
 # Nginx 配置
 RUN cat > /etc/nginx/sites-available/default << 'NGINX'
@@ -38,16 +38,20 @@ server {
     listen 80;
     server_name _;
 
-    root /usr/share/nginx/html;
-    index index.html;
-
-    # 前端静态文件 + SPA fallback
-    location / {
-        try_files $uri $uri/ /index.html;
+    # 根路径重定向到 /meeting/
+    location = / {
+        return 302 /meeting/;
     }
 
-    # API 反向代理到后端（保留 /api 前缀）
-    location /api/ {
+    # 前端静态文件 + SPA fallback
+    location /meeting/ {
+        alias /usr/share/nginx/html/meeting/;
+        try_files $uri $uri/ /meeting/index.html;
+    }
+
+    # API 反向代理：/meeting/api/... -> 后端 /api/...
+    location /meeting/api/ {
+        rewrite ^/meeting(/api/.*)$ $1 break;
         proxy_pass http://127.0.0.1:8000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -66,7 +70,8 @@ server {
     }
 
     # 静态资源缓存
-    location /assets/ {
+    location /meeting/assets/ {
+        alias /usr/share/nginx/html/meeting/assets/;
         expires 30d;
         add_header Cache-Control "public, immutable";
     }

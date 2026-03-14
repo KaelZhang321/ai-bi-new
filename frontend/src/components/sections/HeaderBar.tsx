@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useMemo } from 'react'
+import dayjs from 'dayjs'
 import { theme } from '../../styles/theme'
 
 interface HeaderBarProps {
@@ -12,7 +13,9 @@ const tabs = [
   { id: 2, label: '三 · 目标达成' },
 ]
 
-const HeaderBar: React.FC<HeaderBarProps> = ({ activeTab, onTabChange }) => (
+const HeaderBar: React.FC<HeaderBarProps> = ({ activeTab, onTabChange }) => {
+  const todayStr = useMemo(() => dayjs().format('YYYY-MM-DD'), [])
+  return (
   <div style={{ position: 'relative', padding: '20px 0 14px', marginBottom: 8 }}>
     {/* 背景光晕 */}
     <div style={{
@@ -71,7 +74,7 @@ const HeaderBar: React.FC<HeaderBarProps> = ({ activeTab, onTabChange }) => (
               fontFamily: theme.fontMono,
               letterSpacing: 0.5,
             }}>
-              2024-12-14 ~ 2024-12-20
+              {todayStr}
             </span>
             <div style={{ width: 1, height: 12, background: 'rgba(34,211,238,0.12)' }} />
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -110,6 +113,7 @@ const HeaderBar: React.FC<HeaderBarProps> = ({ activeTab, onTabChange }) => (
       </div>
     </div>
   </div>
-)
+  )
+}
 
 export default HeaderBar

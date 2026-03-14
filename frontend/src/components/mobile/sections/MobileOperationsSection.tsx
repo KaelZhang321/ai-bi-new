@@ -24,15 +24,20 @@ const MobileOperationsSection: React.FC = () => {
 
   const trendChart = useMemo(() => {
     if (!trendData) return { categories: [], series: [] }
-    const timeLabels = [...new Set(trendData.map((d) => `${d.schedule_date.slice(5)} ${d.day_time_period}`))]
-    const sceneLabels = selectedScene === 'all'
-      ? [...new Set(trendData.map((d) => d.scene_label))]
-      : [selectedScene]
+
+    const filteredTrendData = selectedScene === 'all'
+      ? trendData
+      : trendData.filter((d) => d.scene_label === selectedScene)
+
+    const timeLabels = [...new Set(filteredTrendData.map((d) => `${d.schedule_date.slice(5)} ${d.day_time_period}`))]
+
+    const sceneLabels = [...new Set(filteredTrendData.map((d) => d.scene_label))]
+
     const series = sceneLabels.map((scene) => ({
       name: scene,
       data: timeLabels.map((t) => {
         const [date, period] = t.split(' ')
-        return trendData.find((d) => d.schedule_date.slice(5) === date && d.day_time_period === period && d.scene_label === scene)?.people_count || 0
+        return filteredTrendData.find((d) => d.schedule_date.slice(5) === date && d.day_time_period === period && d.scene_label === scene)?.people_count || 0
       }),
     }))
     return { categories: timeLabels, series }
@@ -45,7 +50,7 @@ const MobileOperationsSection: React.FC = () => {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-        <MobileSectionTitle title="会议运营数据" subtitle="实时运营概况" accentColor="#10B981" />
+        <MobileSectionTitle title="会议运营数据" subtitle="实时运营概况与时间维度趋势分析" accentColor="#10B981" />
         <DatePicker
           defaultValue={dayjs()}
           onChange={handleDateChange}
@@ -65,7 +70,7 @@ const MobileOperationsSection: React.FC = () => {
       <MobileCard
         glowColor="#10B981"
         title="时间维度数据分析"
-        subtitle="人流趋势 · 按场景"
+        subtitle="人流热力图 · 会期时间段（上午/下午/晚上）× 关键场景"
         extra={
           <Select
             value={selectedScene}
