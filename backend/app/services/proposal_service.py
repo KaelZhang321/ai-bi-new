@@ -6,48 +6,13 @@ from app.schemas.proposal import ProposalRow, ProposalCrossRow, ProposalDetail
 def get_proposal_overview(db: Session) -> list[ProposalRow]:
     sql = text("""
             SELECT
-                p.proposal_type,
-                p.target_count,
-                p.target_amount,
-                
-                -- [新增] 1. 统计实际成交数量
-                COALESCE((
-                    SELECT COUNT(1) 
-                    FROM meeting_transaction_details d
-                    WHERE d.deal_type LIKE '%新成交%'
-                      AND (
-                        d.deal_content LIKE CONCAT('%', p.proposal_type, '%')
-                        OR (
-                          p.proposal_type REGEXP '海心卡|细胞卡'
-                          AND d.deal_content REGEXP '海心卡|细胞卡'
-                        )
-                      )
-                ), 0) AS actual_count,
-            
-                -- 2. 统计实际成交金额
-                COALESCE((
-                    SELECT SUM(COALESCE(d.new_deal_amount, 0))
-                    FROM meeting_transaction_details d
-                    WHERE d.deal_type LIKE '%新成交%'
-                      AND (
-                        d.deal_content LIKE CONCAT('%', p.proposal_type, '%')
-                        OR (
-                          p.proposal_type REGEXP '海心卡|细胞卡'
-                          AND d.deal_content REGEXP '海心卡|细胞卡'
-                        )
-                      )
-                ), 0) AS actual_amount
-            
-            FROM (
-                -- 派生表：汇总目标数据
-                SELECT
-                    proposal_type,
-                    SUM(COALESCE(target_count, 0)) AS target_count,
-                    SUM(COALESCE(target_amount, 0)) AS target_amount
-                FROM meeting_proposal_targets
-                GROUP BY proposal_type
-            ) AS p
-            ORDER BY p.proposal_type ASC;
+                proposal_type,
+                target_count,
+                target_amount,
+                actual_count,
+                actual_amount
+            FROM meeting_proposal_targets
+            ORDER BY proposal_type;
     """)
     rows = db.execute(sql).mappings().all()
     return [

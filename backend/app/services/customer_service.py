@@ -12,12 +12,7 @@ def get_customer_profile(db: Session) -> CustomerProfile:
           COUNT(DISTINCT t.customer_unique_id) AS `value`
         FROM
           (SELECT
-            CASE
-              WHEN (TRIM(customer_level_name) = '' OR customer_level_name IS NULL) THEN '未分类' 
-              WHEN customer_level_name LIKE '%千万%' THEN '千万客户'
-              WHEN (customer_level_name LIKE '%百万%' OR customer_level_name LIKE '%300万%') THEN '百万客户'
-              ELSE '普通客户'
-            END AS `name`,
+            IF (TRIM(customer_level_name) = '' OR customer_level_name IS NULL, '未分类', customer_level_name) AS `name`,
             customer_unique_id
           FROM
             meeting_registration) AS t
@@ -33,11 +28,19 @@ def get_customer_profile(db: Session) -> CustomerProfile:
     # 身份类型分布 (meeting_registration.attendee_role)
     role_rows = db.execute(text("""
         SELECT
-            COALESCE(attendee_role, '未知') AS name,
-            COUNT(DISTINCT customer_unique_id) AS value
-        FROM meeting_registration
-        GROUP BY name
-        ORDER BY value DESC
+            CASE
+                WHEN (TRIM(real_identity) = '' OR real_identity IS NULL) THEN '未分类'
+                WHEN real_identity LIKE '%陪同%' THEN '陪同'
+                WHEN real_identity LIKE '%观摩%' THEN '观摩'
+                WHEN real_identity LIKE '%市场%' THEN '市场'
+                WHEN real_identity LIKE '%家属%' THEN '家属'
+                ELSE '客户'
+            END AS `name`,
+            COUNT(DISTINCT customer_unique_id) AS `value`
+        FROM
+            meeting_registration
+        GROUP BY `name`
+        ORDER BY `value` DESC
     """)).mappings().all()
     total_role = sum(r["value"] for r in role_rows) or 1
     role_dist = [
@@ -49,9 +52,12 @@ def get_customer_profile(db: Session) -> CustomerProfile:
     # 新老客户 (meeting_registration.customer_category)
     new_old_rows = db.execute(text("""
         SELECT
-            COALESCE(customer_category, '未知') AS name,
+            IF(customer_category LIKE '%新%', '新客户', '老客户') AS name,
             COUNT(DISTINCT customer_unique_id) AS value
         FROM meeting_registration
+        WHERE TRIM(customer_category) != '' 
+        AND customer_category IS NOT NULL
+        AND (customer_category LIKE '%新%' OR customer_category LIKE '%老%')
         GROUP BY name
         ORDER BY value DESC
     """)).mappings().all()
