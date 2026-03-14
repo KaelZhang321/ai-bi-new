@@ -15,6 +15,7 @@ frontend/dist/
 .env
 .env.local
 .env.*.local
+backend/.env.compose
 
 # IDE
 .vscode/
