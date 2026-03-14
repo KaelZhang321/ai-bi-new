@@ -10650,6 +10650,285 @@
           ]
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "QUmsN",
+      "x": 0,
+      "y": 1040,
+      "name": "A-3 权益方案模板管理",
+      "clip": true,
+      "width": 1440,
+      "height": 920,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "SgQJz",
+          "name": "Header",
+          "width": "fill_container",
+          "height": 64,
+          "fill": "#FFFFFF",
+          "padding": [
+            0,
+            24
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center"
+        },
+        {
+          "type": "frame",
+          "id": "1qUHg",
+          "name": "Divider",
+          "width": "fill_container",
+          "height": 1,
+          "fill": "#EBEEF5"
+        },
+        {
+          "type": "frame",
+          "id": "LaCz3",
+          "name": "Stats",
+          "width": "fill_container",
+          "height": 100,
+          "fill": "#F5F7FA",
+          "gap": 16,
+          "padding": [
+            16,
+            24
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "NpBFh",
+          "name": "Filter",
+          "width": "fill_container",
+          "height": 56,
+          "fill": "#FFFFFF",
+          "gap": 12,
+          "padding": [
+            10,
+            24
+          ],
+          "alignItems": "center"
+        },
+        {
+          "type": "frame",
+          "id": "7i6wo",
+          "name": "Table",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": "#FFFFFF",
+          "layout": "vertical",
+          "padding": [
+            0,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "type": "note",
+      "id": "oKSrp",
+      "x": 1460,
+      "y": 1040,
+      "name": "A-3 Note",
+      "width": 440,
+      "height": 0,
+      "content": "A-3 权益方案模板管理\n[页面目标]\n- 统一管理权益方案模板、版本状态与合同引用情况。\n[核心交互流程]\n- 默认展示模板统计、筛选、模板列表；点击 新建方案 进入 A-4，点击 预览 打开 A-5。\n[关键字段与校验]\n- 方案编码自动生成；方案名称、分类、版本、标准售价为核心字段。\n[业务约束与状态]\n- 当前版本可编辑；归档版本只读；有关联合同的模板不允许删除。\n[页面跳转与触发条件]\n- 点击 详情 / 编辑 进入 A-4；点击 预览 打开 A-5；点击 归档版本 查看历史版本筛选态。"
+    },
+    {
+      "type": "frame",
+      "id": "iJUmI",
+      "x": 1940,
+      "y": 1040,
+      "name": "A-4 新建编辑权益方案模板",
+      "clip": true,
+      "width": 1600,
+      "height": 920,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "DDwdj",
+          "name": "Header",
+          "width": "fill_container",
+          "height": 64,
+          "fill": "#FFFFFF",
+          "padding": [
+            0,
+            24
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center"
+        },
+        {
+          "type": "frame",
+          "id": "UTBJc",
+          "name": "Divider",
+          "width": "fill_container",
+          "height": 1,
+          "fill": "#EBEEF5"
+        },
+        {
+          "type": "frame",
+          "id": "IE7v5",
+          "name": "Body",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": "#F5F7FA",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            16,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "type": "note",
+      "id": "50wCO",
+      "x": 3560,
+      "y": 1040,
+      "name": "A-4 Note",
+      "width": 460,
+      "height": 0,
+      "content": "A-4 新建/编辑权益方案模板\n[页面目标]\n- 完成方案基础信息配置、物料组合、附加服务及定价计算。\n[核心交互流程]\n- 先填写基础信息，再添加物料与附加项，系统自动汇总建议售价、成本价、毛利率，最后保存新版本。\n[关键字段与校验]\n- 方案名称、方案分类、有效期、至少1个物料项为必填；数量需为正整数。\n[业务约束与状态]\n- 保存后生成新版本并归档旧版本；设备/高端物料不参与点数兑换时需继承物料库配置。\n[页面跳转与触发条件]\n- 从 A-3 的 新建方案/编辑 进入；点击 添加物料 打开物料选择层，点击 保存 返回 A-3。"
+    },
+    {
+      "type": "frame",
+      "id": "sDiPT",
+      "x": 4060,
+      "y": 1040,
+      "name": "A-5 方案模板预览弹窗",
+      "clip": true,
+      "width": 620,
+      "height": 760,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "qFtgi",
+          "name": "Header",
+          "width": "fill_container",
+          "height": 64,
+          "fill": "#FFFFFF",
+          "padding": [
+            0,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center"
+        },
+        {
+          "type": "frame",
+          "id": "6wsjS",
+          "name": "Divider",
+          "width": "fill_container",
+          "height": 1,
+          "fill": "#EBEEF5"
+        },
+        {
+          "type": "frame",
+          "id": "rAEnT",
+          "name": "Body",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": "#FFFFFF",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            16,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "type": "note",
+      "id": "Rtjh8",
+      "x": 4700,
+      "y": 1040,
+      "name": "A-5 Note",
+      "width": 420,
+      "height": 0,
+      "content": "A-5 方案模板预览\n[页面目标]\n- 以会员视角预览方案卡片，校验展示信息是否可对外发布。\n[核心交互流程]\n- 从方案模板列表点击 预览 打开；展示权益分类、数量与标准售价，不展示内部成本信息。\n[关键字段与校验]\n- 权益名称、数量、展示分组需与模板配置一致；缺少封面信息时使用默认卡片样式。\n[业务约束与状态]\n- 仅展示会员可见字段；成本价、毛利率、结算价默认隐藏。\n[页面跳转与触发条件]\n- 从 A-3 的 预览 打开；关闭后返回原列表筛选状态。"
+    },
+    {
+      "type": "frame",
+      "id": "fbE5u",
+      "x": 0,
+      "y": 2080,
+      "name": "A-6 价格变更审计日志",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "L1Ui7",
+          "name": "Header",
+          "width": "fill_container",
+          "height": 64,
+          "fill": "#FFFFFF",
+          "padding": [
+            0,
+            24
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center"
+        },
+        {
+          "type": "frame",
+          "id": "7hVTC",
+          "name": "Divider",
+          "width": "fill_container",
+          "height": 1,
+          "fill": "#EBEEF5"
+        },
+        {
+          "type": "frame",
+          "id": "g4rxM",
+          "name": "Filter",
+          "width": "fill_container",
+          "height": 56,
+          "fill": "#FFFFFF",
+          "gap": 12,
+          "padding": [
+            10,
+            24
+          ],
+          "alignItems": "center"
+        },
+        {
+          "type": "frame",
+          "id": "fV56J",
+          "name": "Table",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": "#FFFFFF",
+          "layout": "vertical",
+          "padding": [
+            0,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "type": "note",
+      "id": "DUcoE",
+      "x": 1460,
+      "y": 2080,
+      "name": "A-6 Note",
+      "width": 440,
+      "height": 0,
+      "content": "A-6 价格变更审计日志\n[页面目标]\n- 追踪物料与方案的价格变更、审批链与操作留痕。\n[核心交互流程]\n- 从物料库更新时间或管理菜单进入；通过筛选查询变更记录，可执行受控导出。\n[关键字段与校验]\n- 类型、对象、变更前后值、操作人、审批人、变更原因需完整返回；时间范围支持开始/结束校验。\n[业务约束与状态]\n- 审计日志只读不可删改；导出需二次身份校验。\n[页面跳转与触发条件]\n- 从 KAM-1 更新时间或管理入口进入；点击对象名称可回跳物料/方案详情。"
     }
   ],
   "themes": {
