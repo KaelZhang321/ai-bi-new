@@ -15,6 +15,8 @@ const columns = [
   { title: '千万(到)', dataIndex: 'qianwan_arrive', key: 'qa', width: 62, render: (v: number) => <span style={{ color: v > 0 ? '#10B981' : '#9CA3AF', fontWeight: v > 0 ? 600 : 400 }}>{v}</span> },
   { title: '百万(报)', dataIndex: 'baiwan_register', key: 'br', width: 62 },
   { title: '百万(到)', dataIndex: 'baiwan_arrive', key: 'ba', width: 62, render: (v: number) => <span style={{ color: v > 0 ? '#10B981' : '#9CA3AF', fontWeight: v > 0 ? 600 : 400 }}>{v}</span> },
+  { title: '普通(报)', dataIndex: 'putong_register', key: 'pr', width: 62 },
+  { title: '普通(到)', dataIndex: 'putong_arrive', key: 'pa', width: 62, render: (v: number) => <span style={{ color: v > 0 ? '#10B981' : '#9CA3AF', fontWeight: v > 0 ? 600 : 400 }}>{v}</span> },
   { title: '总报名', dataIndex: 'total_register', key: 'tr', width: 56, render: (v: number) => <strong style={{ color: '#3B82F6' }}>{v}</strong> },
   { title: '总抵达', dataIndex: 'total_arrive', key: 'ta', width: 56, render: (v: number) => <strong style={{ color: '#10B981' }}>{v}</strong> },
 ]
@@ -22,8 +24,10 @@ const columns = [
 const detailColumns = [
   { title: '客户姓名', dataIndex: 'customer_name', key: 'name', width: 80 },
   { title: '签到状态', dataIndex: 'sign_in_status', key: 'status', width: 70, render: (v: string) => <span style={{ color: v === '已签到' ? '#10B981' : '#9CA3AF' }}>{v || '-'}</span> },
+  { title: '客户类别', dataIndex: 'customer_category', key: 'category', width: 70 },
   { title: '金额等级', dataIndex: 'customer_level_name', key: 'level', width: 70, render: (v: string | null) => v || '未分类' },
   { title: '参会角色', dataIndex: 'attendee_role', key: 'role', width: 70 },
+  { title: '店铺来源', dataIndex: 'store_name', key: 'store', width: 80 },
 ]
 
 const MobileRegistrationSection: React.FC = () => {
@@ -67,8 +71,8 @@ const MobileRegistrationSection: React.FC = () => {
 
   return (
     <div>
-      <MobileSectionTitle title="报名 VS 签到" subtitle="各区域按金额等级对比" accentColor="#3B82F6" />
-      <MobileCard title="报名/抵达统计" subtitle="点击柱体查看明细" glowColor="#3B82F6">
+      <MobileSectionTitle title="报名 VS 签到情况" subtitle="各区域按金额等级的报名与抵达对比" accentColor="#3B82F6" />
+      <MobileCard title="报名/抵达统计" subtitle="按大区·金额等级 | 点击柱体查看明细" glowColor="#3B82F6">
         <StackedBarChart categories={categories} series={series} height={260} onBarClick={handleChartClick} />
       </MobileCard>
       <div style={{ height: 12 }} />

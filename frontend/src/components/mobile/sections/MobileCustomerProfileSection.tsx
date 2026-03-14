@@ -11,7 +11,7 @@ const MobileCustomerProfileSection: React.FC = () => {
 
   return (
     <div>
-      <MobileSectionTitle title="客户画像分析" subtitle="金额等级·身份类型·新老客户" accentColor="#8B5CF6" />
+      <MobileSectionTitle title="客户画像分析" subtitle="客户金额等级、身份类型、新老客户三维画像" accentColor="#8B5CF6" />
       <MobileCard glowColor="#3B82F6" title="金额等级分布">
         <PieChart data={data.level_distribution} height={220} />
       </MobileCard>

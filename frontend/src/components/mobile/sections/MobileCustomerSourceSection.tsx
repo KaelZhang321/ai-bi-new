@@ -10,8 +10,11 @@ import { fetchTargetCustomerDetail, type TargetCustomerDetail } from '../../../a
 
 const detailColumns = [
   { title: '客户姓名', dataIndex: 'customer_name', key: 'name', width: 80 },
+  { title: '区域', dataIndex: 'region', key: 'region', width: 60 },
   { title: '客户等级', dataIndex: 'customer_level', key: 'level', width: 70 },
   { title: '新老客户', dataIndex: 'new_or_old_customer', key: 'newold', width: 70 },
+  { title: '成交低限', dataIndex: 'min_deal', key: 'min', width: 70, render: (v: number | null) => v != null ? `¥${v.toLocaleString()}` : '-' },
+  { title: '成交高限', dataIndex: 'max_deal', key: 'max', width: 70, render: (v: number | null) => v != null ? `¥${v.toLocaleString()}` : '-' },
   { title: '铺垫成熟度', dataIndex: 'prep_maturity', key: 'prep', width: 80 },
   { title: '是否抵达', dataIndex: 'is_arrived', key: 'arrived', width: 70, render: (v: boolean) => <span style={{ color: v ? '#10B981' : '#EF4444', fontWeight: 600 }}>{v ? '已抵达' : '未抵达'}</span> },
 ]
@@ -60,7 +63,7 @@ const MobileCustomerSourceSection: React.FC = () => {
 
   return (
     <div>
-      <MobileSectionTitle title="客户来源 + 任务进展" subtitle="来源渠道与目标客户抵达" accentColor="#10B981" />
+      <MobileSectionTitle title="客户来源 + 任务进展" subtitle="按大区·来源维度分析客户报名渠道与目标客户抵达" accentColor="#10B981" />
       <MobileCard glowColor="#3B82F6" title="客户报名统计" subtitle="按大区·来源类型">
         <StackedBarChart categories={sourceChart.categories} series={sourceChart.series} height={260} />
       </MobileCard>

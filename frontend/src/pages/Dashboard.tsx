@@ -7,6 +7,7 @@ import PageCustomer from './PageCustomer'
 import PageOperations from './PageOperations'
 import PageAchievement from './PageAchievement'
 import { theme } from '../styles/theme'
+import aiIcon from '../styles/AI.png'
 
 const pages = [PageCustomer, PageOperations, PageAchievement]
 
@@ -60,28 +61,20 @@ const Dashboard: React.FC = () => {
           position: 'fixed',
           bottom: 32,
           right: 32,
-          width: 52,
-          height: 52,
-          borderRadius: 14,
-          border: `1px solid ${theme.colors.accentCyan}30`,
-          background: `linear-gradient(135deg, ${theme.colors.bgCardSolid} 0%, rgba(34,211,238,0.08) 100%)`,
-          color: theme.colors.accentCyan,
+          width: 64,
+          height: 64,
+          borderRadius: '50%',
+          border: 'none',
+          background: 'transparent',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: `0 4px 24px rgba(0,0,0,0.4), 0 0 24px ${theme.colors.accentCyan}10`,
+          padding: 0,
           zIndex: 900,
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
         }}
       >
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z" />
-          <path d="M18 14a6 6 0 0 1-12 0" />
-          <path d="M12 18v4" />
-          <path d="M8 22h8" />
-        </svg>
+        <img src={aiIcon} alt="AI" style={{ width: 64, height: 64, borderRadius: '50%' }} />
       </motion.button>
 
       {/* AI 聊天面板 */}
