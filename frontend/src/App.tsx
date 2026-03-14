@@ -16,6 +16,10 @@ const queryClient = new QueryClient({
   },
 })
 
+const routerBase = import.meta.env.BASE_URL === '/'
+  ? undefined
+  : import.meta.env.BASE_URL.replace(/\/$/, '')
+
 function isMobile(): boolean {
   if (typeof window === 'undefined') return false
   const ua = navigator.userAgent
@@ -34,7 +38,7 @@ const HomeRoute: React.FC = () => {
 const App: React.FC = () => (
   <QueryClientProvider client={queryClient}>
     <ConfigProvider theme={antdDarkTheme}>
-      <BrowserRouter>
+      <BrowserRouter basename={routerBase}>
         <Routes>
           <Route path="/" element={<HomeRoute />} />
           <Route path="/mobile" element={<MobileDashboard />} />
