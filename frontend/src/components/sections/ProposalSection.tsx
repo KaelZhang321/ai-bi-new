@@ -7,17 +7,30 @@ import DataTable from '../common/DataTable'
 import { theme } from '../../styles/theme'
 import type { ProposalRow, ProposalCrossRow } from '../../api/proposal'
 
+interface ProposalSectionProps {
+  showSectionTitle?: boolean
+  showOverview?: boolean
+  showCross?: boolean
+  reserveSectionTitleSpace?: boolean
+}
+
 const overviewColumns = [
-  { title: '大区', dataIndex: 'region', key: 'region' },
-  { title: '方案类型', dataIndex: 'proposal_type', key: 'type' },
-  { title: '目标数量', dataIndex: 'target_count', key: 'target' },
+  { title: '方案名称', dataIndex: 'proposal_type', key: 'type', width: 180 },
+  { title: '目标数量', dataIndex: 'target_count', key: 'target_count', width: 100 },
   {
-    title: '达成数量',
-    dataIndex: 'achieved_count',
-    key: 'achieved',
-    render: (v: number, record: ProposalRow) => (
-      <span style={{ color: v >= record.target_count ? theme.colors.accentGreen : theme.colors.accentRed, fontWeight: 600 }}>{v}</span>
-    ),
+    title: '目标金额(万)',
+    dataIndex: 'target_amount',
+    key: 'target_amount',
+    width: 120,
+    render: (v: number) => <span style={{ color: theme.colors.accentAmber, fontWeight: 600 }}>¥{Number(v ?? 0).toLocaleString()}</span>,
+  },
+  { title: '实际数量', dataIndex: 'actual_count', key: 'actual_count', width: 100 },
+  {
+    title: '实际金额(万)',
+    dataIndex: 'actual_amount',
+    key: 'actual_amount',
+    width: 120,
+    render: (v: number) => <span style={{ color: theme.colors.accentGreen, fontWeight: 600 }}>¥{Number(v ?? 0).toLocaleString()}</span>,
   },
 ]
 
@@ -28,9 +41,15 @@ const EmptyPlaceholder = () => (
   </div>
 )
 
-const ProposalSection: React.FC = () => {
+const ProposalSection: React.FC<ProposalSectionProps> = ({
+  showSectionTitle = true,
+  showOverview = true,
+  showCross = true,
+  reserveSectionTitleSpace = false,
+}) => {
   const { data: overviewData, isLoading: overviewLoading } = useProposalOverview()
   const { data: crossData, isLoading: crossLoading } = useProposalCrossTable()
+  const singleCardMode = [showOverview, showCross].filter(Boolean).length === 1
 
   // 动态生成交叉表列定义
   const crossColumns = useMemo(() => {
@@ -50,22 +69,53 @@ const ProposalSection: React.FC = () => {
   if (overviewLoading && crossLoading) return <LoadingSkeleton />
 
   return (
-    <div>
-      <SectionTitle title="方案目标 VS 达成" subtitle="各成交方案目标与达成" accentColor={theme.colors.accentAmber} />
-      <DashboardCard glowColor={theme.colors.accentAmber} title="方案概览表" subtitle="各区域各方案目标与达成">
-        {overviewLoading ? <LoadingSkeleton /> : overviewData && overviewData.length > 0 ? (
-          <DataTable<ProposalRow> columns={overviewColumns} dataSource={overviewData} rowKey={(r) => `${r.region}-${r.proposal_type}`} />
-        ) : (
-          <EmptyPlaceholder />
-        )}
-      </DashboardCard>
-      <DashboardCard glowColor={theme.colors.accentAmber} title="多维交叉明细表" subtitle="各方案在各区域的达成矩阵" style={{ marginTop: 16 }}>
-        {crossLoading ? <LoadingSkeleton /> : crossData && crossData.length > 0 ? (
-          <DataTable<ProposalCrossRow> columns={crossColumns} dataSource={crossData} rowKey="region" />
-        ) : (
-          <EmptyPlaceholder />
-        )}
-      </DashboardCard>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      {showSectionTitle && (
+        <SectionTitle title="方案目标 VS 达成" subtitle="各成交方案目标与达成" accentColor={theme.colors.accentAmber} />
+      )}
+      {!showSectionTitle && reserveSectionTitleSpace && (
+        <div style={{ visibility: 'hidden' }}>
+          <SectionTitle title="方案目标 VS 达成" subtitle="各成交方案目标与达成" accentColor={theme.colors.accentAmber} />
+        </div>
+      )}
+      {showOverview && (
+        <DashboardCard
+          glowColor={theme.colors.accentAmber}
+          title="方案概览表"
+          subtitle="各方案目标配置与实际达成"
+          fill={singleCardMode}
+          style={singleCardMode ? { flex: 1, minHeight: 0 } : undefined}
+        >
+          {overviewLoading ? <LoadingSkeleton /> : (
+            <DataTable<ProposalRow>
+              columns={overviewColumns}
+              dataSource={overviewData || []}
+              rowKey={(r) => `${r.proposal_type}-${r.sub_proposal_type || 'default'}`}
+              locale={{ emptyText: '暂无方案目标数据' }}
+            />
+          )}
+        </DashboardCard>
+      )}
+      {showCross && (
+        <DashboardCard
+          glowColor={theme.colors.accentAmber}
+          title="多维交叉明细表"
+          subtitle="各方案在各区域的达成矩阵"
+          fill={singleCardMode}
+          style={{
+            marginTop: showOverview ? 16 : 0,
+            ...(singleCardMode ? { flex: 1, minHeight: 0 } : {}),
+          }}
+        >
+          {crossLoading ? <LoadingSkeleton /> : crossData && crossData.length > 0 ? (
+            <DataTable<ProposalCrossRow> columns={crossColumns} dataSource={crossData} rowKey="region" />
+          ) : (
+            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <EmptyPlaceholder />
+            </div>
+          )}
+        </DashboardCard>
+      )}
     </div>
   )
 }

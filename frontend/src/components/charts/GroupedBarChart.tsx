@@ -8,6 +8,7 @@ interface GroupedBarChartProps {
   height?: number | string
   showLegend?: boolean
   xAxisLabelFormatter?: (value: string) => string
+  onBarClick?: (params: { name?: string }) => void
 }
 
 const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
@@ -16,6 +17,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
   height = 320,
   showLegend = true,
   xAxisLabelFormatter,
+  onBarClick,
 }) => {
   const option = {
     ...baseOption,
@@ -62,7 +64,15 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
   }
 
   const isFluid = height === '100%'
-  return <ReactECharts option={option} notMerge style={{ height }} {...(isFluid ? { opts: { height: 'auto' } } : {})} />
+  return (
+    <ReactECharts
+      option={option}
+      notMerge
+      style={{ height }}
+      onEvents={onBarClick ? { click: onBarClick } : undefined}
+      {...(isFluid ? { opts: { height: 'auto' } } : {})}
+    />
+  )
 }
 
 export default GroupedBarChart

@@ -2,10 +2,11 @@ from pydantic import BaseModel
 
 
 class ProposalRow(BaseModel):
-    region: str
     proposal_type: str
     target_count: int
-    achieved_count: int
+    target_amount: float
+    actual_count: int
+    actual_amount: float
 
 
 class ProposalCrossRow(BaseModel):

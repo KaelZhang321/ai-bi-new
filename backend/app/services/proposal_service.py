@@ -3,15 +3,79 @@ from sqlalchemy.orm import Session
 
 from app.schemas.proposal import ProposalRow, ProposalCrossRow, ProposalDetail
 
-
 def get_proposal_overview(db: Session) -> list[ProposalRow]:
     sql = text("""
+            SELECT
+                p.proposal_type,
+                p.target_count,
+                p.target_amount,
+                
+                -- [新增] 1. 统计实际成交数量
+                COALESCE((
+                    SELECT COUNT(1) 
+                    FROM meeting_transaction_details d
+                    WHERE d.deal_type LIKE '%新成交%'
+                      AND (
+                        d.deal_content LIKE CONCAT('%', p.proposal_type, '%')
+                        OR (
+                          p.proposal_type REGEXP '海心卡|细胞卡'
+                          AND d.deal_content REGEXP '海心卡|细胞卡'
+                        )
+                      )
+                ), 0) AS actual_count,
+            
+                -- 2. 统计实际成交金额
+                COALESCE((
+                    SELECT SUM(COALESCE(d.new_deal_amount, 0))
+                    FROM meeting_transaction_details d
+                    WHERE d.deal_type LIKE '%新成交%'
+                      AND (
+                        d.deal_content LIKE CONCAT('%', p.proposal_type, '%')
+                        OR (
+                          p.proposal_type REGEXP '海心卡|细胞卡'
+                          AND d.deal_content REGEXP '海心卡|细胞卡'
+                        )
+                      )
+                ), 0) AS actual_amount
+            
+            FROM (
+                -- 派生表：汇总目标数据
+                SELECT
+                    proposal_type,
+                    SUM(COALESCE(target_count, 0)) AS target_count,
+                    SUM(COALESCE(target_amount, 0)) AS target_amount
+                FROM meeting_proposal_targets
+                GROUP BY proposal_type
+            ) AS p
+            ORDER BY p.proposal_type ASC;
+    """)
+    rows = db.execute(sql).mappings().all()
+    return [
+        ProposalRow(
+            proposal_type=r["proposal_type"],
+            target_count=int(r["target_count"] or 0),
+            target_amount=float(r["target_amount"] or 0),
+            actual_count=int(r["actual_count"] or 0),
+            actual_amount=float(r["actual_amount"] or 0),
+        )
+        for r in rows
+    ]
+
+
+def get_proposal_cross_table(db: Session) -> list[ProposalCrossRow]:
+    types = db.execute(text(
+        "SELECT DISTINCT proposal_type FROM meeting_proposal_targets ORDER BY proposal_type"
+    )).scalars().all()
+
+    if not types:
+        return []
+
+    overview = db.execute(text("""
         SELECT
             p.region,
             p.proposal_type,
-            p.target_count,
             COUNT(d.id) AS achieved_count
-        FROM meeting_region_proposal_targets p
+        FROM meeting_proposal_targets p
         LEFT JOIN meeting_transaction_details d
             ON p.region = d.region
             AND d.deal_type LIKE '%新成交%'
@@ -20,28 +84,17 @@ def get_proposal_overview(db: Session) -> list[ProposalRow]:
                 OR (p.proposal_type LIKE '%海心卡%' AND (d.deal_content LIKE '%海心卡%' OR d.deal_content LIKE '%细胞卡%'))
                 OR (p.proposal_type LIKE '%细胞卡%' AND (d.deal_content LIKE '%海心卡%' OR d.deal_content LIKE '%细胞卡%'))
             )
-        GROUP BY p.region, p.proposal_type, p.target_count
+        GROUP BY p.region, p.proposal_type
         ORDER BY p.region, p.proposal_type
-    """)
-    rows = db.execute(sql).mappings().all()
-    return [ProposalRow(**r) for r in rows]
+    """)).mappings().all()
 
-
-def get_proposal_cross_table(db: Session) -> list[ProposalCrossRow]:
-    # 获取所有方案类型
-    types = db.execute(text(
-        "SELECT DISTINCT proposal_type FROM meeting_region_proposal_targets ORDER BY proposal_type"
-    )).scalars().all()
-
-    if not types:
-        return []
-
-    # 获取各区域各方案的达成数量
-    overview = get_proposal_overview(db)
     region_map: dict[str, dict[str, int]] = {}
     for row in overview:
-        region_map.setdefault(row.region, {t: 0 for t in types})
-        region_map[row.region][row.proposal_type] = row.achieved_count
+        region = row["region"]
+        proposal_type = row["proposal_type"]
+        achieved_count = int(row["achieved_count"] or 0)
+        region_map.setdefault(region, {t: 0 for t in types})
+        region_map[region][proposal_type] = achieved_count
 
     return [ProposalCrossRow(region=region, proposals=proposals) for region, proposals in region_map.items()]
 
