@@ -132,7 +132,9 @@ pnpm dev
 
 ```bash
 # 首次部署前准备配置
-cp .env.example backend/.env
+cp .env.example .env
+cp backend/.env.example backend/.env
+# 编辑 .env 配置端口等部署参数
 # 编辑 backend/.env 填入生产环境数据库和密钥
 
 # 一键构建并启动
@@ -154,13 +156,9 @@ cp .env.example backend/.env
 - API 文档：`http://localhost:8000/docs`
 
 说明：
+- 根目录 `.env` 用于 `docker compose` 和 `deploy.sh`，配置端口、时区、Gunicorn 参数
+- `backend/.env` 用于后端应用自身配置，配置数据库、API Key 等业务参数
 - `deploy.sh` 会在启动前根据 `backend/.env` 自动生成 `backend/.env.compose`，用于兼容旧版 Docker Compose 并安全处理密码中的 `$` 字符。
-
-如需修改端口，可在执行前临时指定环境变量：
-
-```bash
-FRONTEND_PORT=8080 BACKEND_PORT=18000 ./deploy.sh start
-```
 
 ## 开发指南
 

@@ -6,6 +6,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "${ROOT_DIR}"
 
 COMPOSE_CMD=(docker compose)
+ROOT_ENV_FILE=".env"
 BACKEND_PORT="${BACKEND_PORT:-8000}"
 FRONTEND_PORT="${FRONTEND_PORT:-80}"
 BACKEND_ENV_SOURCE="backend/.env"
@@ -15,6 +16,15 @@ require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then
     echo "Missing required command: $1" >&2
     exit 1
+  fi
+}
+
+load_root_env() {
+  if [[ -f "${ROOT_ENV_FILE}" ]]; then
+    set -a
+    # shellcheck disable=SC1090
+    source "${ROOT_ENV_FILE}"
+    set +a
   fi
 }
 
@@ -37,7 +47,7 @@ wait_for_http() {
 
 ensure_env() {
   if [[ ! -f "${BACKEND_ENV_SOURCE}" ]]; then
-    echo "Missing backend/.env. Copy .env.example to backend/.env and fill in production values first." >&2
+    echo "Missing backend/.env. Copy backend/.env.example to backend/.env and fill in production values first." >&2
     exit 1
   fi
 }
@@ -99,6 +109,9 @@ status() {
 
 require_command docker
 require_command curl
+load_root_env
+BACKEND_PORT="${BACKEND_PORT:-8000}"
+FRONTEND_PORT="${FRONTEND_PORT:-80}"
 
 case "${1:-start}" in
   start)
