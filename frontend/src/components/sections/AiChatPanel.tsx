@@ -317,6 +317,7 @@ const AiChatPanel: React.FC<{ open: boolean; onClose: () => void; light?: boolea
   const [loading, setLoading] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const conversationIdRef = useRef(crypto.randomUUID())
 
   useEffect(() => {
     const toSave = messages.filter((m) => !m.loading)
@@ -329,6 +330,7 @@ const AiChatPanel: React.FC<{ open: boolean; onClose: () => void; light?: boolea
   const clearHistory = () => {
     setMessages([])
     localStorage.removeItem(STORAGE_KEY)
+    conversationIdRef.current = crypto.randomUUID()
   }
 
   const sendQuery = async (question: string) => {
@@ -370,7 +372,7 @@ const AiChatPanel: React.FC<{ open: boolean; onClose: () => void; light?: boolea
         onError: (message) => {
           updateAiMsg({ content: `查询失败: ${message}`, loading: false, error: true, stage: undefined })
         },
-      })
+      }, conversationIdRef.current)
     } catch (err: any) {
       updateAiMsg({ content: `查询失败: ${err?.message || '网络错误'}`, loading: false, error: true, stage: undefined })
     } finally {

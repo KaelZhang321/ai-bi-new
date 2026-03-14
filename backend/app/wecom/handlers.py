@@ -67,7 +67,8 @@ async def handle_text_message(client: "WSClient", frame: dict) -> None:
     try:
         db = SessionLocal()
         try:
-            result = execute_ai_query(text, db)
+            conversation_id = f"wecom_{sender['userid']}" if sender['userid'] else None
+            result = execute_ai_query(text, db, conversation_id=conversation_id)
         finally:
             db.close()
 

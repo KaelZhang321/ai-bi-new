@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 import json
 
 from app.schemas.ai_query import AiQueryResponse, ChartConfig
+from app.ai.context_store import get_last_question, save_round, get_recent_rounds, QARound
 
 logger = logging.getLogger(__name__)
 
@@ -101,7 +102,39 @@ def _is_numeric(v: str) -> bool:
         return False
 
 
-def execute_ai_query(question: str, db: Session) -> AiQueryResponse:
+def _rewrite_question(vn, question: str, conversation_id: str | None) -> str:
+    """有上下文时改写问题为完整表述，否则原样返回。"""
+    if not conversation_id:
+        return question
+    last_q = get_last_question(conversation_id)
+    if not last_q:
+        return question
+    try:
+        rewritten = vn.generate_rewritten_question(last_q, question)
+        if rewritten and rewritten.strip():
+            logger.info(f"Question rewritten: '{question}' -> '{rewritten}'")
+            return rewritten.strip()
+    except Exception as e:
+        logger.warning(f"Question rewrite failed, using original: {e}")
+    return question
+
+
+def _build_history_prompt(conversation_id: str | None) -> str:
+    """构建最近 2 轮历史 Q&A 的 prompt 片段。"""
+    if not conversation_id:
+        return ""
+    rounds = get_recent_rounds(conversation_id, n=2)
+    if not rounds:
+        return ""
+    lines = []
+    for r in rounds:
+        lines.append(f"Q: {r.rewritten}")
+        if r.answer:
+            lines.append(f"A: {r.answer[:200]}")
+    return "历史对话：\n" + "\n".join(lines) + "\n\n"
+
+
+def execute_ai_query(question: str, db: Session, conversation_id: str | None = None) -> AiQueryResponse:
     try:
         from app.ai.vanna_client import get_vanna
         vn = get_vanna()
@@ -109,9 +142,12 @@ def execute_ai_query(question: str, db: Session) -> AiQueryResponse:
         logger.error(f"Vanna init failed: {e}")
         return AiQueryResponse(sql="", columns=[], rows=[], answer=f"AI 服务初始化失败: {str(e)}")
 
+    # 上下文改写
+    rewritten = _rewrite_question(vn, question, conversation_id)
+
     # 生成 SQL
     try:
-        sql = vn.generate_sql(question=question)
+        sql = vn.generate_sql(question=rewritten)
         if not sql:
             return AiQueryResponse(sql="", columns=[], rows=[], answer="无法生成 SQL，请尝试更具体的描述。")
         sql = _clean_sql(sql)
@@ -137,13 +173,24 @@ def execute_ai_query(question: str, db: Session) -> AiQueryResponse:
     # 生成自然语言回答
     try:
         display_rows = rows[:30]
+        history_prompt = _build_history_prompt(conversation_id)
         answer_prompt = (
-            f"用户问题：{question}\nSQL：{sql}\n结果（共{len(rows)}行）：{display_rows}\n\n"
+            f"{history_prompt}"
+            f"用户问题：{rewritten}\nSQL：{sql}\n结果（共{len(rows)}行）：{display_rows}\n\n"
             f"请用简洁中文回答，直接给出关键数据和结论。"
         )
         answer = vn.submit_prompt([{"role": "user", "content": answer_prompt}])
     except Exception:
         answer = f"查询成功，共返回 {len(rows)} 条数据。"
+
+    # 保存本轮到上下文缓存
+    if conversation_id:
+        save_round(conversation_id, QARound(
+            question=question,
+            rewritten=rewritten,
+            sql=sql,
+            answer=answer[:200] if answer else "",
+        ))
 
     # 序列化所有值为 JSON 兼容
     safe_rows = [{k: (str(v) if v is not None and not isinstance(v, (int, float)) else v) for k, v in row.items()} for row in rows]
@@ -151,7 +198,7 @@ def execute_ai_query(question: str, db: Session) -> AiQueryResponse:
     return AiQueryResponse(sql=sql, columns=columns, rows=safe_rows, answer=answer, chart=chart)
 
 
-async def execute_ai_query_stream(question: str, db: Session):
+async def execute_ai_query_stream(question: str, db: Session, conversation_id: str | None = None):
     """SSE 流式执行 AI 查询，分阶段 yield 事件。"""
 
     def _sse(event: str, data: dict) -> dict:
@@ -166,9 +213,12 @@ async def execute_ai_query_stream(question: str, db: Session):
         yield _sse("error", {"message": f"AI 服务初始化失败: {str(e)}"})
         return
 
+    # 上下文改写
+    rewritten = _rewrite_question(vn, question, conversation_id)
+
     # 阶段 1: 生成 SQL
     try:
-        sql = vn.generate_sql(question=question)
+        sql = vn.generate_sql(question=rewritten)
         if not sql:
             yield _sse("error", {"message": "无法生成 SQL，请尝试更具体的描述。"})
             return
@@ -208,12 +258,23 @@ async def execute_ai_query_stream(question: str, db: Session):
     # 阶段 4: 生成自然语言回答
     try:
         display_rows = rows[:30]
+        history_prompt = _build_history_prompt(conversation_id)
         answer_prompt = (
-            f"用户问题：{question}\nSQL：{sql}\n结果（共{len(rows)}行）：{display_rows}\n\n"
+            f"{history_prompt}"
+            f"用户问题：{rewritten}\nSQL：{sql}\n结果（共{len(rows)}行）：{display_rows}\n\n"
             f"请用简洁中文回答，直接给出关键数据和结论。"
         )
         answer = vn.submit_prompt([{"role": "user", "content": answer_prompt}])
     except Exception:
         answer = f"查询成功，共返回 {len(rows)} 条数据。"
+
+    # 保存本轮到上下文缓存
+    if conversation_id:
+        save_round(conversation_id, QARound(
+            question=question,
+            rewritten=rewritten,
+            sql=sql,
+            answer=answer[:200] if answer else "",
+        ))
 
     yield _sse("answer", {"answer": answer})

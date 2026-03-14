@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 class AiQueryRequest(BaseModel):
     question: str
+    conversation_id: str | None = None
 
 
 class ChartConfig(BaseModel):
