@@ -14,7 +14,6 @@ def get_progress(db: Session) -> ProgressSummary:
         LEFT JOIN (
             SELECT region, SUM(new_deal_amount) AS deal_amount
             FROM meeting_transaction_details
-            WHERE deal_type = '新成交'
             GROUP BY region
         ) d ON t.region = d.region
         ORDER BY deal_amount DESC
