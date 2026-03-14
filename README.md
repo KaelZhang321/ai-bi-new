@@ -153,6 +153,9 @@ cp .env.example backend/.env
 - 后端 API：`http://localhost:8000`
 - API 文档：`http://localhost:8000/docs`
 
+说明：
+- `deploy.sh` 会在启动前根据 `backend/.env` 自动生成 `backend/.env.compose`，用于兼容旧版 Docker Compose 并安全处理密码中的 `$` 字符。
+
 如需修改端口，可在执行前临时指定环境变量：
 
 ```bash

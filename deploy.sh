@@ -8,6 +8,8 @@ cd "${ROOT_DIR}"
 COMPOSE_CMD=(docker compose)
 BACKEND_PORT="${BACKEND_PORT:-8000}"
 FRONTEND_PORT="${FRONTEND_PORT:-80}"
+BACKEND_ENV_SOURCE="backend/.env"
+BACKEND_ENV_COMPOSE="backend/.env.compose"
 
 require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -34,14 +36,40 @@ wait_for_http() {
 }
 
 ensure_env() {
-  if [[ ! -f backend/.env ]]; then
+  if [[ ! -f "${BACKEND_ENV_SOURCE}" ]]; then
     echo "Missing backend/.env. Copy .env.example to backend/.env and fill in production values first." >&2
     exit 1
   fi
 }
 
+prepare_compose_env() {
+  local strict="${1:-strict}"
+
+  if [[ ! -f "${BACKEND_ENV_SOURCE}" ]]; then
+    if [[ "${strict}" == "strict" ]]; then
+      ensure_env
+    else
+      : > "${BACKEND_ENV_COMPOSE}"
+      return 0
+    fi
+  fi
+
+  awk '
+    {
+      sub(/\r$/, "")
+      if ($0 ~ /^[[:space:]]*#/ || $0 ~ /^[[:space:]]*$/) {
+        print
+        next
+      }
+      gsub(/\$/, "$$$$")
+      print
+    }
+  ' "${BACKEND_ENV_SOURCE}" > "${BACKEND_ENV_COMPOSE}"
+}
+
 deploy() {
   ensure_env
+  prepare_compose_env strict
   "${COMPOSE_CMD[@]}" up -d --build --remove-orphans
   "${COMPOSE_CMD[@]}" ps
   wait_for_http "Backend" "http://127.0.0.1:${BACKEND_PORT}/api/health"
@@ -49,19 +77,23 @@ deploy() {
 }
 
 down() {
+  prepare_compose_env relaxed
   "${COMPOSE_CMD[@]}" down
 }
 
 restart() {
+  prepare_compose_env strict
   "${COMPOSE_CMD[@]}" down
   deploy
 }
 
 logs() {
+  prepare_compose_env relaxed
   "${COMPOSE_CMD[@]}" logs -f --tail=200
 }
 
 status() {
+  prepare_compose_env relaxed
   "${COMPOSE_CMD[@]}" ps
 }
 
