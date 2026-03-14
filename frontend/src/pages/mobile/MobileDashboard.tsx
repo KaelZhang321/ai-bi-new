@@ -9,6 +9,8 @@ import LoadingSkeleton from '../../components/common/LoadingSkeleton'
 import MobilePageCustomer from './MobilePageCustomer'
 import MobilePageOperations from './MobilePageOperations'
 import MobilePageAchievement from './MobilePageAchievement'
+import AiChatPanel from '../../components/sections/AiChatPanel'
+import aiIcon from '../../styles/AI.png'
 import '../../styles/mobile.css'
 
 const mobileKpiColors: Record<string, string> = {
@@ -75,6 +77,7 @@ const mobileLightTheme = {
 
 const MobileDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0)
+  const [aiOpen, setAiOpen] = useState(false)
   const { data: kpiData, isLoading: kpiLoading } = useKpiOverview()
   const ActivePage = pages[activeTab]
 
@@ -117,6 +120,14 @@ const MobileDashboard: React.FC = () => {
           </AnimatePresence>
         </div>
         <MobileTabBar activeTab={activeTab} onTabChange={setActiveTab} />
+
+        {/* AI 浮动按钮 */}
+        <button className="mobile-ai-fab" onClick={() => setAiOpen(true)}>
+          <img src={aiIcon} alt="AI" style={{ width: 52, height: 52 }} />
+        </button>
+
+        {/* AI 聊天面板 */}
+        <AiChatPanel open={aiOpen} onClose={() => setAiOpen(false)} light />
       </div>
     </ConfigProvider>
   )
