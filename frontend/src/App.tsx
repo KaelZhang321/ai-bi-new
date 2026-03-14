@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { antdDarkTheme } from './styles/theme'
 import Dashboard from './pages/Dashboard'
 import MobileDashboard from './pages/mobile/MobileDashboard'
+import { normalizedBasePath } from './utils/base-path'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,9 +17,7 @@ const queryClient = new QueryClient({
   },
 })
 
-const routerBase = import.meta.env.BASE_URL === '/'
-  ? undefined
-  : import.meta.env.BASE_URL.replace(/\/$/, '')
+const routerBase = normalizedBasePath || undefined
 
 function isMobile(): boolean {
   if (typeof window === 'undefined') return false

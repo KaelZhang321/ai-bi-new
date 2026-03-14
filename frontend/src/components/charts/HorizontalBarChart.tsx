@@ -5,7 +5,7 @@ import { baseOption, axisStyle, chartPalette } from './echarts-config'
 interface HorizontalBarChartProps {
   categories: string[]
   series: { name: string; data: number[] }[]
-  height?: number
+  height?: number | string
   completionRates?: Array<number | null | undefined>
 }
 

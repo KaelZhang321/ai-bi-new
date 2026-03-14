@@ -47,12 +47,12 @@ def get_trend_data(db: Session) -> list[TrendPoint]:
                 ELSE '全天'
             END AS day_time_period,
             CASE
-                WHEN time_period LIKE '%听课%' THEN '听课'
-                WHEN time_period LIKE '%抵达%' THEN '抵达'
+                WHEN time_period LIKE '%参加会议%' THEN '参会'
+                WHEN time_period LIKE '%签到%' THEN '抵达'
                 WHEN time_period LIKE '%离开%' THEN '离开'
                 WHEN time_period LIKE '%午餐%' THEN '用餐'
                 WHEN time_period LIKE '%晚餐%' THEN '用餐'
-                WHEN time_period LIKE '%医院人数合计%' THEN '到院'
+                WHEN time_period LIKE '%医院%' THEN '到院'
                 ELSE '其他'
             END AS scene_label,
             SUM(people_count) AS people_count

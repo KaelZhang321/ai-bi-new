@@ -1,8 +1,5 @@
 import client, { type ApiResponse } from './client'
-
-const apiBase = import.meta.env.BASE_URL === '/'
-  ? '/api'
-  : `${import.meta.env.BASE_URL}api`
+import { apiBasePath } from '../utils/base-path'
 
 export interface ChartConfig {
   chart_type: 'pie' | 'bar' | 'grouped_bar' | 'horizontal_bar' | 'line' | 'none'
@@ -32,7 +29,7 @@ export interface SseCallback {
 }
 
 export async function streamAiQuery(question: string, callbacks: SseCallback) {
-  const response = await fetch(`${apiBase}/v1/ai/query/stream`, {
+  const response = await fetch(`${apiBasePath}/v1/ai/query/stream`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ question }),

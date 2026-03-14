@@ -1,12 +1,17 @@
 import React, { useMemo } from 'react'
 import { useProgress } from '../../hooks/useApi'
 import DashboardCard from '../common/DashboardCard'
-import SectionTitle from '../common/SectionTitle'
 import LoadingSkeleton from '../common/LoadingSkeleton'
 import HorizontalBarChart from '../charts/HorizontalBarChart'
 import { theme } from '../../styles/theme'
 
-const ProgressSection: React.FC = () => {
+interface ProgressSectionProps {
+  fill?: boolean
+}
+
+const ProgressSection: React.FC<ProgressSectionProps> = ({
+  fill = false,
+}) => {
   const { data, isLoading } = useProgress()
 
   const chart = useMemo(() => {
@@ -24,14 +29,21 @@ const ProgressSection: React.FC = () => {
   if (isLoading || !data) return <LoadingSkeleton />
 
   return (
-    <div>
-      <SectionTitle title="完成进度排行" subtitle="前景柱=成交金额 | 底条=高限" accentColor={theme.colors.accentAmber} />
-      <DashboardCard glowColor={theme.colors.accentAmber} title="各区域完成度" subtitle={`平均完成率: ${data.avg_completion_rate ?? 0}%`}>
+    <div
+      style={fill ? { height: '100%', width: '100%', display: 'flex', flexDirection: 'column' } : undefined}
+    >
+      <DashboardCard
+        glowColor={theme.colors.accentAmber}
+        title="各区域完成度"
+        subtitle={`平均完成率: ${data.avg_completion_rate ?? 0}%`}
+        fill={fill}
+        style={fill ? { flex: 1, minHeight: 0 } : undefined}
+      >
         <HorizontalBarChart
           categories={chart.categories}
           series={chart.series}
           completionRates={chart.completionRates}
-          height={Math.max(280, data.items.length * 36)}
+          height={fill ? '100%' : Math.max(280, data.items.length * 36)}
         />
       </DashboardCard>
     </div>

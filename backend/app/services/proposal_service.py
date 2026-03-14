@@ -62,41 +62,41 @@ def get_proposal_overview(db: Session) -> list[ProposalRow]:
     ]
 
 
-def get_proposal_cross_table(db: Session) -> list[ProposalCrossRow]:
-    types = db.execute(text(
-        "SELECT DISTINCT proposal_type FROM meeting_proposal_targets ORDER BY proposal_type"
-    )).scalars().all()
-
-    if not types:
-        return []
-
-    overview = db.execute(text("""
-        SELECT
-            p.region,
-            p.proposal_type,
-            COUNT(d.id) AS achieved_count
-        FROM meeting_proposal_targets p
-        LEFT JOIN meeting_transaction_details d
-            ON p.region = d.region
-            AND d.deal_type LIKE '%新成交%'
-            AND (
-                d.deal_content LIKE CONCAT('%', p.proposal_type, '%')
-                OR (p.proposal_type LIKE '%海心卡%' AND (d.deal_content LIKE '%海心卡%' OR d.deal_content LIKE '%细胞卡%'))
-                OR (p.proposal_type LIKE '%细胞卡%' AND (d.deal_content LIKE '%海心卡%' OR d.deal_content LIKE '%细胞卡%'))
-            )
-        GROUP BY p.region, p.proposal_type
-        ORDER BY p.region, p.proposal_type
-    """)).mappings().all()
-
-    region_map: dict[str, dict[str, int]] = {}
-    for row in overview:
-        region = row["region"]
-        proposal_type = row["proposal_type"]
-        achieved_count = int(row["achieved_count"] or 0)
-        region_map.setdefault(region, {t: 0 for t in types})
-        region_map[region][proposal_type] = achieved_count
-
-    return [ProposalCrossRow(region=region, proposals=proposals) for region, proposals in region_map.items()]
+# def get_proposal_cross_table(db: Session) -> list[ProposalCrossRow]:
+#     types = db.execute(text(
+#         "SELECT DISTINCT proposal_type FROM meeting_proposal_targets ORDER BY proposal_type"
+#     )).scalars().all()
+#
+#     if not types:
+#         return []
+#
+#     overview = db.execute(text("""
+#         SELECT
+#             p.region,
+#             p.proposal_type,
+#             COUNT(d.id) AS achieved_count
+#         FROM meeting_proposal_targets p
+#         LEFT JOIN meeting_transaction_details d
+#             ON p.region = d.region
+#             AND d.deal_type LIKE '%新成交%'
+#             AND (
+#                 d.deal_content LIKE CONCAT('%', p.proposal_type, '%')
+#                 OR (p.proposal_type LIKE '%海心卡%' AND (d.deal_content LIKE '%海心卡%' OR d.deal_content LIKE '%细胞卡%'))
+#                 OR (p.proposal_type LIKE '%细胞卡%' AND (d.deal_content LIKE '%海心卡%' OR d.deal_content LIKE '%细胞卡%'))
+#             )
+#         GROUP BY p.region, p.proposal_type
+#         ORDER BY p.region, p.proposal_type
+#     """)).mappings().all()
+#
+#     region_map: dict[str, dict[str, int]] = {}
+#     for row in overview:
+#         region = row["region"]
+#         proposal_type = row["proposal_type"]
+#         achieved_count = int(row["achieved_count"] or 0)
+#         region_map.setdefault(region, {t: 0 for t in types})
+#         region_map[region][proposal_type] = achieved_count
+#
+#     return [ProposalCrossRow(region=region, proposals=proposals) for region, proposals in region_map.items()]
 
 
 def get_proposal_detail(db: Session, region: str | None = None, proposal_type: str | None = None) -> list[ProposalDetail]:
