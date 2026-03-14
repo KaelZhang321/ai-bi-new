@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.schemas.kpi import KpiItem, KpiOverview
 
-TOTAL_BUDGET = 6_000_000
+TOTAL_BUDGET = 600  # 单位：万
 
 
 def get_kpi_overview(db: Session) -> KpiOverview:
@@ -36,14 +36,14 @@ def get_kpi_overview(db: Session) -> KpiOverview:
     consumed = float(row["consumed"])
     received = float(row["received"])
 
-    # ROI
+    # ROI = (Budget / Deal) * 0.4. Since budget and deal are both in '万', they cancel out.
     roi = round(TOTAL_BUDGET / deal * 0.4, 4) if deal else 0
 
     return KpiOverview(
         registered_customers=KpiItem(label="报名客户", value=registered, unit="人"),
         arrived_customers=KpiItem(label="已抵达客户", value=arrived, unit="人"),
-        deal_amount=KpiItem(label="已成交金额", value=deal, prefix="¥"),
-        consumed_budget=KpiItem(label="已消耗预算", value=consumed, prefix="¥"),
-        received_amount=KpiItem(label="已收款金额", value=received, prefix="¥"),
+        deal_amount=KpiItem(label="已成交金额", value=deal, prefix="¥", unit="万"),
+        consumed_budget=KpiItem(label="已消耗预算", value=consumed, prefix="¥", unit="万"),
+        received_amount=KpiItem(label="已收款金额", value=received, prefix="¥", unit="万"),
         roi=KpiItem(label="总投资回报率", value=roi * 100, unit="%"),
     )

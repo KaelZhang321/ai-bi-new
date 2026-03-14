@@ -13,7 +13,7 @@ def get_achievement_chart(db: Session) -> list[AchievementBar]:
             COALESCE(SUM(d.new_deal_amount), 0) AS deal_amount
         FROM meeting_region_transaction_targets t
         LEFT JOIN meeting_transaction_details d
-            ON t.region = d.region AND d.deal_type = '新成交'
+            ON t.region = d.region
         GROUP BY t.region, t.min_deal, t.max_deal
         ORDER BY t.region
     """)
@@ -41,7 +41,6 @@ def get_achievement_table(db: Session) -> list[AchievementRow]:
         LEFT JOIN (
             SELECT region, SUM(new_deal_amount) AS deal_amount
             FROM meeting_transaction_details
-            WHERE deal_type = '新成交'
             GROUP BY region
         ) d ON t.region = d.region
         ORDER BY t.region
@@ -67,7 +66,7 @@ def get_achievement_table(db: Session) -> list[AchievementRow]:
 
 def get_achievement_detail(db: Session, region: str | None = None) -> list[AchievementDetail]:
     """目标达成下钻：成交明细"""
-    conditions = ["deal_type = '新成交'"]
+    conditions = []
     params: dict = {}
     if region:
         conditions.append("region = :region")

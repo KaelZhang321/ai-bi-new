@@ -25,15 +25,20 @@ const OperationsSection: React.FC = () => {
 
   const trendChart = useMemo(() => {
     if (!trendData) return { categories: [], series: [] }
-    const timeLabels = [...new Set(trendData.map((d) => `${d.schedule_date.slice(5)} ${d.day_time_period}`))]
-    const sceneLabels = selectedScene === 'all'
-      ? [...new Set(trendData.map((d) => d.scene_label))]
-      : [selectedScene]
+
+    const filteredTrendData = selectedScene === 'all'
+      ? trendData
+      : trendData.filter((d) => d.scene_label === selectedScene)
+
+    const timeLabels = [...new Set(filteredTrendData.map((d) => `${d.schedule_date.slice(5)} ${d.day_time_period}`))]
+
+    const sceneLabels = [...new Set(filteredTrendData.map((d) => d.scene_label))]
+
     const series = sceneLabels.map((scene) => ({
       name: scene,
       data: timeLabels.map((t) => {
         const [date, period] = t.split(' ')
-        return trendData.find((d) => d.schedule_date.slice(5) === date && d.day_time_period === period && d.scene_label === scene)?.people_count || 0
+        return filteredTrendData.find((d) => d.schedule_date.slice(5) === date && d.day_time_period === period && d.scene_label === scene)?.people_count || 0
       }),
     }))
     return { categories: timeLabels, series }

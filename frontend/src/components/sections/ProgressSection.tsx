@@ -10,13 +10,14 @@ const ProgressSection: React.FC = () => {
   const { data, isLoading } = useProgress()
 
   const chart = useMemo(() => {
-    if (!data) return { categories: [], series: [] }
+    if (!data) return { categories: [], series: [], completionRates: [] }
     return {
       categories: data.items.map((d) => d.region),
       series: [
         { name: '达成金额', data: data.items.map((d) => d.deal_amount) },
         { name: '成交高限', data: data.items.map((d) => d.high_limit) },
       ],
+      completionRates: data.items.map((d) => d.completion_rate),
     }
   }, [data])
 
@@ -26,7 +27,12 @@ const ProgressSection: React.FC = () => {
     <div>
       <SectionTitle title="完成进度排行" subtitle="前景柱=成交金额 | 底条=高限" accentColor={theme.colors.accentAmber} />
       <DashboardCard glowColor={theme.colors.accentAmber} title="各区域完成度" subtitle={`平均完成率: ${data.avg_completion_rate ?? 0}%`}>
-        <HorizontalBarChart categories={chart.categories} series={chart.series} height={Math.max(280, data.items.length * 36)} />
+        <HorizontalBarChart
+          categories={chart.categories}
+          series={chart.series}
+          completionRates={chart.completionRates}
+          height={Math.max(280, data.items.length * 36)}
+        />
       </DashboardCard>
     </div>
   )

@@ -1,10 +1,11 @@
 import client, { type ApiResponse } from './client'
 
 export interface ProposalRow {
-  region: string
   proposal_type: string
+  sub_proposal_type: string | null
   target_count: number
-  achieved_count: number
+  target_amount: number
+  actual_amount: number
 }
 
 export interface ProposalCrossRow {

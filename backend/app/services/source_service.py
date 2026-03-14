@@ -29,7 +29,7 @@ def get_target_arrival(db: Session) -> list[TargetArrival]:
     """优质目标客户抵达情况"""
     # 目标客户（按大区）
     target_sql = text("""
-        SELECT region, COUNT(*) AS target_count
+        SELECT region, COUNT(DISTINCT customer_unique_id) AS target_count
         FROM meeting_customer_analysis
         WHERE (min_deal >= 100)
             AND region IS NOT NULL
@@ -39,7 +39,7 @@ def get_target_arrival(db: Session) -> list[TargetArrival]:
 
     # 已抵达的目标客户（通过 customer_unique_id 关联）
     arrive_sql = text("""
-        SELECT mca.region, COUNT(*) AS arrive_count
+        SELECT mca.region, COUNT(DISTINCT mca.customer_unique_id) AS arrive_count
         FROM meeting_customer_analysis mca
         INNER JOIN meeting_registration mr ON mca.customer_unique_id = mr.customer_unique_id
         WHERE (mca.min_deal >= 100)

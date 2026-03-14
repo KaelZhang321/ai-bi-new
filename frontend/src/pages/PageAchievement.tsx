@@ -18,12 +18,15 @@ const PageAchievement: React.FC = () => (
     <motion.div custom={0} initial="hidden" animate="visible" variants={fadeUp} style={{ marginBottom: 24 }}>
       <AchievementSection />
     </motion.div>
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-      <motion.div custom={1} initial="hidden" animate="visible" variants={fadeUp}>
-        <ProgressSection />
+    <motion.div custom={1} initial="hidden" animate="visible" variants={fadeUp} style={{ marginBottom: 20 }}>
+      <ProgressSection />
+    </motion.div>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch' }}>
+      <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp} style={{ height: '100%' }}>
+        <ProposalSection showOverview showCross={false} showSectionTitle />
       </motion.div>
-      <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp}>
-        <ProposalSection />
+      <motion.div custom={3} initial="hidden" animate="visible" variants={fadeUp} style={{ height: '100%' }}>
+        <ProposalSection showOverview={false} showCross showSectionTitle={false} reserveSectionTitleSpace />
       </motion.div>
     </div>
   </div>

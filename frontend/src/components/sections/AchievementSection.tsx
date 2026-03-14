@@ -13,10 +13,10 @@ import { theme } from '../../styles/theme'
 const tableColumns = [
   { title: '#', dataIndex: 'row_num', key: 'n', width: 40 },
   { title: '区域', dataIndex: 'region', key: 'r' },
-  { title: '达成', dataIndex: 'actual_amount', key: 'a', render: (v: number) => <span style={{ color: theme.colors.accentCyan, fontWeight: 600, fontFamily: theme.fontMono }}>¥{v.toLocaleString()}</span> },
-  { title: '目标', dataIndex: 'target_amount', key: 't', render: (v: number) => <span style={{ fontFamily: theme.fontMono }}>¥{v.toLocaleString()}</span> },
+  { title: '达成(万)', dataIndex: 'actual_amount', key: 'a', render: (v: number) => <span style={{ color: theme.colors.accentCyan, fontWeight: 600, fontFamily: theme.fontMono }}>¥{v.toLocaleString()}</span> },
+  { title: '目标(万)', dataIndex: 'target_amount', key: 't', render: (v: number) => <span style={{ fontFamily: theme.fontMono }}>¥{v.toLocaleString()}</span> },
   { title: '达成率', dataIndex: 'achievement_rate', key: 'rt', render: (v: number | null) => v !== null ? <span style={{ color: v >= 100 ? theme.colors.accentGreen : theme.colors.accentRed, fontWeight: 600, fontFamily: theme.fontMono }}>{v}%</span> : '-' },
-  { title: '差值', dataIndex: 'difference', key: 'd', render: (v: number) => <span style={{ color: v >= 0 ? theme.colors.accentGreen : theme.colors.accentRed, fontWeight: 600, fontFamily: theme.fontMono }}>{v >= 0 ? '+' : ''}{v.toLocaleString()}</span> },
+  { title: '差值(万)', dataIndex: 'difference', key: 'd', render: (v: number) => <span style={{ color: v >= 0 ? theme.colors.accentGreen : theme.colors.accentRed, fontWeight: 600, fontFamily: theme.fontMono }}>{v >= 0 ? '+' : ''}{v.toLocaleString()}</span> },
 ]
 
 const detailColumns = [
@@ -25,8 +25,8 @@ const detailColumns = [
   { title: '分公司', dataIndex: 'branch', key: 'branch' },
   { title: '成交类型', dataIndex: 'deal_type', key: 'type' },
   { title: '成交内容', dataIndex: 'deal_content', key: 'content', width: 200 },
-  { title: '新成交金额', dataIndex: 'new_deal_amount', key: 'amount', render: (v: number) => <span style={{ color: theme.colors.accentCyan, fontWeight: 600, fontFamily: theme.fontMono }}>¥{v.toLocaleString()}</span> },
-  { title: '收款金额', dataIndex: 'received_amount', key: 'received', render: (v: number) => <span style={{ fontFamily: theme.fontMono }}>¥{v.toLocaleString()}</span> },
+  { title: '新成交金额(万)', dataIndex: 'new_deal_amount', key: 'amount', render: (v: number) => <span style={{ color: theme.colors.accentCyan, fontWeight: 600, fontFamily: theme.fontMono }}>¥{v.toLocaleString()}</span> },
+  { title: '收款金额(万)', dataIndex: 'received_amount', key: 'received', render: (v: number) => <span style={{ fontFamily: theme.fontMono }}>¥{v.toLocaleString()}</span> },
   { title: '方案类型', dataIndex: 'plan_type', key: 'plan' },
   { title: '日期', dataIndex: 'record_date', key: 'date' },
 ]
