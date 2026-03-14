@@ -33,7 +33,7 @@ COPY aibot-python-sdk/ /app/aibot-python-sdk/
 COPY --from=frontend-build /app/frontend/dist /usr/share/nginx/html/meeting
 
 # Nginx 配置
-RUN cat > /etc/nginx/sites-available/default << 'NGINX'
+COPY <<'NGINX' /etc/nginx/sites-available/default
 server {
     listen 80;
     server_name _;
@@ -79,7 +79,7 @@ server {
 NGINX
 
 # 启动脚本
-RUN cat > /app/start.sh << 'SCRIPT'
+COPY <<'SCRIPT' /app/start.sh
 #!/bin/sh
 set -e
 

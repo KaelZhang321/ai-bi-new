@@ -258,6 +258,29 @@
   color: #3B82F6 !important;
 }
 
+/* AI 浮动按钮 */
+.mobile-ai-fab {
+  position: fixed;
+  right: 20px;
+  bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  width: 52px;
+  height: 52px;
+  border: none;
+  background: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 99;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.2s ease;
+}
+
+.mobile-ai-fab:active {
+  transform: scale(0.88);
+}
+
 /* 滚动条 - 移动端浅色 */
 .mobile-container ::-webkit-scrollbar {
   width: 3px;
