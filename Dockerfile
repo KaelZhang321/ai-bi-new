@@ -11,7 +11,7 @@ COPY frontend/ ./
 RUN pnpm run build
 
 # ---- Stage 2: 运行时 (Python + Nginx) ----
-FROM registry.npmmirror.com/python:3.11-slim
+FROM dockerpull.org/python:3.11-slim
 
 # 安装 nginx 和必要工具
 RUN apt-get update && \
