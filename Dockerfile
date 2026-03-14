@@ -1,5 +1,5 @@
 # ---- Stage 1: 构建前端 ----
-FROM qpwke2zn.mirror.aliyuncs.com/library/node:20-alpine AS frontend-build
+FROM node:20-alpine AS frontend-build
 
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
@@ -11,7 +11,7 @@ COPY frontend/ ./
 RUN pnpm run build
 
 # ---- Stage 2: 运行时 (Python + Nginx) ----
-FROM qpwke2zn.mirror.aliyuncs.com/library/python:3.11-slim
+FROM python:3.11-slim
 
 # 安装 nginx 和必要工具
 RUN apt-get update && \
