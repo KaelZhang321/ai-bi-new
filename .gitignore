@@ -28,3 +28,6 @@ backend/.env.compose
 *.log
 .gitnexus
 .claude/*
+
+AGENTS.md
+CLAUDE.md
