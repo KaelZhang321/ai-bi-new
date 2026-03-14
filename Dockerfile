@@ -54,12 +54,15 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
 
-        # SSE 支持（AI 流式查询）
+        # SSE / 长连接支持
         proxy_http_version 1.1;
         proxy_set_header Connection '';
         proxy_buffering off;
         proxy_cache off;
-        proxy_read_timeout 300s;
+        chunked_transfer_encoding off;
+        proxy_read_timeout 600s;
+        proxy_send_timeout 600s;
+        proxy_connect_timeout 10s;
     }
 
     # 静态资源缓存
@@ -80,7 +83,7 @@ nginx
 
 # 启动后端
 cd /app/backend
-exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2
+exec uvicorn app.main:app --host 0.0.0.0 --port 8000
 SCRIPT
 RUN chmod +x /app/start.sh
 
