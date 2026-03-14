@@ -119,6 +119,38 @@ def _rewrite_question(vn, question: str, conversation_id: str | None) -> str:
     return question
 
 
+_RELEVANCE_PROMPT = """你是一个会议BI数据分析助手，只能回答与以下数据库表相关的问题：
+- meeting_registration（报名签到）
+- meeting_customer_analysis（客户分析）
+- meeting_schedule_stats（运营日程统计）
+- meeting_transaction_details（成交明细）
+- meeting_region_transaction_targets（区域成交目标）
+- meeting_region_proposal_targets（区域方案目标）
+
+用户问题：{question}
+
+请判断这个问题是否与上述数据表相关。只回答"是"或"否"。"""
+
+_OUT_OF_SCOPE_ANSWER = (
+    "抱歉，我是会议BI数据分析助手，只能回答与会议报名、签到、客户画像、"
+    "成交数据、运营统计等相关的问题。\n\n"
+    "您可以试试这样问我：\n"
+    "- 报名了多少客户？\n"
+    "- 今天签到了多少人？\n"
+    "- 各大区成交金额是多少？\n"
+    "- 新老客户比例是多少？"
+)
+
+
+def _is_relevant_question(vn, question: str) -> bool:
+    """判断问题是否与数据库相关。"""
+    try:
+        answer = vn.submit_prompt(_RELEVANCE_PROMPT.format(question=question))
+        return "是" in answer[:10]
+    except Exception:
+        return True  # 判断失败时放行，不阻断正常流程
+
+
 def _build_history_prompt(conversation_id: str | None) -> str:
     """构建最近 2 轮历史 Q&A 的 prompt 片段。"""
     if not conversation_id:
@@ -144,6 +176,10 @@ def execute_ai_query(question: str, db: Session, conversation_id: str | None = N
 
     # 上下文改写
     rewritten = _rewrite_question(vn, question, conversation_id)
+
+    # 意图判断
+    if not _is_relevant_question(vn, rewritten):
+        return AiQueryResponse(sql="", columns=[], rows=[], answer=_OUT_OF_SCOPE_ANSWER)
 
     # 生成 SQL
     try:
@@ -217,6 +253,11 @@ async def execute_ai_query_stream(question: str, db: Session, conversation_id: s
 
     # 上下文改写
     rewritten = _rewrite_question(vn, question, conversation_id)
+
+    # 意图判断
+    if not _is_relevant_question(vn, rewritten):
+        yield _sse("answer", {"answer": _OUT_OF_SCOPE_ANSWER})
+        return
 
     # 阶段 1: 生成 SQL
     try:
