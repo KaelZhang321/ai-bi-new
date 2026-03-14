@@ -27,3 +27,4 @@ backend/.env.compose
 # Logs
 *.log
 .gitnexus
+.claude/*
