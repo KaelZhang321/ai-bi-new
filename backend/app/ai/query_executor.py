@@ -140,7 +140,7 @@ def execute_ai_query(question: str, db: Session, conversation_id: str | None = N
         vn = get_vanna()
     except Exception as e:
         logger.error(f"Vanna init failed: {e}")
-        return AiQueryResponse(sql="", columns=[], rows=[], answer=f"AI 服务初始化失败: {str(e)}")
+        return AiQueryResponse(sql="", columns=[], rows=[], answer="AI 服务暂时不可用，请稍后再试。")
 
     # 上下文改写
     rewritten = _rewrite_question(vn, question, conversation_id)
@@ -153,10 +153,11 @@ def execute_ai_query(question: str, db: Session, conversation_id: str | None = N
         sql = _clean_sql(sql)
         logger.info(f"Generated SQL: {sql}")
     except Exception as e:
-        return AiQueryResponse(sql="", columns=[], rows=[], answer=f"SQL 生成失败: {str(e)}")
+        logger.error(f"SQL generation failed: {e}")
+        return AiQueryResponse(sql="", columns=[], rows=[], answer="抱歉，我暂时无法理解这个问题，请换一种方式描述再试试。")
 
     if not validate_sql(sql):
-        return AiQueryResponse(sql=sql, columns=[], rows=[], answer="生成的 SQL 不安全，已拒绝执行。")
+        return AiQueryResponse(sql=sql, columns=[], rows=[], answer="生成的查询语句存在安全风险，已拒绝执行，请换一种方式提问。")
 
     # 执行 SQL
     try:
@@ -165,7 +166,8 @@ def execute_ai_query(question: str, db: Session, conversation_id: str | None = N
         raw_rows = result.fetchall()
         rows = [{col: _serialize_value(val) for col, val in zip(columns, row)} for row in raw_rows]
     except Exception as e:
-        return AiQueryResponse(sql=sql, columns=[], rows=[], answer=f"SQL 执行失败: {str(e)}")
+        logger.error(f"SQL execution failed: {e}\nSQL: {sql}")
+        return AiQueryResponse(sql=sql, columns=[], rows=[], answer="抱歉，查询未能成功执行，请尝试换一种方式提问。")
 
     # 生成图表
     chart = _build_chart(columns, rows)
@@ -210,7 +212,7 @@ async def execute_ai_query_stream(question: str, db: Session, conversation_id: s
         vn = get_vanna()
     except Exception as e:
         logger.error(f"Vanna init failed: {e}")
-        yield _sse("error", {"message": f"AI 服务初始化失败: {str(e)}"})
+        yield _sse("error", {"message": "AI 服务暂时不可用，请稍后再试。"})
         return
 
     # 上下文改写
@@ -225,11 +227,12 @@ async def execute_ai_query_stream(question: str, db: Session, conversation_id: s
         sql = _clean_sql(sql)
         logger.info(f"Generated SQL: {sql}")
     except Exception as e:
-        yield _sse("error", {"message": f"SQL 生成失败: {str(e)}"})
+        logger.error(f"SQL generation failed: {e}")
+        yield _sse("error", {"message": "抱歉，我暂时无法理解这个问题，请换一种方式描述再试试。"})
         return
 
     if not validate_sql(sql):
-        yield _sse("error", {"message": "生成的 SQL 不安全，已拒绝执行。"})
+        yield _sse("error", {"message": "生成的查询语句存在安全风险，已拒绝执行，请换一种方式提问。"})
         return
 
     yield _sse("sql", {"sql": sql})
@@ -245,7 +248,8 @@ async def execute_ai_query_stream(question: str, db: Session, conversation_id: s
             for row in rows
         ]
     except Exception as e:
-        yield _sse("error", {"message": f"SQL 执行失败: {str(e)}"})
+        logger.error(f"SQL execution failed: {e}\nSQL: {sql}")
+        yield _sse("error", {"message": "抱歉，查询未能成功执行，请尝试换一种方式提问。"})
         return
 
     yield _sse("data", {"columns": columns, "rows": safe_rows})
