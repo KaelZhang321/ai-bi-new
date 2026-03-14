@@ -71,8 +71,19 @@ prepare_compose_env() {
         print
         next
       }
-      gsub(/\$/, "$$$$")
-      print
+      eq = index($0, "=")
+      if (eq == 0) {
+        print
+        next
+      }
+      key = substr($0, 1, eq)
+      value = substr($0, eq + 1)
+      if (substr(value, 1, 1) == "'"'"'" && substr(value, length(value), 1) == "'"'"'") {
+        print
+        next
+      }
+      gsub(/\$/, "$$$$", value)
+      printf "%s%s\n", key, value
     }
   ' "${BACKEND_ENV_SOURCE}" > "${BACKEND_ENV_COMPOSE}"
 }
