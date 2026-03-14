@@ -10,6 +10,8 @@ interface PieChartProps {
 }
 
 const PieChart: React.FC<PieChartProps> = ({ data, title, height = 260 }) => {
+  const isCompact = height <= 220
+
   const option = {
     ...baseOption,
     color: chartPalette,
@@ -23,20 +25,20 @@ const PieChart: React.FC<PieChartProps> = ({ data, title, height = 260 }) => {
     },
     legend: {
       ...baseOption.legend,
-      orient: 'vertical' as const,
-      right: 4,
-      top: 'middle',
+      orient: 'horizontal' as const,
+      left: 'center',
+      bottom: isCompact ? 0 : 4,
       itemWidth: 8,
       itemHeight: 8,
-      itemGap: 12,
+      itemGap: isCompact ? 12 : 16,
       icon: 'circle',
-      textStyle: { color: '#8896B3', fontSize: 11, fontFamily: theme.fontFamily },
+      textStyle: { color: '#8896B3', fontSize: isCompact ? 10 : 11, fontFamily: theme.fontFamily },
     },
     series: [
       {
         type: 'pie' as const,
-        radius: ['42%', '66%'],
-        center: ['38%', '52%'],
+        radius: isCompact ? ['34%', '56%'] : ['38%', '60%'],
+        center: isCompact ? ['50%', '38%'] : ['50%', '42%'],
         avoidLabelOverlap: true,
         data,
         label: {
@@ -69,7 +71,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, title, height = 260 }) => {
     ],
   }
 
-  return <ReactECharts option={option} style={{ height }} />
+  return <ReactECharts option={option} style={{ width: '100%', height }} />
 }
 
 export default PieChart

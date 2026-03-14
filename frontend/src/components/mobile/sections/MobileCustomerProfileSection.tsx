@@ -9,12 +9,13 @@ import DistributionBarChart from '../../charts/DistributionBarChart'
 const MobileCustomerProfileSection: React.FC = () => {
   const { data, isLoading } = useCustomerProfile()
   if (isLoading || !data) return <LoadingSkeleton />
+  const levelChartHeight = Math.max(260, data.level_distribution.length * 26 + 72)
 
   return (
     <div>
       <MobileSectionTitle title="客户画像分析" subtitle="客户金额等级、身份类型、新老客户三维画像" accentColor="#8B5CF6" />
       <MobileCard glowColor="#3B82F6" title="金额等级分布">
-        <DistributionBarChart data={data.level_distribution} height={220} />
+        <DistributionBarChart data={data.level_distribution} height={levelChartHeight} />
       </MobileCard>
       <div style={{ height: 12 }} />
       <MobileCard glowColor="#8B5CF6" title="身份类型分布">

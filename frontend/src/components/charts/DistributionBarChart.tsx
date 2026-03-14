@@ -19,10 +19,12 @@ const DistributionBarChart: React.FC<DistributionBarChartProps> = ({
   const values = sortedData.map((item) => item.value)
   const percentages = sortedData.map((item) => item.percentage)
   const maxValue = Math.max(...values, 0)
+  const resolvedHeight = typeof height === 'number' ? Math.max(height, sortedData.length * 28 + 96) : height
 
   const option = {
     ...baseOption,
     color: [chartPalette[0]],
+    legend: { show: false },
     tooltip: {
       ...baseOption.tooltip,
       trigger: 'axis' as const,
@@ -51,19 +53,21 @@ const DistributionBarChart: React.FC<DistributionBarChartProps> = ({
     },
     grid: {
       ...baseOption.grid,
-      left: 132,
-      right: 72,
-      top: 12,
-      bottom: 14,
+      left: 148,
+      right: 118,
+      top: 6,
+      bottom: 30,
       containLabel: false,
     },
     xAxis: {
       type: 'value' as const,
       ...axisStyle,
+      splitNumber: 4,
       max: maxValue > 0 ? Math.ceil(maxValue * 1.12) : undefined,
+      axisLine: { show: false },
       axisLabel: {
         ...axisStyle.axisLabel,
-        formatter: (value: number) => value >= 1000 ? `${(value / 1000).toFixed(value % 1000 === 0 ? 0 : 1)}k` : `${value}`,
+        show: false,
       },
     },
     yAxis: {
@@ -73,9 +77,10 @@ const DistributionBarChart: React.FC<DistributionBarChartProps> = ({
       inverse: true,
       axisLabel: {
         ...axisStyle.axisLabel,
-        width: 114,
+        width: 136,
         overflow: 'truncate' as const,
-        margin: 14,
+        margin: 18,
+        lineHeight: 18,
         fontSize: 12,
         color: '#A8B4CC',
       },
@@ -91,11 +96,11 @@ const DistributionBarChart: React.FC<DistributionBarChartProps> = ({
           borderRadius: 999,
         },
         barWidth: 14,
-        barCategoryGap: '32%',
+        barCategoryGap: '38%',
         label: {
           show: true,
           position: 'right' as const,
-          distance: 10,
+          distance: 12,
           color: '#C7D2E4',
           fontSize: 11,
           fontWeight: 500,
@@ -146,7 +151,7 @@ const DistributionBarChart: React.FC<DistributionBarChartProps> = ({
     ],
   }
 
-  return <ReactECharts option={option} notMerge style={{ height }} />
+  return <ReactECharts option={option} notMerge style={{ height: resolvedHeight }} />
 }
 
 export default DistributionBarChart
