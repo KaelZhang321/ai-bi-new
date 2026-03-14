@@ -128,14 +128,35 @@ pnpm dev
 
 ## 部署
 
-项目支持 Docker 容器化部署：
+项目支持 Docker 容器化生产部署：
 
 ```bash
-# 构建并启动
-docker-compose up -d --build
+# 首次部署前准备配置
+cp .env.example backend/.env
+# 编辑 backend/.env 填入生产环境数据库和密钥
+
+# 一键构建并启动
+./deploy.sh start
+
+# 查看状态
+./deploy.sh status
+
+# 查看日志
+./deploy.sh logs
 
 # 停止服务
-docker-compose down
+./deploy.sh stop
+```
+
+默认端口：
+- 前端（Web + H5）：`http://localhost`
+- 后端 API：`http://localhost:8000`
+- API 文档：`http://localhost:8000/docs`
+
+如需修改端口，可在执行前临时指定环境变量：
+
+```bash
+FRONTEND_PORT=8080 BACKEND_PORT=18000 ./deploy.sh start
 ```
 
 ## 开发指南

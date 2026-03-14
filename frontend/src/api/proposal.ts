@@ -4,6 +4,7 @@ export interface ProposalRow {
   proposal_type: string
   sub_proposal_type: string | null
   target_count: number
+  actual_count: number
   target_amount: number
   actual_amount: number
 }
