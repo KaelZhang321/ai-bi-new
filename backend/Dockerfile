@@ -39,8 +39,14 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv pip install --system --no-cache -r ./requirements.txt \
     --extra-index-url https://pypi.tuna.tsinghua.edu.cn/simple 
 
+# 预装 ChromaDB ONNX 嵌入模型（避免运行时下载超时）
+COPY backend/onnx.tar.gz /tmp/onnx.tar.gz
+RUN mkdir -p /root/.cache/chroma/onnx_models/all-MiniLM-L6-v2 \
+    && tar -xzf /tmp/onnx.tar.gz -C /root/.cache/chroma/onnx_models/all-MiniLM-L6-v2/ \
+    && rm /tmp/onnx.tar.gz
+
 # 第五步：复制项目源代码
-COPY backend ./ 
+COPY backend ./
 COPY aibot-python-sdk /app/aibot-python-sdk
 
 # 暴露后端端口

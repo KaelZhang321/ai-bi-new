@@ -12,7 +12,9 @@ services:
     environment:
       TZ: ${TZ:-Asia/Shanghai}
       GUNICORN_WORKERS: ${GUNICORN_WORKERS:-2}
-      GUNICORN_TIMEOUT: ${GUNICORN_TIMEOUT:-120}
+      GUNICORN_TIMEOUT: ${GUNICORN_TIMEOUT:-600}
+    volumes:
+      - chroma-cache:/root/.cache/chroma
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
       interval: 30s
@@ -39,3 +41,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
+
+volumes:
+  chroma-cache:

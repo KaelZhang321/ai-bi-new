@@ -28,11 +28,11 @@ export interface SseCallback {
   onError?: (message: string) => void
 }
 
-export async function streamAiQuery(question: string, callbacks: SseCallback) {
+export async function streamAiQuery(question: string, callbacks: SseCallback, conversationId?: string) {
   const response = await fetch(`${apiBasePath}/v1/ai/query/stream`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ question }),
+    body: JSON.stringify({ question, conversation_id: conversationId }),
   })
 
   if (!response.ok || !response.body) {

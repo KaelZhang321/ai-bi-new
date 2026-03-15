@@ -12,10 +12,10 @@ router = APIRouter(prefix="/ai", tags=["AI查询"])
 
 @router.post("/query", response_model=ApiResponse[AiQueryResponse])
 def ai_query(req: AiQueryRequest, db: Session = Depends(get_db)):
-    result = execute_ai_query(req.question, db)
+    result = execute_ai_query(req.question, db, conversation_id=req.conversation_id)
     return ApiResponse(data=result)
 
 
 @router.post("/query/stream")
 async def ai_query_stream(req: AiQueryRequest, db: Session = Depends(get_db)):
-    return EventSourceResponse(execute_ai_query_stream(req.question, db))
+    return EventSourceResponse(execute_ai_query_stream(req.question, db, conversation_id=req.conversation_id))

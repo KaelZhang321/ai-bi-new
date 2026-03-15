@@ -24,6 +24,9 @@ backend/.env.compose
 *.swo
 .DS_Store
 
+# Models
+backend/onnx.tar.gz
+
 # Logs
 *.log
 .gitnexus

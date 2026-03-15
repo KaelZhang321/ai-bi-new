@@ -5,7 +5,7 @@ const MobileHeader: React.FC = () => {
   const todayStr = dayjs().format('YYYY-MM-DD')
   return (
   <div className="mobile-header">
-    <span className="mobile-header-title">大会数据看板</span>
+    <span className="mobile-header-title">大会数据分析看板</span>
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       <span style={{
         fontSize: 10,

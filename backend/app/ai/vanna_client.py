@@ -5,7 +5,7 @@ import logging
 from vanna.chromadb import ChromaDB_VectorStore
 
 from app.config import settings
-from app.ai.training_data import DDL_STATEMENTS, QA_PAIRS
+from app.ai.training_data import TABLES, QA_PAIRS
 
 logger = logging.getLogger(__name__)
 
@@ -73,12 +73,17 @@ def get_vanna() -> VolcanoVanna:
 
 
 def _train(vn: VolcanoVanna):
-    """用 DDL 语句和 QA 对训练 Vanna。"""
-    for ddl in DDL_STATEMENTS:
+    """从数据库读取真实 DDL 并结合 QA 对训练 Vanna。"""
+    # 从数据库自动获取真实 DDL
+    for table in TABLES:
         try:
-            vn.train(ddl=ddl)
+            result = vn.run_sql(f"SHOW CREATE TABLE {table}")
+            if result is not None and not result.empty:
+                ddl = result.iloc[0]["Create Table"]
+                logger.info(f"Training DDL for table: {table}")
+                vn.train(ddl=ddl)
         except Exception as e:
-            logger.warning(f"DDL training warning: {e}")
+            logger.warning(f"DDL training warning for {table}: {e}")
 
     for qa in QA_PAIRS:
         try:
