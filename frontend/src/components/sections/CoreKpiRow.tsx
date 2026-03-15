@@ -8,7 +8,7 @@ const colorMap: Record<string, string> = {
   报名客户: theme.colors.accentCyan,
   已抵达客户: theme.colors.accentGreen,
   已成交金额: theme.colors.accentAmber,
-  已消耗预算: theme.colors.accentRed,
+  新规划消耗: theme.colors.accentRed,
   已收款金额: theme.colors.accentPurple,
   总投资回报率: '#38BDF8',
 }

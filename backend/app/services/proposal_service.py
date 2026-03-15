@@ -6,12 +6,14 @@ from app.schemas.proposal import ProposalRow, ProposalCrossRow, ProposalDetail
 def get_proposal_overview(db: Session) -> list[ProposalRow]:
     sql = text("""
             SELECT
-                proposal_type,
-                target_count,
-                target_amount,
-                actual_count,
-                actual_amount
-            FROM meeting_proposal_targets
+                p.proposal_type,
+                p.target_count,
+                p.target_amount,
+                COUNT(t.special_remarks) AS actual_count,
+                SUM(t.new_deal_amount) AS actual_amount
+            FROM meeting_proposal_targets AS p
+						LEFT JOIN meeting_transaction_details AS t ON p.proposal_type = TRIM(t.special_remarks)
+						GROUP BY p.proposal_type, p.target_count, p.target_amount
             ORDER BY proposal_type;
     """)
     rows = db.execute(sql).mappings().all()

@@ -43,7 +43,7 @@ def get_kpi_overview(db: Session) -> KpiOverview:
         registered_customers=KpiItem(label="报名客户", value=registered, unit="人"),
         arrived_customers=KpiItem(label="已抵达客户", value=arrived, unit="人"),
         deal_amount=KpiItem(label="已成交金额", value=deal, prefix="¥", unit="万"),
-        consumed_budget=KpiItem(label="已消耗预算", value=consumed, prefix="¥", unit="万"),
+        consumed_budget=KpiItem(label="新规划消耗", value=consumed, prefix="¥", unit="万"),
         received_amount=KpiItem(label="已收款金额", value=received, prefix="¥", unit="万"),
         roi=KpiItem(label="总投资回报率", value=roi * 100, unit="%"),
     )

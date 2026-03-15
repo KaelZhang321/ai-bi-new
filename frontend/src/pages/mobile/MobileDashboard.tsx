@@ -17,7 +17,7 @@ const mobileKpiColors: Record<string, string> = {
   报名客户: '#3B82F6',
   已抵达客户: '#10B981',
   已成交金额: '#F59E0B',
-  已消耗预算: '#EF4444',
+  新规划消耗: '#EF4444',
   已收款金额: '#8B5CF6',
   总投资回报率: '#06B6D4',
 }
