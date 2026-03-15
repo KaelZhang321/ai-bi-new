@@ -7,13 +7,15 @@ from app.schemas.achievement import AchievementBar, AchievementRow, AchievementD
 def get_achievement_chart(db: Session) -> list[AchievementBar]:
     sql = text("""
         SELECT
-            region,
-            deal_target_low AS low_limit,
-            deal_target_high AS high_limit,
-            new_deal_amount AS deal_amount
-        FROM meeting_region_proposal_targets
-		WHERE region_owner IS NOT NULL
-		ORDER BY region
+            p.region,
+            COALESCE(p.deal_target_low, 0) AS low_limit,
+            COALESCE(p.deal_target_high, 0) AS high_limit,
+            COALESCE(SUM(t.new_deal_amount), 0) / 10000 AS deal_amount
+        FROM meeting_region_proposal_targets AS p
+		LEFT JOIN meeting_transaction_details AS t ON p.region = t.region
+		WHERE p.region_owner IS NOT NULL
+		GROUP BY p.region, low_limit, high_limit
+		ORDER BY p.region
     """)
     rows = db.execute(sql).mappings().all()
     return [
@@ -30,14 +32,16 @@ def get_achievement_chart(db: Session) -> list[AchievementBar]:
 def get_achievement_table(db: Session) -> list[AchievementRow]:
     sql = text("""
         SELECT
-            region,
-			COALESCE(new_deal_amount, 0) AS actual_amount,
-			COALESCE(deal_target, 0) AS target_amount,
-            COALESCE(deal_target_low, 0) AS min_limit,
-            COALESCE(deal_target_high, 0) AS max_limit
-        FROM meeting_region_proposal_targets
-		WHERE region_owner IS NOT NULL
-		ORDER BY region
+            p.region,
+			COALESCE(SUM(t.new_deal_amount), 0) / 10000 AS actual_amount,
+			COALESCE(p.deal_target, 0) AS target_amount,
+            COALESCE(p.deal_target_low, 0) AS min_limit,
+            COALESCE(p.deal_target_high, 0) AS max_limit
+        FROM meeting_region_proposal_targets AS p
+		LEFT JOIN meeting_transaction_details AS t ON p.region = t.region
+		WHERE p.region_owner IS NOT NULL
+		GROUP BY p.region, p.deal_target, p.deal_target_low, p.deal_target_high
+		ORDER BY p.region
     """)
     rows = db.execute(sql).mappings().all()
     result = []
@@ -73,8 +77,8 @@ def get_achievement_detail(db: Session, region: str | None = None) -> list[Achie
             branch,
             deal_type,
             deal_content,
-            COALESCE(new_deal_amount, 0) AS new_deal_amount,
-            COALESCE(received_amount, 0) AS received_amount,
+            COALESCE(new_deal_amount, 0) / 10000 AS new_deal_amount,
+            COALESCE(received_amount, 0) / 10000 AS received_amount,
             plan_type,
             record_date
         FROM meeting_transaction_details

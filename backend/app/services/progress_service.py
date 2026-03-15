@@ -7,11 +7,13 @@ from app.schemas.progress import ProgressItem, ProgressSummary
 def get_progress(db: Session) -> ProgressSummary:
     sql = text("""
         SELECT
-            region,
-            COALESCE(deal_target_high, 0) AS high_limit,
-            COALESCE(new_deal_amount, 0) AS deal_amount
-        FROM meeting_region_proposal_targets
-		WHERE region_owner IS NOT NULL
+            p.region,
+            COALESCE(p.deal_target_high, 0) AS high_limit,
+            COALESCE(SUM(t.new_deal_amount), 0) / 10000 AS deal_amount
+        FROM meeting_region_proposal_targets AS p
+		LEFT JOIN meeting_transaction_details AS t ON p.region = t.region
+		WHERE p.region_owner IS NOT NULL
+		GROUP BY p.region, p.deal_target_high
         ORDER BY deal_amount DESC
     """)
     rows = db.execute(sql).mappings().all()
