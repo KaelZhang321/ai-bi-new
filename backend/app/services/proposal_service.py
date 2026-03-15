@@ -23,7 +23,7 @@ def get_proposal_overview(db: Session) -> list[ProposalRow]:
             target_count=int(r["target_count"] or 0),
             target_amount=float(r["target_amount"] or 0),
             actual_count=int(r["actual_count"] or 0),
-            actual_amount=float(r["actual_amount"] or 0),
+            actual_amount=float(r["actual_amount"] or 0) / 10000,
         )
         for r in rows
     ]

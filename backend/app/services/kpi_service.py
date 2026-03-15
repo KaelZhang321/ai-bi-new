@@ -24,17 +24,17 @@ def get_kpi_overview(db: Session) -> KpiOverview:
 
     # 成交/消耗/收款
     row = db.execute(
-        text(
-            "SELECT "
-            "  COALESCE(SUM(new_deal_amount), 0) AS deal, "
-            "  COALESCE(SUM(consumed_amount), 0) AS consumed, "
-            "  COALESCE(SUM(received_amount), 0) AS received "
-            "FROM meeting_transaction_details"
-        )
+        text("""
+            SELECT 
+            COALESCE(SUM(new_deal_amount), 0) AS deal, 
+            COALESCE(SUM(consumed_amount), 0) AS consumed, 
+            COALESCE(SUM(received_amount), 0) AS received
+            FROM meeting_transaction_details
+        """)
     ).mappings().first()
-    deal = float(row["deal"])
-    consumed = float(row["consumed"])
-    received = float(row["received"])
+    deal = float(row["deal"]) / 10000
+    consumed = float(row["consumed"]) / 10000
+    received = float(row["received"]) / 10000
 
     # ROI = (Budget / Deal) * 0.4. Since budget and deal are both in '万', they cancel out.
     roi = round(TOTAL_BUDGET / deal * 0.4, 4) if deal else 0
