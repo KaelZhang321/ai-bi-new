@@ -6,6 +6,7 @@ WebSocket 长连接管理器
 """
 
 import asyncio
+import inspect
 import json
 import ssl
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -42,6 +43,17 @@ try:
         return False
 except ImportError:
     raise ImportError("请安装 websockets: pip install websockets>=12.0")
+
+
+def _websockets_connect_supports_proxy() -> bool:
+    """检测当前 websockets.connect 是否支持 proxy 参数（兼容多版本）。"""
+    try:
+        return "proxy" in inspect.signature(websockets.connect).parameters
+    except (TypeError, ValueError):
+        return False
+
+
+_WS_CONNECT_SUPPORTS_PROXY = _websockets_connect_supports_proxy()
 
 
 class _ReplyQueueItem:
@@ -123,13 +135,17 @@ class WsConnectionManager:
         self._logger.info(f"Connecting to WebSocket: {self._ws_url}...")
 
         try:
-            self._ws = await websockets.connect(
-                self._ws_url,
-                ssl=_SSL_CONTEXT,
-                ping_interval=None,  # 我们自己管理心跳
-                ping_timeout=None,
-                close_timeout=5,
-            )
+            connect_kwargs = {
+                "ssl": _SSL_CONTEXT,
+                "ping_interval": None,  # 我们自己管理心跳
+                "ping_timeout": None,
+                "close_timeout": 5,
+            }
+            # websockets>=15 会默认继承系统代理，显式禁用可避免 SOCKS 依赖问题。
+            if _WS_CONNECT_SUPPORTS_PROXY:
+                connect_kwargs["proxy"] = None
+
+            self._ws = await websockets.connect(self._ws_url, **connect_kwargs)
 
             self._reconnect_attempts = 0
             self._missed_pong_count = 0
