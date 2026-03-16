@@ -40,7 +40,7 @@ def get_trend_data(db: Session) -> list[TrendPoint]:
             CASE
                 WHEN time_period LIKE '%上午%' THEN '上午'
                 WHEN time_period LIKE '%下午%' THEN '下午'
-                WHEN time_period LIKE '%午餐%' THEN '下午'
+                WHEN time_period LIKE '%午餐%' THEN '中午'
                 WHEN time_period LIKE '%晚餐%' THEN '晚上'
                 WHEN time_period LIKE '%晚上%' THEN '晚上'
                 ELSE '全天'
