@@ -11,6 +11,7 @@ from app.api.v1 import (
     proposal,
     ai_query,
     wecom,
+    chart,
 )
 
 api_router = APIRouter()
@@ -27,3 +28,4 @@ api_router.include_router(progress.router, prefix=v1_prefix)
 api_router.include_router(proposal.router, prefix=v1_prefix)
 api_router.include_router(ai_query.router, prefix=v1_prefix)
 api_router.include_router(wecom.router, prefix=v1_prefix)
+api_router.include_router(chart.router, prefix=v1_prefix)
