@@ -313,6 +313,11 @@
   border-radius: 16px;
   min-height: 132px;
   padding: 14px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
   box-shadow: 0 12px 24px rgba(24, 53, 138, 0.22), inset 0 1px 0 rgba(242, 249, 255, 0.36);
 }
 
@@ -329,11 +334,9 @@
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.5px;
-}
-
-.mobile-kpi-grid--primary .mobile-kpi-card__bg-num {
-  font-size: 46px;
-  opacity: 0.06;
+  width: 100%;
+  text-align: left;
+  align-self: flex-start;
 }
 
 .mobile-kpi-card--compact {
@@ -351,18 +354,6 @@
   left: 0;
   right: 0;
   height: 2px;
-}
-
-.mobile-kpi-card__bg-num {
-  position: absolute;
-  bottom: -8px;
-  right: 1px;
-  font-size: 40px;
-  font-family: var(--font-display);
-  line-height: 1;
-  user-select: none;
-  pointer-events: none;
-  opacity: 0.08;
 }
 
 .mobile-card {

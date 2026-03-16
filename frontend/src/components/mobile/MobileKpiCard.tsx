@@ -37,9 +37,6 @@ const MobileKpiCard: React.FC<MobileKpiCardProps> = ({
           : `linear-gradient(90deg, ${color}, ${color}80)`,
       }}
     />
-    <div className="mobile-kpi-card__bg-num" style={{ color }}>
-      {Math.round(value)}
-    </div>
     <div className="mobile-kpi-card__label">{label}</div>
     <AnimatedNumber
       value={value}
