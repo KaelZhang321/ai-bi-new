@@ -68,10 +68,10 @@ const PieChart: React.FC<PieChartProps> = ({ data, title, height = 260 }) => {
           length2: 12,
         },
         itemStyle: {
-          borderColor: 'rgba(2,10,24,0.9)',
-          borderWidth: 2,
-          shadowBlur: 12,
-          shadowColor: 'rgba(0,0,0,0.3)',
+          borderColor: 'transparent',
+          borderWidth: 0,
+          shadowBlur: 8,
+          shadowColor: 'rgba(63,101,224,0.16)',
         },
         emphasis: {
           scale: true,

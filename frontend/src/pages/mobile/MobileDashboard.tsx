@@ -16,8 +16,8 @@ import '../../styles/mobile.css'
 const mobileKpiColors: Record<string, string> = {
   报名客户: '#3B82F6',
   已抵达客户: '#10B981',
-  已成交金额: '#F59E0B',
-  新规划消耗: '#EF4444',
+  已成交金额: '#4E6BFF',
+  新规划消耗: '#18B7A0',
   已收款金额: '#8B5CF6',
   总投资回报率: '#06B6D4',
 }
@@ -32,42 +32,42 @@ const pageVariants = {
 
 const mobileLightTheme = {
   token: {
-    colorPrimary: '#3B82F6',
+    colorPrimary: '#2E64F6',
     colorBgContainer: '#FFFFFF',
     colorBgElevated: '#FFFFFF',
-    colorBgLayout: '#F2F4F8',
-    colorText: '#1A1D2E',
-    colorTextSecondary: '#6B7280',
-    colorBorder: '#E5E7EB',
-    colorBorderSecondary: '#F3F4F6',
-    borderRadius: 10,
-    fontFamily: "'Noto Sans SC', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    colorBgLayout: '#F3F6FC',
+    colorText: '#162038',
+    colorTextSecondary: '#6C7895',
+    colorBorder: '#DFE7F3',
+    colorBorderSecondary: '#ECF1F8',
+    borderRadius: 12,
+    fontFamily: "'Noto Sans SC', 'Saira Semi Condensed', 'PingFang SC', 'Microsoft YaHei', sans-serif",
     fontSize: 13,
   },
   components: {
     Table: {
-      headerBg: '#F8F9FB',
-      headerColor: '#6B7280',
-      rowHoverBg: '#F8FAFC',
-      borderColor: '#F3F4F6',
+      headerBg: '#F5F8FE',
+      headerColor: '#6C7895',
+      rowHoverBg: '#F6F9FF',
+      borderColor: '#EAF0F8',
       colorBgContainer: '#FFFFFF',
       cellFontSize: 13,
       headerFontSize: 11,
     },
     Skeleton: {
-      color: '#F3F4F6',
-      colorGradientEnd: '#E5E7EB',
+      color: '#EAF0F8',
+      colorGradientEnd: '#DCE7F6',
     },
     Select: {
-      optionSelectedBg: '#EFF6FF',
-      optionSelectedColor: '#3B82F6',
-      optionActiveBg: '#F8FAFC',
-      selectorBg: '#F8F9FB',
-      colorBorder: '#E5E7EB',
+      optionSelectedBg: '#ECF3FF',
+      optionSelectedColor: '#2E64F6',
+      optionActiveBg: '#F5F8FE',
+      selectorBg: '#F5F8FE',
+      colorBorder: '#DFE7F3',
     },
     DatePicker: {
-      colorBgContainer: '#F8F9FB',
-      colorBorder: '#E5E7EB',
+      colorBgContainer: '#F5F8FE',
+      colorBorder: '#DFE7F3',
     },
     Drawer: {
       colorBgElevated: '#FFFFFF',
@@ -82,42 +82,64 @@ const MobileDashboard: React.FC = () => {
   const ActivePage = pages[activeTab]
 
   const kpiItems = kpiData
-    ? [kpiData.registered_customers, kpiData.arrived_customers, kpiData.deal_amount, kpiData.consumed_budget, kpiData.received_amount, kpiData.roi]
+    ? [kpiData.deal_amount, kpiData.consumed_budget, kpiData.arrived_customers, kpiData.registered_customers, kpiData.received_amount, kpiData.roi]
     : []
+  const primaryKpis = kpiItems.slice(0, 2)
+  const secondaryKpis = kpiItems.slice(2)
 
   return (
     <ConfigProvider theme={mobileLightTheme}>
       <div className="mobile-container">
         <MobileHeader />
         <div className="mobile-content">
-          {/* KPI 网格 2x3 */}
+          {/* KPI 网格 */}
           {kpiLoading ? (
-            <div style={{ padding: '8px 0 20px' }}>
-              <div style={{ background: '#fff', borderRadius: 14, padding: 24 }}>
-                <div style={{ height: 60, background: '#F3F4F6', borderRadius: 8, animation: 'skeleton-pulse 1.8s ease-in-out infinite' }} />
+            <div style={{ padding: '4px 0 14px' }}>
+              <div style={{ background: '#fff', borderRadius: 14, padding: 16, border: '1px solid #DFE7F3' }}>
+                <div style={{ height: 60, background: '#EAF0F8', borderRadius: 10, animation: 'skeleton-pulse 1.8s ease-in-out infinite' }} />
               </div>
             </div>
           ) : (
-            <div className="mobile-kpi-grid">
-              {kpiItems.map((item) => (
-                <MobileKpiCard
-                  key={item.label}
-                  label={item.label}
-                  value={item.value}
-                  prefix={item.prefix}
-                  unit={item.unit}
-                  color={mobileKpiColors[item.label]}
-                />
-              ))}
+            <div className="mobile-kpi-panel">
+              <div className="mobile-kpi-grid mobile-kpi-grid--primary">
+                {primaryKpis.map((item) => (
+                  <MobileKpiCard
+                    key={item.label}
+                    label={item.label}
+                    value={item.value}
+                    prefix={item.prefix}
+                    unit={item.unit}
+                    color={mobileKpiColors[item.label]}
+                    featured
+                  />
+                ))}
+              </div>
+              <div className="mobile-kpi-secondary-wrap">
+                <div className="mobile-kpi-grid mobile-kpi-grid--secondary">
+                  {secondaryKpis.map((item) => (
+                    <MobileKpiCard
+                      key={item.label}
+                      label={item.label}
+                      value={item.value}
+                      prefix={item.prefix}
+                      unit={item.unit}
+                      color={mobileKpiColors[item.label]}
+                      compact
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
           {/* 页面内容 */}
-          <AnimatePresence mode="wait">
-            <motion.div key={activeTab} variants={pageVariants} initial="initial" animate="animate" exit="exit">
-              <ActivePage />
-            </motion.div>
-          </AnimatePresence>
+          <div className="mobile-page-shell">
+            <AnimatePresence mode="wait">
+              <motion.div key={activeTab} variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                <ActivePage />
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
         <MobileTabBar activeTab={activeTab} onTabChange={setActiveTab} />
 
