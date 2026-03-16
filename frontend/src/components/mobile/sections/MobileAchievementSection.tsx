@@ -1,6 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react'
 import { useAchievementChart, useAchievementTable } from '../../../hooks/useApi'
-import MobileSectionTitle from '../MobileSectionTitle'
 import MobileCard from '../MobileCard'
 import MobileDataTable from '../MobileDataTable'
 import MobileDrillDrawer from '../MobileDrillDrawer'
@@ -66,8 +65,11 @@ const MobileAchievementSection: React.FC = () => {
 
   return (
     <div>
-      <MobileSectionTitle title="目标 VS 达成" subtitle="各区域成交目标完成情况" accentColor="#EF4444" />
-      <MobileCard glowColor="#EF4444" title="目标 VS 达成对比图" subtitle="点击柱体查看明细">
+      <MobileCard
+        glowColor="#10B981"
+        title="目标 VS 达成"
+        subtitle="各区域成交目标完成情况"
+      >
         <GroupedBarChart categories={chart.categories} series={chart.series} height={260} onBarClick={handleChartClick} />
       </MobileCard>
       <div style={{ height: 12 }} />

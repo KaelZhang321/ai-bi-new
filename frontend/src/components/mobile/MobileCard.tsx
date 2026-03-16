@@ -9,8 +9,9 @@ interface MobileCardProps {
   style?: React.CSSProperties
 }
 
-const MobileCard: React.FC<MobileCardProps> = ({ children, title, subtitle, glowColor, extra, style }) => {
-  const color = glowColor || '#3B82F6'
+const MobileCard: React.FC<MobileCardProps> = ({ children, title, subtitle, glowColor: _glowColor, extra, style }) => {
+  const matrixBaseColor = '#3B82F6'
+  const color = matrixBaseColor
   return (
     <div className="mobile-card" style={{ ...style, ['--mobile-card-accent' as string]: color }}>
       {title && (

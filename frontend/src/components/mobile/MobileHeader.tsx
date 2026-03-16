@@ -7,8 +7,6 @@ const MobileHeader: React.FC = () => {
 
   return (
     <div className="mobile-header">
-      <div className="mobile-header-nav">会议数据分析驾驶舱</div>
-
       <div className="mobile-header-row">
         <div className="mobile-header-brand">
           <div className="mobile-header-title">318梅赛尔国际健康节</div>

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { antdDarkTheme } from './styles/theme'
 import Dashboard from './pages/Dashboard'
 import MobileDashboard from './pages/mobile/MobileDashboard'
+import ChartView from './pages/ChartView'
 import { normalizedBasePath } from './utils/base-path'
 
 const queryClient = new QueryClient({
@@ -41,6 +42,7 @@ const App: React.FC = () => (
         <Routes>
           <Route path="/" element={<HomeRoute />} />
           <Route path="/mobile" element={<MobileDashboard />} />
+          <Route path="/chart/:id" element={<ChartView />} />
         </Routes>
       </BrowserRouter>
     </ConfigProvider>

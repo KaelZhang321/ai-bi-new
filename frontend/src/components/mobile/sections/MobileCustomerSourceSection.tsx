@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import { useProgress, useSourceDistribution } from '../../../hooks/useApi'
-import MobileSectionTitle from '../MobileSectionTitle'
 import MobileCard from '../MobileCard'
 import LoadingSkeleton from '../../common/LoadingSkeleton'
 import StackedBarChart from '../../charts/StackedBarChart'
@@ -39,8 +38,11 @@ const MobileCustomerSourceSection: React.FC = () => {
 
   return (
     <div>
-      <MobileSectionTitle title="客户来源 + 任务进展" subtitle="来源渠道结构与区域完成度" accentColor="#10B981" />
-      <MobileCard glowColor="#3B82F6" title="客户报名统计" subtitle="按大区·来源类型">
+      <MobileCard
+        glowColor="#10B981"
+        title="客户来源分布"
+        subtitle="按区域与来源类型对比"
+      >
         <StackedBarChart categories={sourceChart.categories} series={sourceChart.series} height={260} />
       </MobileCard>
       <div style={{ height: 12 }} />
