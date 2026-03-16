@@ -59,6 +59,7 @@ def get_trend_data(db: Session) -> list[TrendPoint]:
         WHERE time_period NOT LIKE '%率%'
             AND time_period NOT LIKE '%占比%'
         GROUP BY schedule_date, day_time_period, scene_label
+        HAVING scene_label != '其他'
         ORDER BY schedule_date, day_time_period
     """)
     rows = db.execute(sql).mappings().all()
