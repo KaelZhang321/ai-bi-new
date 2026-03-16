@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import { useProgress } from '../../../hooks/useApi'
-import MobileSectionTitle from '../MobileSectionTitle'
 import MobileCard from '../MobileCard'
 import LoadingSkeleton from '../../common/LoadingSkeleton'
 import HorizontalBarChart from '../../charts/HorizontalBarChart'
@@ -24,8 +23,7 @@ const MobileProgressSection: React.FC = () => {
 
   return (
     <div>
-      <MobileSectionTitle title="完成进度排行" subtitle="前景柱=成交金额 | 底条=高限" accentColor="#F59E0B" />
-      <MobileCard glowColor="#F59E0B" title="各区域完成度" subtitle={`平均完成率: ${data.avg_completion_rate ?? 0}%`}>
+      <MobileCard glowColor="#10B981" title="任务进展" subtitle={`平均完成率 ${(data.avg_completion_rate ?? 0).toFixed(2)}%`}>
         <HorizontalBarChart categories={chart.categories} series={chart.series} completionRates={chart.completionRates} height={Math.max(240, data.items.length * 32)} />
       </MobileCard>
     </div>

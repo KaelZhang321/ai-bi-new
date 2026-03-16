@@ -69,7 +69,7 @@ const AchievementSection: React.FC = () => {
         <div className="goal-section-heading-subtitle">各区域成交目标完成情况</div>
       </div>
       <div className="achievement-grid">
-        <DashboardCard glowColor={theme.colors.accentRed} title="目标 VS 达成对比图" subtitle="点击柱体查看成交明细" fill>
+        <DashboardCard glowColor={theme.colors.accentRed} fill>
           <GroupedBarChart categories={chart.categories} series={chart.series} height="100%" onBarClick={handleChartClick} />
         </DashboardCard>
         <DashboardCard glowColor={theme.colors.accentRed} title="达成率明细表">

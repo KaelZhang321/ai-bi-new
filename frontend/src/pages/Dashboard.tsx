@@ -75,10 +75,7 @@ const Dashboard: React.FC = () => {
   const { data: progressData, isLoading: progressLoading } = useProgress()
 
   const dealAmountItem = kpiData?.deal_amount
-  const receivedAmountItem = kpiData?.received_amount
-
   const dealAmountLabel = dealAmountItem?.label || '已成交金额'
-  const receivedAmountLabel = receivedAmountItem?.label || '已收款金额'
 
   const centerAmount = useMemo(() => {
     if (!dealAmountItem) return '--'
@@ -86,11 +83,6 @@ const Dashboard: React.FC = () => {
   }, [dealAmountItem])
 
   const centerUnit = useMemo(() => (dealAmountItem?.unit ? `${dealAmountItem.unit}` : ''), [dealAmountItem])
-
-  const monthAmount = useMemo(() => {
-    if (!receivedAmountItem) return '--'
-    return `${receivedAmountItem.prefix || ''}${formatNumber(receivedAmountItem.value)}${receivedAmountItem.unit || ''}`
-  }, [receivedAmountItem])
 
   const sceneCards = useMemo(() => {
     const fallback = [
@@ -281,7 +273,7 @@ const Dashboard: React.FC = () => {
         >
           <div className="panel-header">
             <div className="panel-title">客户画像分析</div>
-            <div className="panel-subtitle">金额等级 / 身份类型 / 新老客户</div>
+            <div className="panel-subtitle">客户来源 / 身份类型 / 新老客户</div>
           </div>
 
           <div className="side-panel-body">
@@ -302,10 +294,14 @@ const Dashboard: React.FC = () => {
                   </div>
                 </div>
                 <div className="mini-chart-card">
-                  <div className="mini-chart-title">金额等级分布</div>
-                  <div className="mini-chart-content">
-                    <DistributionBarChart data={customerProfile.level_distribution} height="100%" />
-                  </div>
+                  <div className="mini-chart-title">客户来源分布</div>
+                  {sourceLoading ? (
+                    <LoadingSkeleton />
+                  ) : (
+                    <div className="mini-chart-content">
+                      <DistributionBarChart data={sourceDistribution} height="100%" seriesName="客户数" />
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -325,7 +321,6 @@ const Dashboard: React.FC = () => {
                 {kpiLoading ? '--' : centerAmount}
                 <span className="hero-unit">{centerUnit}</span>
               </div>
-              <div className="hero-subamount">{receivedAmountLabel} {monthAmount}</div>
             </div>
             <div className="hero-divider" />
             <div className="hero-channels">
@@ -418,19 +413,19 @@ const Dashboard: React.FC = () => {
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="panel-header">
-            <div className="panel-title">客户来源 + 任务进展</div>
-            <div className="panel-subtitle">来源渠道结构与区域完成度</div>
+            <div className="panel-title">金额等级 + 任务进展</div>
+            <div className="panel-subtitle">金额等级结构与区域完成度</div>
           </div>
 
           <div className="side-panel-body">
             <div className="chart-stack chart-stack--right">
               <div className="mini-chart-card">
-                <div className="mini-chart-title">客户来源分布</div>
-                {sourceLoading ? (
+                <div className="mini-chart-title">金额等级分布</div>
+                {profileLoading || !customerProfile ? (
                   <LoadingSkeleton />
                 ) : (
                   <div className="mini-chart-content">
-                    <DistributionBarChart data={sourceDistribution} height="100%" seriesName="客户数" />
+                    <DistributionBarChart data={customerProfile.level_distribution} height="100%" />
                   </div>
                 )}
               </div>

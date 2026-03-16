@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import { useProposalOverview } from '../../../hooks/useApi'
-import MobileSectionTitle from '../MobileSectionTitle'
 import MobileCard from '../MobileCard'
 import MobileDataTable from '../MobileDataTable'
 import LoadingSkeleton from '../../common/LoadingSkeleton'
@@ -54,7 +53,6 @@ const MobileProposalSection: React.FC = () => {
 
   return (
     <div>
-      <MobileSectionTitle title="方案目标 VS 达成" subtitle="各成交方案目标与达成" accentColor="#F59E0B" />
       <MobileCard glowColor="#F59E0B" title="方案概览表" subtitle="各方案目标配置与实际达成">
         {overviewData && overviewData.length > 0 ? (
           <MobileDataTable<ProposalRow> columns={overviewColumns} dataSource={overviewData} rowKey={(r) => `${r.proposal_type}-${r.sub_proposal_type || 'default'}`} />

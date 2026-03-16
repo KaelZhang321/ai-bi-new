@@ -3,7 +3,6 @@ import { DatePicker, Select } from 'antd'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 import { useOperationsKpi, useTrendData } from '../../../hooks/useApi'
-import MobileSectionTitle from '../MobileSectionTitle'
 import MobileCard from '../MobileCard'
 import MobileKpiCard from '../MobileKpiCard'
 import LoadingSkeleton from '../../common/LoadingSkeleton'
@@ -49,8 +48,7 @@ const MobileOperationsSection: React.FC = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-        <MobileSectionTitle title="会议运营数据" subtitle="实时运营概况与时间维度趋势分析" accentColor="#10B981" />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 14 }}>
         <DatePicker
           defaultValue={dayjs()}
           onChange={handleDateChange}

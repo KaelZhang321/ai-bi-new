@@ -46,19 +46,19 @@ const MobileKpiCard: React.FC<MobileKpiCardProps> = ({
       prefix={prefix}
       unit={unit}
       style={{
-        fontSize: compact ? 20 : 24,
-        fontWeight: 800,
+        fontSize: compact ? 20 : featured ? 'clamp(29px, 7.8vw, 36px)' : 24,
+        fontWeight: featured ? 900 : 800,
         fontFamily: "'MiSans-Heavy', 'Orbitron', 'JetBrains Mono', monospace",
         color: featured ? '#FFFFFF' : color,
-        letterSpacing: -0.5,
-        lineHeight: 1.1,
+        letterSpacing: featured ? -0.75 : -0.5,
+        lineHeight: featured ? 1.04 : 1.1,
       }}
       unitStyle={{
-        fontSize: compact ? 11 : 12,
+        fontSize: compact ? 11 : featured ? 16 : 12,
         fontWeight: 600,
         color: featured ? '#EAF3FF' : color,
         opacity: featured ? 0.88 : 0.65,
-        marginLeft: 3,
+        marginLeft: featured ? 4 : 3,
         fontFamily: "'Noto Sans SC', 'PingFang SC', sans-serif",
       }}
     />

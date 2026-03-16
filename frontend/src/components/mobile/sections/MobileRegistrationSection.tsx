@@ -1,6 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react'
 import { useRegistrationMatrix } from '../../../hooks/useApi'
-import MobileSectionTitle from '../MobileSectionTitle'
 import MobileCard from '../MobileCard'
 import MobileDataTable from '../MobileDataTable'
 import MobileDrillDrawer from '../MobileDrillDrawer'
@@ -62,8 +61,11 @@ const MobileRegistrationSection: React.FC = () => {
 
   return (
     <div>
-      <MobileSectionTitle title="报名 VS 签到情况" subtitle="按区域查看报名与抵达人数对比" accentColor="#3B82F6" />
-      <MobileCard title="报名/抵达统计" subtitle="按区域查看报名与抵达人数对比 | 点击柱体查看明细" glowColor="#3B82F6">
+      <MobileCard
+        glowColor="#10B981"
+        title="报名 VS 签到情况"
+        subtitle="各区域报名与抵达人数对比"
+      >
         <GroupedBarChart categories={categories} series={series} height={260} onBarClick={handleChartClick} />
       </MobileCard>
       <div style={{ height: 12 }} />

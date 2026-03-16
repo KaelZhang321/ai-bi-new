@@ -100,7 +100,7 @@ const MobileDashboard: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="mobile-kpi-panel">
+            <>
               <div className="mobile-kpi-grid mobile-kpi-grid--primary">
                 {primaryKpis.map((item) => (
                   <MobileKpiCard
@@ -114,7 +114,7 @@ const MobileDashboard: React.FC = () => {
                   />
                 ))}
               </div>
-              <div className="mobile-kpi-secondary-wrap">
+              <div className="mobile-kpi-secondary-panel">
                 <div className="mobile-kpi-grid mobile-kpi-grid--secondary">
                   {secondaryKpis.map((item) => (
                     <MobileKpiCard
@@ -129,7 +129,7 @@ const MobileDashboard: React.FC = () => {
                   ))}
                 </div>
               </div>
-            </div>
+            </>
           )}
 
           {/* 页面内容 */}
