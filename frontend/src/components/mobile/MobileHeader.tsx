@@ -1,42 +1,22 @@
 import React from 'react'
 import dayjs from 'dayjs'
+import eventLogo from '../../styles/logo.png'
 
 const MobileHeader: React.FC = () => {
-  const todayStr = dayjs().format('YYYY-MM-DD')
+  const updateTime = dayjs().format('YYYY-MM-DD HH:mm:ss')
+
   return (
-  <div className="mobile-header">
-    <span className="mobile-header-title">大会数据分析看板</span>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <span style={{
-        fontSize: 10,
-        color: '#9CA3AF',
-        fontFamily: "'JetBrains Mono', monospace",
-        letterSpacing: 0.3,
-      }}>
-        {todayStr}
-      </span>
-      <div style={{ width: 1, height: 10, background: 'rgba(16,185,129,0.15)' }} />
-      <div className="mobile-header-live">
-        <div style={{
-          width: 7,
-          height: 7,
-          borderRadius: '50%',
-          background: '#10B981',
-          boxShadow: '0 0 6px rgba(16, 185, 129, 0.5)',
-          animation: 'pulse-glow 2s ease-in-out infinite',
-        }} />
-        <span style={{
-          fontSize: 10,
-          color: '#10B981',
-          fontWeight: 700,
-          fontFamily: "'JetBrains Mono', monospace",
-          letterSpacing: 0.5,
-        }}>
-          LIVE
-        </span>
+    <div className="mobile-header">
+      <div className="mobile-header-nav">会议数据分析驾驶舱</div>
+
+      <div className="mobile-header-row">
+        <div className="mobile-header-brand">
+          <div className="mobile-header-title">318梅赛尔国际健康节</div>
+          <div className="mobile-header-time">{updateTime}</div>
+        </div>
+        <img className="mobile-header-logo" src={eventLogo} alt="318梅赛尔国际健康节 Logo" />
       </div>
     </div>
-  </div>
   )
 }
 

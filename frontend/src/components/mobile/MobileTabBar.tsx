@@ -45,7 +45,9 @@ const MobileTabBar: React.FC<MobileTabBarProps> = ({ activeTab, onTabChange }) =
         className={`mobile-tabbar-item ${activeTab === i ? 'mobile-tabbar-item--active' : 'mobile-tabbar-item--inactive'}`}
         onClick={() => onTabChange(i)}
       >
-        {tab.icon}
+        <span className="mobile-tabbar-item__icon-wrap">
+          {tab.icon}
+        </span>
         <span>{tab.label}</span>
       </button>
     ))}

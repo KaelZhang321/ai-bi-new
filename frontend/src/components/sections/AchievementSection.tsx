@@ -1,7 +1,6 @@
 import React, { useMemo, useState, useCallback } from 'react'
 import { useAchievementChart, useAchievementTable } from '../../hooks/useApi'
 import DashboardCard from '../common/DashboardCard'
-import SectionTitle from '../common/SectionTitle'
 import LoadingSkeleton from '../common/LoadingSkeleton'
 import GroupedBarChart from '../charts/GroupedBarChart'
 import DataTable from '../common/DataTable'
@@ -65,8 +64,11 @@ const AchievementSection: React.FC = () => {
 
   return (
     <div>
-      <SectionTitle title="目标 VS 达成" subtitle="各区域成交目标完成情况" accentColor={theme.colors.accentRed} />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+      <div className="goal-section-heading">
+        <div className="goal-section-heading-title">目标 VS 达成</div>
+        <div className="goal-section-heading-subtitle">各区域成交目标完成情况</div>
+      </div>
+      <div className="achievement-grid">
         <DashboardCard glowColor={theme.colors.accentRed} title="目标 VS 达成对比图" subtitle="点击柱体查看成交明细" fill>
           <GroupedBarChart categories={chart.categories} series={chart.series} height="100%" onBarClick={handleChartClick} />
         </DashboardCard>

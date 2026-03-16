@@ -9,6 +9,7 @@ import StackedBarChart from '../../charts/StackedBarChart'
 import { fetchRegistrationDetail, type RegistrationDetail } from '../../../api/registration'
 import type { MatrixRow } from '../../../api/registration'
 
+
 const columns = [
   { title: '大区', dataIndex: 'region', key: 'region', fixed: 'left' as const, width: 60 },
   { title: '千万(报)', dataIndex: 'qianwan_register', key: 'qr', width: 62 },

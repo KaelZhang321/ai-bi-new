@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700;900&family=Oxanium:wght@500;600;700&family=Rajdhani:wght@500;600;700&family=Saira+Semi+Condensed:wght@400;500;600;700&display=swap');
 
 @font-face {
   font-family: 'MiSans-Heavy';
@@ -9,29 +9,29 @@
 }
 
 :root {
-  --bg-page: #020a18;
-  --bg-card: rgba(6, 16, 40, 0.72);
-  --bg-card-solid: #071230;
-  --bg-card-hover: rgba(10, 22, 52, 0.85);
-  --accent-cyan: #22D3EE;
-  --accent-blue: #3B82F6;
-  --accent-red: #F87171;
-  --accent-amber: #FBBF24;
-  --accent-green: #34D399;
-  --accent-purple: #A78BFA;
-  --text-primary: #E8ECF4;
-  --text-secondary: #6B7A99;
-  --text-tertiary: #4A5568;
-  --border-glow: rgba(34, 211, 238, 0.3);
-  --border-subtle: rgba(34, 211, 238, 0.08);
-  --font-family: 'Noto Sans SC', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', Consolas, monospace;
-  --font-display: 'MiSans-Heavy', 'Orbitron', 'JetBrains Mono', monospace;
+  --bg-page: #050f24;
+  --bg-card: rgba(14, 31, 73, 0.74);
+  --bg-card-solid: #0d2455;
+  --bg-card-hover: rgba(26, 54, 122, 0.85);
+  --accent-cyan: #79e7ff;
+  --accent-blue: #4f8cff;
+  --accent-red: #ff9ea4;
+  --accent-amber: #ffd166;
+  --accent-green: #6fe7c8;
+  --accent-purple: #9cb8ff;
+  --text-primary: #f3f8ff;
+  --text-secondary: #9fb7db;
+  --text-tertiary: #6f89b3;
+  --border-glow: rgba(121, 231, 255, 0.34);
+  --border-subtle: rgba(121, 231, 255, 0.11);
+  --font-family: 'Saira Semi Condensed', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'Oxanium', 'Rajdhani', 'JetBrains Mono', 'SF Mono', monospace;
+  --font-display: 'MiSans-Heavy', 'Bebas Neue', 'Oxanium', sans-serif;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --transition-base: 0.3s var(--ease-out-expo);
-  --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.3);
-  --shadow-card-hover: 0 4px 24px rgba(0,0,0,0.5), 0 0 24px rgba(34, 211, 238, 0.06);
-  --radius-card: 8px;
+  --shadow-card: 0 14px 36px rgba(1, 8, 26, 0.55);
+  --shadow-card-hover: 0 20px 48px rgba(1, 8, 26, 0.66), 0 0 22px rgba(121, 231, 255, 0.16);
+  --radius-card: 12px;
   --radius-sm: 4px;
 }
 
@@ -40,6 +40,7 @@
 html, body, #root { height: 100%; }
 
 body {
+  position: relative;
   font-family: var(--font-family);
   background: var(--bg-page);
   color: var(--text-primary);
@@ -48,6 +49,38 @@ body {
   overflow-x: hidden;
   font-size: 14px;
   line-height: 1.6;
+  text-rendering: optimizeLegibility;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(138, 196, 255, 0.05) 0%,
+    rgba(138, 196, 255, 0) 38%,
+    rgba(126, 231, 255, 0.035) 100%
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(125, 208, 255, 0.025) 0,
+    rgba(125, 208, 255, 0.025) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  opacity: 0.22;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* === 多层背景 === */
@@ -56,9 +89,11 @@ body {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 120% 80% at 50% -30%, rgba(34, 100, 238, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 60% at 90% 85%, rgba(99, 60, 200, 0.05) 0%, transparent 50%),
-    radial-gradient(ellipse 50% 50% at 10% 80%, rgba(34, 211, 238, 0.03) 0%, transparent 50%);
+    linear-gradient(rgba(5, 15, 36, 0.55), rgba(5, 15, 36, 0.72)),
+    url('./background.png') center center / cover no-repeat,
+    radial-gradient(ellipse 120% 90% at 52% -38%, rgba(95, 156, 255, 0.26) 0%, transparent 57%),
+    radial-gradient(ellipse 64% 62% at 95% 86%, rgba(66, 136, 255, 0.14) 0%, transparent 64%),
+    radial-gradient(ellipse 58% 58% at 3% 86%, rgba(111, 231, 200, 0.1) 0%, transparent 58%);
   pointer-events: none;
   z-index: 0;
 }
@@ -69,9 +104,9 @@ body {
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(34, 211, 238, 0.018) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(34, 211, 238, 0.018) 1px, transparent 1px);
-  background-size: 48px 48px;
+    linear-gradient(rgba(121, 231, 255, 0.024) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(121, 231, 255, 0.024) 1px, transparent 1px);
+  background-size: 44px 44px;
   mask-image: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(0,0,0,0.4) 10%, transparent 75%);
   -webkit-mask-image: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(0,0,0,0.4) 10%, transparent 75%);
   pointer-events: none;
@@ -82,11 +117,11 @@ body {
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(34, 211, 238, 0.15);
+  background: rgba(121, 231, 255, 0.2);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(34, 211, 238, 0.35);
+  background: rgba(121, 231, 255, 0.48);
 }
 
 /* === 分隔线 === */
@@ -112,19 +147,19 @@ body {
 
 /* === 发光文字 === */
 .glow-text {
-  text-shadow: 0 0 8px rgba(34, 211, 238, 0.5), 0 0 24px rgba(34, 211, 238, 0.25), 0 0 48px rgba(34, 211, 238, 0.08);
+  text-shadow: 0 0 10px rgba(121, 231, 255, 0.56), 0 0 26px rgba(121, 231, 255, 0.3), 0 0 54px rgba(121, 231, 255, 0.1);
 }
 
 /* === 卡片系统 === */
 .dashboard-card {
   transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base), background var(--transition-base);
   position: relative;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px) saturate(1.1);
+  -webkit-backdrop-filter: blur(16px) saturate(1.1);
 }
 .dashboard-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(34, 211, 238, 0.4) !important;
+  border-color: rgba(121, 231, 255, 0.44) !important;
   box-shadow: var(--shadow-card-hover) !important;
   background: var(--bg-card-hover) !important;
 }
@@ -168,14 +203,14 @@ body {
 }
 .nav-tab:hover {
   color: var(--accent-cyan);
-  background: rgba(34, 211, 238, 0.06);
-  border-color: rgba(34, 211, 238, 0.1);
+  background: rgba(121, 231, 255, 0.08);
+  border-color: rgba(121, 231, 255, 0.14);
 }
 .nav-tab.active {
   color: var(--accent-cyan);
-  background: rgba(34, 211, 238, 0.1);
-  border-color: rgba(34, 211, 238, 0.25);
-  box-shadow: 0 0 16px rgba(34, 211, 238, 0.08), inset 0 0 16px rgba(34, 211, 238, 0.04);
+  background: rgba(121, 231, 255, 0.12);
+  border-color: rgba(121, 231, 255, 0.3);
+  box-shadow: 0 0 18px rgba(121, 231, 255, 0.12), inset 0 0 16px rgba(121, 231, 255, 0.08);
   font-weight: 600;
 }
 .nav-tab.active::after {
@@ -194,9 +229,9 @@ body {
 .ant-table { background: transparent !important; }
 .ant-table-thead > tr > th,
 .ant-table-thead > tr > td {
-  background: rgba(6, 16, 40, 0.9) !important;
+  background: rgba(11, 29, 71, 0.93) !important;
   color: var(--accent-cyan) !important;
-  border-bottom: 1px solid rgba(34, 211, 238, 0.12) !important;
+  border-bottom: 1px solid rgba(121, 231, 255, 0.16) !important;
   font-size: 11px !important;
   font-weight: 600 !important;
   letter-spacing: 0.6px;
@@ -205,20 +240,20 @@ body {
   font-family: var(--font-family) !important;
 }
 .ant-table-tbody > tr > td {
-  border-bottom: 1px solid rgba(34, 211, 238, 0.04) !important;
+  border-bottom: 1px solid rgba(121, 231, 255, 0.06) !important;
   font-size: 13px !important;
   padding: 10px 14px !important;
   color: var(--text-primary) !important;
   transition: background 0.2s ease;
 }
 .ant-table-tbody > tr:hover > td {
-  background: rgba(34, 211, 238, 0.06) !important;
+  background: rgba(121, 231, 255, 0.09) !important;
 }
 .ant-table-tbody > tr:nth-child(even) > td {
-  background: rgba(34, 211, 238, 0.015) !important;
+  background: rgba(121, 231, 255, 0.02) !important;
 }
 .ant-table-tbody > tr:nth-child(even):hover > td {
-  background: rgba(34, 211, 238, 0.06) !important;
+  background: rgba(121, 231, 255, 0.09) !important;
 }
 .ant-pagination .ant-pagination-item-active {
   border-color: var(--accent-cyan) !important;
@@ -229,14 +264,14 @@ body {
 
 /* Modal 样式增强 */
 .ant-modal .ant-modal-content {
-  background: linear-gradient(180deg, #071230 0%, #040d22 100%) !important;
-  border: 1px solid rgba(34, 211, 238, 0.15) !important;
+  background: linear-gradient(180deg, #0b1f4b 0%, #071738 100%) !important;
+  border: 1px solid rgba(121, 231, 255, 0.2) !important;
   border-radius: var(--radius-card) !important;
-  box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 40px rgba(34, 211, 238, 0.05) !important;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.62), 0 0 48px rgba(121, 231, 255, 0.08) !important;
 }
 .ant-modal .ant-modal-header {
   background: transparent !important;
-  border-bottom: 1px solid rgba(34, 211, 238, 0.1) !important;
+  border-bottom: 1px solid rgba(121, 231, 255, 0.14) !important;
   padding: 16px 24px !important;
 }
 .ant-modal .ant-modal-body {
@@ -251,42 +286,42 @@ body {
 
 /* Select 和 DatePicker 样式 */
 .ant-select-selector {
-  background: rgba(34, 211, 238, 0.06) !important;
-  border-color: rgba(34, 211, 238, 0.15) !important;
+  background: rgba(121, 231, 255, 0.08) !important;
+  border-color: rgba(121, 231, 255, 0.2) !important;
 }
 .ant-select-selector:hover {
-  border-color: rgba(34, 211, 238, 0.3) !important;
+  border-color: rgba(121, 231, 255, 0.36) !important;
 }
 /* Select 下拉弹出层 */
 .ant-select-dropdown {
-  background: #071230 !important;
-  border: 1px solid rgba(34, 211, 238, 0.15) !important;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 12px rgba(34, 211, 238, 0.06) !important;
+  background: #0b1f4b !important;
+  border: 1px solid rgba(121, 231, 255, 0.18) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.52), 0 0 16px rgba(121, 231, 255, 0.08) !important;
   border-radius: var(--radius-card) !important;
 }
 .ant-select-item {
   color: var(--text-primary) !important;
 }
 .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
-  background: rgba(34, 211, 238, 0.08) !important;
+  background: rgba(121, 231, 255, 0.1) !important;
 }
 .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-  background: rgba(34, 211, 238, 0.15) !important;
-  color: #22D3EE !important;
+  background: rgba(121, 231, 255, 0.18) !important;
+  color: #79e7ff !important;
   font-weight: 500;
 }
 .ant-picker {
-  background: rgba(34, 211, 238, 0.06) !important;
-  border-color: rgba(34, 211, 238, 0.15) !important;
+  background: rgba(121, 231, 255, 0.08) !important;
+  border-color: rgba(121, 231, 255, 0.2) !important;
 }
 .ant-picker:hover {
-  border-color: rgba(34, 211, 238, 0.3) !important;
+  border-color: rgba(121, 231, 255, 0.36) !important;
 }
 
 /* === 动画 === */
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 4px rgba(52, 211, 153, 0.5); }
-  50% { box-shadow: 0 0 10px rgba(52, 211, 153, 0.8), 0 0 20px rgba(52, 211, 153, 0.25); }
+  0%, 100% { box-shadow: 0 0 5px rgba(111, 231, 200, 0.5); }
+  50% { box-shadow: 0 0 12px rgba(111, 231, 200, 0.84), 0 0 24px rgba(111, 231, 200, 0.3); }
 }
 
 @keyframes skeleton-pulse {
@@ -305,7 +340,7 @@ body {
 }
 
 .ant-skeleton .ant-skeleton-content .ant-skeleton-paragraph > li {
-  background: linear-gradient(90deg, rgba(34, 211, 238, 0.03) 25%, rgba(34, 211, 238, 0.08) 50%, rgba(34, 211, 238, 0.03) 75%) !important;
+  background: linear-gradient(90deg, rgba(121, 231, 255, 0.04) 25%, rgba(121, 231, 255, 0.1) 50%, rgba(121, 231, 255, 0.04) 75%) !important;
   background-size: 200% 100% !important;
   animation: skeleton-pulse 1.8s ease-in-out infinite !important;
   border-radius: 4px !important;

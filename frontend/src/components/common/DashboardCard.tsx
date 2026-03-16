@@ -41,7 +41,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ children, style, glowColo
       <div className="hud-corner hud-corner--bl" data-color={colorAttr} />
       <div className="hud-corner hud-corner--br" data-color={colorAttr} />
       {/* 顶部光线 */}
-      <div style={{
+      <div className="dashboard-card-top-glow" style={{
         position: 'absolute',
         top: 0,
         left: 20,
@@ -51,14 +51,14 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ children, style, glowColo
       }} />
       {/* 标题区域 */}
       {title && (
-        <div style={{
+        <div className="dashboard-card-header" style={{
           marginBottom: 16,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{
+          <div className="dashboard-card-header-main" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div className="dashboard-card-header-accent" style={{
               width: 3,
               height: 16,
               borderRadius: 2,
@@ -66,7 +66,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ children, style, glowColo
               boxShadow: `0 0 6px ${color}40`,
             }} />
             <div>
-              <div style={{
+              <div className="dashboard-card-title" style={{
                 fontSize: 14,
                 fontWeight: 600,
                 color: theme.colors.textPrimary,
@@ -75,7 +75,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ children, style, glowColo
                 {title}
               </div>
               {subtitle && (
-                <div style={{
+                <div className="dashboard-card-subtitle" style={{
                   fontSize: 11,
                   color: theme.colors.textSecondary,
                   marginTop: 3,

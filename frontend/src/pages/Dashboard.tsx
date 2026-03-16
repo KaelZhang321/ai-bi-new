@@ -1,84 +1,475 @@
-import React, { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import HeaderBar from '../components/sections/HeaderBar'
-import CoreKpiRow from '../components/sections/CoreKpiRow'
-import AiChatPanel from '../components/sections/AiChatPanel'
-import PageCustomer from './PageCustomer'
-import PageOperations from './PageOperations'
+import React, { useMemo, useState } from 'react'
+import { DatePicker, Select } from 'antd'
+import dayjs from 'dayjs'
+import type { Dayjs } from 'dayjs'
+import { AnimatePresence, motion } from 'framer-motion'
 import PageAchievement from './PageAchievement'
-import { theme } from '../styles/theme'
+import DistributionBarChart from '../components/charts/DistributionBarChart'
+import GroupedBarChart from '../components/charts/GroupedBarChart'
+import HorizontalBarChart from '../components/charts/HorizontalBarChart'
+import MultiLineChart from '../components/charts/MultiLineChart'
+import PieChart from '../components/charts/PieChart'
+import DataTable from '../components/common/DataTable'
+import LoadingSkeleton from '../components/common/LoadingSkeleton'
+import AiChatPanel from '../components/sections/AiChatPanel'
+import type { MatrixRow } from '../api/registration'
+import {
+  useCustomerProfile,
+  useKpiOverview,
+  useOperationsKpi,
+  useProgress,
+  useRegistrationMatrix,
+  useSourceDistribution,
+  useTrendData,
+} from '../hooks/useApi'
+import '../styles/bigscreen.css'
 import aiIcon from '../styles/AI.png'
+import eventLogo from '../styles/logo.png'
 
-const pages = [PageCustomer, PageOperations, PageAchievement]
+const matrixColumns = [
+  { title: '大区', dataIndex: 'region', key: 'region', fixed: 'left' as const, width: 80 },
+  { title: '千万(报)', dataIndex: 'qianwan_register', key: 'qianwan_register', width: 82 },
+  { title: '千万(到)', dataIndex: 'qianwan_arrive', key: 'qianwan_arrive', width: 82 },
+  { title: '百万(报)', dataIndex: 'baiwan_register', key: 'baiwan_register', width: 82 },
+  { title: '百万(到)', dataIndex: 'baiwan_arrive', key: 'baiwan_arrive', width: 82 },
+  { title: '普通(报)', dataIndex: 'putong_register', key: 'putong_register', width: 82 },
+  { title: '普通(到)', dataIndex: 'putong_arrive', key: 'putong_arrive', width: 82 },
+  { title: '总报名', dataIndex: 'total_register', key: 'total_register', width: 86 },
+  { title: '总抵达', dataIndex: 'total_arrive', key: 'total_arrive', width: 86 },
+]
 
-const pageTransition = {
-  initial: { opacity: 0, x: 24 },
-  animate: { opacity: 1, x: 0, transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] } },
-  exit: { opacity: 0, x: -24, transition: { duration: 0.2 } },
+const entryTabs = [
+  { id: 'customer', label: '客户总览' },
+  { id: 'ops', label: '运营数据' },
+  { id: 'goal', label: '目标达成' },
+] as const
+
+type EntryTab = (typeof entryTabs)[number]['id']
+
+function formatNumber(value: number): string {
+  if (!Number.isFinite(value)) return '--'
+  if (Math.abs(value) >= 10000) return value.toLocaleString('zh-CN')
+  if (Number.isInteger(value)) return value.toLocaleString('zh-CN')
+  return value.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
+function formatCurrency(value: number, unit = '万'): string {
+  if (!Number.isFinite(value)) return '--'
+  return `¥${formatNumber(value)}${unit}`
 }
 
 const Dashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState(0)
   const [aiOpen, setAiOpen] = useState(false)
-  const ActivePage = pages[activeTab]
+  const [entryTab, setEntryTab] = useState<EntryTab>('customer')
+  const [selectedScene, setSelectedScene] = useState<string>('all')
+  const [selectedDate, setSelectedDate] = useState<string>(dayjs().format('YYYY-MM-DD'))
+
+  const updateTime = dayjs().format('YYYY/MM/DD HH:mm:ss')
+
+  const { data: kpiData, isLoading: kpiLoading } = useKpiOverview()
+  const { data: operationsData, isLoading: operationsLoading } = useOperationsKpi(selectedDate, selectedDate)
+  const { data: registrationData, isLoading: registrationLoading } = useRegistrationMatrix()
+  const { data: trendData, isLoading: trendLoading } = useTrendData()
+  const { data: customerProfile, isLoading: profileLoading } = useCustomerProfile()
+  const { data: sourceData, isLoading: sourceLoading } = useSourceDistribution()
+  const { data: progressData, isLoading: progressLoading } = useProgress()
+
+  const dealAmountItem = kpiData?.deal_amount
+  const receivedAmountItem = kpiData?.received_amount
+
+  const dealAmountLabel = dealAmountItem?.label || '已成交金额'
+  const receivedAmountLabel = receivedAmountItem?.label || '已收款金额'
+
+  const centerAmount = useMemo(() => {
+    if (!dealAmountItem) return '--'
+    return `${dealAmountItem.prefix || ''}${formatNumber(dealAmountItem.value)}`
+  }, [dealAmountItem])
+
+  const centerUnit = useMemo(() => (dealAmountItem?.unit ? `${dealAmountItem.unit}` : ''), [dealAmountItem])
+
+  const monthAmount = useMemo(() => {
+    if (!receivedAmountItem) return '--'
+    return `${receivedAmountItem.prefix || ''}${formatNumber(receivedAmountItem.value)}${receivedAmountItem.unit || ''}`
+  }, [receivedAmountItem])
+
+  const sceneCards = useMemo(() => {
+    const fallback = [
+      { label: '新规划消耗', value: '--' },
+      { label: '已收款金额', value: '--' },
+      { label: '总投资回报率', value: '--' },
+    ]
+
+    if (!kpiData) return fallback
+
+    const picked = [kpiData.consumed_budget, kpiData.received_amount, kpiData.roi]
+    return picked.map((item, idx) => {
+      if (!item) return fallback[idx]
+      const suffix = item.unit || ''
+      const formatted = suffix === '%'
+        ? `${formatNumber(item.value)}${suffix}`
+        : `${item.prefix || ''}${formatNumber(item.value)}${suffix}`
+      return {
+        label: item.label || fallback[idx].label,
+        value: formatted,
+      }
+    })
+  }, [kpiData])
+
+  const customerStats = useMemo(() => {
+    const registeredCustomers = kpiData?.registered_customers.value ?? 0
+    const arrivedCustomers = kpiData?.arrived_customers.value ?? 0
+    const arrivalRate = registeredCustomers > 0 ? (arrivedCustomers / registeredCustomers) * 100 : 0
+
+    return [
+      { label: '报名客户', value: formatNumber(registeredCustomers) },
+      { label: '已抵达客户', value: formatNumber(arrivedCustomers) },
+      { label: '报名抵达率', value: `${arrivalRate.toFixed(2)}%` },
+    ]
+  }, [kpiData?.arrived_customers.value, kpiData?.registered_customers.value])
+
+  const operationStats = useMemo(() => {
+    const checkin = operationsData?.checkin_count ?? 0
+    const pickup = operationsData?.pickup_count ?? 0
+    const leave = operationsData?.leave_count ?? 0
+    const hospital = operationsData?.hospital_count ?? 0
+
+    return [
+      { label: '签到人数', value: `${formatNumber(checkin)} 人` },
+      { label: '接机人数', value: `${formatNumber(pickup)} 人` },
+      { label: '离开人数', value: `${formatNumber(leave)} 人` },
+      { label: '到院人数', value: `${formatNumber(hospital)} 人` },
+    ]
+  }, [operationsData?.checkin_count, operationsData?.hospital_count, operationsData?.leave_count, operationsData?.pickup_count])
+
+  const handleDateChange = (date: Dayjs | null) => {
+    setSelectedDate(date ? date.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'))
+  }
+
+  const registrationChart = useMemo(() => {
+    if (!registrationData || registrationData.length === 0) {
+      return { categories: [] as string[], series: [] as { name: string; data: number[] }[] }
+    }
+    return {
+      categories: registrationData.map((item) => item.region),
+      series: [
+        { name: '报名人数', data: registrationData.map((item) => item.total_register) },
+        { name: '抵达人数', data: registrationData.map((item) => item.total_arrive) },
+      ],
+    }
+  }, [registrationData])
+
+  const sourceDistribution = useMemo(() => {
+    if (!sourceData || sourceData.length === 0) return []
+    const total = sourceData.reduce((sum, item) => sum + item.customer_count, 0) || 1
+    return sourceData
+      .map((item) => ({
+        name: `${item.region} · ${item.source_type}`,
+        value: item.customer_count,
+        percentage: (item.customer_count / total) * 100,
+      }))
+      .sort((a, b) => b.value - a.value)
+  }, [sourceData])
+
+  const sceneOptions = useMemo(() => {
+    if (!trendData || trendData.length === 0) return [{ value: 'all', label: '全部场景' }]
+    const labels = [...new Set(trendData.map((item) => item.scene_label))]
+    return [{ value: 'all', label: '全部场景' }, ...labels.map((label) => ({ value: label, label }))]
+  }, [trendData])
+
+  const trendChart = useMemo(() => {
+    if (!trendData || trendData.length === 0) {
+      return { categories: [] as string[], series: [{ name: '客流趋势', data: [] as number[] }] }
+    }
+
+    const periodOrder: Record<string, number> = { 上午: 1, 下午: 2, 晚上: 3 }
+    const filteredTrendData = selectedScene === 'all'
+      ? trendData
+      : trendData.filter((item) => item.scene_label === selectedScene)
+
+    const timeLabels = [...new Set(filteredTrendData.map((item) => `${item.schedule_date.slice(5)} ${item.day_time_period}`))]
+      .sort((a, b) => {
+        const [aDate, aPeriod] = a.split(' ')
+        const [bDate, bPeriod] = b.split(' ')
+        if (aDate !== bDate) return aDate.localeCompare(bDate)
+        return (periodOrder[aPeriod] ?? 99) - (periodOrder[bPeriod] ?? 99)
+      })
+      .slice(-16)
+
+    const sceneLabels = selectedScene === 'all'
+      ? [...new Set(filteredTrendData.map((item) => item.scene_label))]
+      : [selectedScene]
+
+    return {
+      categories: timeLabels,
+      series: sceneLabels.map((scene) => ({
+        name: scene,
+        data: timeLabels.map((label) => {
+          const [date, period] = label.split(' ')
+          return filteredTrendData.find((item) =>
+            item.schedule_date.slice(5) === date &&
+            item.day_time_period === period &&
+            item.scene_label === scene
+          )?.people_count || 0
+        }),
+      })),
+    }
+  }, [selectedScene, trendData])
+
+  const progressChart = useMemo(() => {
+    if (!progressData) {
+      return { categories: [] as string[], series: [] as { name: string; data: number[] }[], completionRates: [] as Array<number | null | undefined> }
+    }
+    return {
+      categories: progressData.items.map((item) => item.region),
+      series: [
+        { name: '达成金额', data: progressData.items.map((item) => item.deal_amount) },
+        { name: '成交高限', data: progressData.items.map((item) => item.high_limit) },
+      ],
+      completionRates: progressData.items.map((item) => item.completion_rate),
+    }
+  }, [progressData])
+
+  const isGoalView = entryTab === 'goal'
 
   return (
-    <div style={{ maxWidth: 1600, margin: '0 auto', padding: '0 40px 48px', position: 'relative', zIndex: 1 }}>
-      {/* 头部 + 导航 */}
-      <HeaderBar activeTab={activeTab} onTabChange={setActiveTab} />
-
-      {/* KPI 指标行 */}
-      <div style={{ marginBottom: 24 }}>
-        <CoreKpiRow />
-      </div>
-
-      {/* 页面内容 */}
-      <AnimatePresence mode="wait">
-        <motion.div key={activeTab} initial="initial" animate="animate" exit="exit" variants={pageTransition}>
-          <ActivePage />
-        </motion.div>
-      </AnimatePresence>
-
-      {/* 底部 */}
-      <div style={{ textAlign: 'center', padding: '40px 0 8px', opacity: 0.2 }}>
-        <div style={{
-          fontSize: 10,
-          color: theme.colors.textTertiary,
-          letterSpacing: 3,
-          fontFamily: theme.fontMono,
-          fontWeight: 500,
-        }}>
-          MEETING BI DASHBOARD v1.0
+    <div className="bigscreen-root">
+      <div className="bigscreen-header">
+        <div className="bigscreen-brand">
+          <div className="bigscreen-brand-dot" />
+          <div>
+            <div className="bigscreen-brand-title">会议数据分析驾驶舱</div>
+            <div className="bigscreen-brand-sub">数据更新时间 {updateTime}</div>
+          </div>
+        </div>
+        <div className="bigscreen-center-pill">
+          <div className="bigscreen-center-content">
+            <img className="bigscreen-center-logo" src={eventLogo} alt="318梅赛尔国际健康节 Logo" />
+            <span className="bigscreen-center-text">318梅赛尔国际健康节</span>
+          </div>
+        </div>
+        <div className="entry-switch">
+          {entryTabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={`panel-tab-btn ${entryTab === tab.id ? 'active' : ''}`}
+              onClick={() => setEntryTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* AI 浮动按钮 */}
+      {isGoalView ? (
+        <div className="goal-view-shell">
+          <motion.div
+            className="goal-view-main"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <PageAchievement />
+          </motion.div>
+        </div>
+      ) : (
+        <div className="bigscreen-grid">
+        <motion.aside
+          className="panel-shell"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="panel-header">
+            <div className="panel-title">客户画像分析</div>
+            <div className="panel-subtitle">金额等级 / 身份类型 / 新老客户</div>
+          </div>
+
+          <div className="side-panel-body">
+            {profileLoading || !customerProfile ? (
+              <LoadingSkeleton />
+            ) : (
+              <div className="chart-stack chart-stack--left">
+                <div className="mini-chart-card">
+                  <div className="mini-chart-title">身份类型分布</div>
+                  <div className="mini-chart-content">
+                    <PieChart data={customerProfile.role_distribution} height="100%" />
+                  </div>
+                </div>
+                <div className="mini-chart-card">
+                  <div className="mini-chart-title">新老客户对比</div>
+                  <div className="mini-chart-content">
+                    <PieChart data={customerProfile.new_old_distribution} height="100%" />
+                  </div>
+                </div>
+                <div className="mini-chart-card">
+                  <div className="mini-chart-title">金额等级分布</div>
+                  <div className="mini-chart-content">
+                    <DistributionBarChart data={customerProfile.level_distribution} height="100%" />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.aside>
+
+        <main className="stage-main">
+          <motion.section
+            className="hero-card"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div className="hero-headline">
+              <div className="hero-caption">{dealAmountLabel}</div>
+              <div className="hero-amount">
+                {kpiLoading ? '--' : centerAmount}
+                <span className="hero-unit">{centerUnit}</span>
+              </div>
+              <div className="hero-subamount">{receivedAmountLabel} {monthAmount}</div>
+            </div>
+            <div className="hero-divider" />
+            <div className="hero-channels">
+              {sceneCards.map((item) => (
+                <div className="hero-channel" key={item.label}>
+                  <div className="hero-channel-label">{item.label}</div>
+                  <div className="hero-channel-value">{item.value}</div>
+                </div>
+              ))}
+            </div>
+          </motion.section>
+
+          {entryTab === 'ops' && (
+            <div className="stat-toolbar">
+              <div className="trend-subtitle">按日期查询运营指标</div>
+              <DatePicker
+                value={dayjs(selectedDate)}
+                onChange={handleDateChange}
+                allowClear={false}
+                size="small"
+                style={{ width: 146 }}
+              />
+            </div>
+          )}
+          {(entryTab === 'ops' ? operationsLoading : kpiLoading) ? (
+            <LoadingSkeleton />
+          ) : (
+            <section className={`stat-row ${entryTab === 'ops' ? 'stat-row--four' : 'stat-row--three'}`}>
+              {(entryTab === 'ops' ? operationStats : customerStats).map((stat) => (
+                <article className="stat-card" key={stat.label}>
+                  <div className="stat-label">{stat.label}</div>
+                  <div className="stat-value">{stat.value}</div>
+                </article>
+              ))}
+            </section>
+          )}
+
+          <section className="trend-card">
+            {entryTab === 'customer' && (
+              <>
+                <div className="trend-title">报名/抵达统计</div>
+                <div className="trend-subtitle">按区域查看报名与抵达人数对比</div>
+                {registrationLoading ? (
+                  <LoadingSkeleton />
+                ) : (
+                  <>
+                    <GroupedBarChart categories={registrationChart.categories} series={registrationChart.series} height={330} />
+                    <div style={{ marginTop: 20 }}>
+                      <div className="trend-subtitle" style={{ marginBottom: 8 }}>金额等级矩阵</div>
+                      <DataTable<MatrixRow>
+                        columns={matrixColumns}
+                        dataSource={registrationData || []}
+                        rowKey="region"
+                        pagination={{ pageSize: 8, showSizeChanger: false }}
+                      />
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+            {entryTab === 'ops' && (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 6 }}>
+                  <div>
+                    <div className="trend-title">时间维度数据分析</div>
+                    <div className="trend-subtitle">人流热力图 · 会期时间段（上午/下午/晚上）× 关键场景</div>
+                  </div>
+                  <Select
+                    value={selectedScene}
+                    onChange={setSelectedScene}
+                    options={sceneOptions}
+                    size="small"
+                    style={{ width: 138, flexShrink: 0 }}
+                  />
+                </div>
+                {trendLoading ? (
+                  <LoadingSkeleton />
+                ) : (
+                  <MultiLineChart categories={trendChart.categories} series={trendChart.series} height={420} />
+                )}
+              </>
+            )}
+          </section>
+        </main>
+
+        <motion.aside
+          className="panel-shell"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="panel-header">
+            <div className="panel-title">客户来源 + 任务进展</div>
+            <div className="panel-subtitle">来源渠道结构与区域完成度</div>
+          </div>
+
+          <div className="side-panel-body">
+            <div className="chart-stack chart-stack--right">
+              <div className="mini-chart-card">
+                <div className="mini-chart-title">客户来源分布</div>
+                {sourceLoading ? (
+                  <LoadingSkeleton />
+                ) : (
+                  <div className="mini-chart-content">
+                    <DistributionBarChart data={sourceDistribution} height="100%" seriesName="客户数" />
+                  </div>
+                )}
+              </div>
+              <div className="mini-chart-card">
+                <div className="mini-chart-title">
+                  任务进展
+                  {progressData?.avg_completion_rate != null ? ` · 平均完成率 ${progressData.avg_completion_rate.toFixed(2)}%` : ''}
+                </div>
+                {progressLoading ? (
+                  <LoadingSkeleton />
+                ) : (
+                  <div className="mini-chart-content">
+                    <HorizontalBarChart
+                      categories={progressChart.categories}
+                      series={progressChart.series}
+                      completionRates={progressChart.completionRates}
+                      height="100%"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </motion.aside>
+      </div>
+      )}
+
       <motion.button
+        className="ai-float-btn"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setAiOpen(true)}
-        style={{
-          position: 'fixed',
-          bottom: 32,
-          right: 32,
-          width: 64,
-          height: 64,
-          borderRadius: '50%',
-          border: 'none',
-          background: 'transparent',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 0,
-          zIndex: 900,
-        }}
       >
         <img src={aiIcon} alt="AI" style={{ width: 64, height: 64, borderRadius: '50%' }} />
       </motion.button>
 
-      {/* AI 聊天面板 */}
-      <AiChatPanel open={aiOpen} onClose={() => setAiOpen(false)} />
+      <AnimatePresence>
+        <AiChatPanel open={aiOpen} onClose={() => setAiOpen(false)} />
+      </AnimatePresence>
     </div>
   )
 }
