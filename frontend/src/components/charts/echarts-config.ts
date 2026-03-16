@@ -13,6 +13,7 @@ export const baseOption = {
     extraCssText: 'backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:0 10px 36px rgba(0,0,0,0.54),0 0 14px rgba(121,231,255,0.1);border-radius:10px;padding:10px 14px;',
   },
   legend: {
+    right: 0,
     textStyle: { color: '#a6bbdc', fontSize: 11, fontFamily: theme.fontFamily },
     icon: 'roundRect',
     itemWidth: 12,

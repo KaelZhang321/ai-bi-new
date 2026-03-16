@@ -7,13 +7,26 @@ interface PieChartProps {
   data: { name: string; value: number }[]
   title?: string
   height?: number | string
+  legendAlign?: 'left' | 'center' | 'right'
+  labelMode?: 'percent' | 'value'
 }
 
-const PieChart: React.FC<PieChartProps> = ({ data, title, height = 260 }) => {
+const PieChart: React.FC<PieChartProps> = ({
+  data,
+  title,
+  height = 260,
+  legendAlign = 'right',
+  labelMode = 'percent',
+}) => {
   const chartRef = useRef<ReactECharts>(null)
   const isFluid = height === '100%'
   const numericHeight = typeof height === 'number' ? height : 260
   const isCompact = numericHeight <= 220
+  const legendPosition = legendAlign === 'left'
+    ? { left: 0 }
+    : legendAlign === 'center'
+      ? { left: 'center' as const }
+      : { right: 0 }
 
   useEffect(() => {
     if (!isFluid) return
@@ -40,7 +53,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, title, height = 260 }) => {
     legend: {
       ...baseOption.legend,
       orient: 'horizontal' as const,
-      left: 'center',
+      ...legendPosition,
       bottom: isCompact ? 0 : 4,
       itemWidth: 8,
       itemHeight: 8,
@@ -57,7 +70,10 @@ const PieChart: React.FC<PieChartProps> = ({ data, title, height = 260 }) => {
         data,
         label: {
           show: true,
-          formatter: '{d}%',
+          formatter: (params: { value?: number; percent?: number }) => {
+            if (labelMode === 'value') return `${(params.value ?? 0).toLocaleString()}`
+            return `${(params.percent ?? 0).toFixed(0)}%`
+          },
           color: '#8896B3',
           fontSize: 10,
           fontFamily: theme.fontMono,

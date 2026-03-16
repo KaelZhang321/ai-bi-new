@@ -17,11 +17,11 @@ const MobileCustomerProfileSection: React.FC = () => {
       </MobileCard>
       <div style={{ height: 12 }} />
       <MobileCard glowColor="#10B981" title="身份类型分布" subtitle="客户身份结构分布">
-        <PieChart data={data.role_distribution} height={220} />
+        <PieChart data={data.role_distribution} height={220} legendAlign="center" labelMode="value" />
       </MobileCard>
       <div style={{ height: 12 }} />
       <MobileCard glowColor="#10B981" title="新老客户对比" subtitle="新客与老客占比对比">
-        <PieChart data={data.new_old_distribution} height={220} />
+        <PieChart data={data.new_old_distribution} height={220} legendAlign="center" labelMode="value" />
       </MobileCard>
     </div>
   )

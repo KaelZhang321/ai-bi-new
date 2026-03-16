@@ -84,7 +84,7 @@ function buildOption(data: ChartData) {
       ...baseOption,
       color: chartPalette,
       tooltip: { ...baseOption.tooltip, trigger: 'item' as const, formatter: '{b}: {c} ({d}%)' },
-      legend: { ...baseOption.legend, orient: 'horizontal' as const, left: 'center', bottom: 10, icon: 'circle', itemWidth: 8, itemHeight: 8 },
+      legend: { ...baseOption.legend, orient: 'horizontal' as const, right: 0, bottom: 10, icon: 'circle', itemWidth: 8, itemHeight: 8 },
       series: [{
         type: 'pie' as const,
         radius: ['42%', '68%'],

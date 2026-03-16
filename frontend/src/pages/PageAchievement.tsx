@@ -15,11 +15,11 @@ const fadeUp = {
 
 const PageAchievement: React.FC = () => (
   <div className="goal-page">
-    <motion.section className="goal-section goal-panel goal-panel--top" custom={0} initial="hidden" animate="visible" variants={fadeUp}>
+    <motion.section className="goal-section goal-panel--top" custom={0} initial="hidden" animate="visible" variants={fadeUp}>
       <AchievementSection />
     </motion.section>
 
-    <motion.section className="goal-section goal-panel goal-panel--bottom" custom={1} initial="hidden" animate="visible" variants={fadeUp}>
+    <motion.section className="goal-section goal-panel--bottom" custom={1} initial="hidden" animate="visible" variants={fadeUp}>
       <div className="goal-panel-head">
         <div className="goal-section-heading">
           <div className="goal-section-heading-title">方案目标 VS 达成</div>

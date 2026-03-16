@@ -245,7 +245,7 @@
 .goal-page .goal-section-heading {
   margin-bottom: 14px;
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(121, 231, 255, 0.14);
+  border-bottom: none;
 }
 
 .goal-page .goal-section-heading-title {
@@ -310,7 +310,7 @@
 .goal-page .dashboard-card .dashboard-card-header {
   margin-bottom: 14px !important;
   padding-bottom: 10px;
-  border-bottom: 1px solid rgba(121, 231, 255, 0.1);
+  border-bottom: none;
 }
 
 .goal-page .dashboard-card .dashboard-card-header-main {

@@ -284,13 +284,13 @@ const Dashboard: React.FC = () => {
                 <div className="mini-chart-card">
                   <div className="mini-chart-title">身份类型分布</div>
                   <div className="mini-chart-content">
-                    <PieChart data={customerProfile.role_distribution} height="100%" />
+                    <PieChart data={customerProfile.role_distribution} height="100%" legendAlign="center" labelMode="value" />
                   </div>
                 </div>
                 <div className="mini-chart-card">
                   <div className="mini-chart-title">新老客户对比</div>
                   <div className="mini-chart-content">
-                    <PieChart data={customerProfile.new_old_distribution} height="100%" />
+                    <PieChart data={customerProfile.new_old_distribution} height="100%" legendAlign="center" labelMode="value" />
                   </div>
                 </div>
                 <div className="mini-chart-card">

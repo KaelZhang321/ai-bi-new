@@ -21,12 +21,12 @@ const CustomerProfileSection: React.FC = () => {
         </DashboardCard>
         <DashboardCard glowColor={theme.colors.accentPurple} title="身份类型分布" fill style={{ height: '100%' }}>
           <div style={{ flex: 1, minHeight: 0, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <PieChart data={data.role_distribution} height={280} />
+            <PieChart data={data.role_distribution} height={280} legendAlign="center" labelMode="value" />
           </div>
         </DashboardCard>
         <DashboardCard glowColor={theme.colors.accentGreen} title="新老客户对比" fill style={{ height: '100%' }}>
           <div style={{ flex: 1, minHeight: 0, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <PieChart data={data.new_old_distribution} height={280} />
+            <PieChart data={data.new_old_distribution} height={280} legendAlign="center" labelMode="value" />
           </div>
         </DashboardCard>
       </div>
