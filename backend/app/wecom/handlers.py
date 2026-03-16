@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING
 from app.db.session import SessionLocal
 from app.ai.query_executor import execute_ai_query
 from app.services.chart_store import save_chart
+from app.wecom.subscribers import add_subscriber
 
 if TYPE_CHECKING:
     from aibot import WSClient
@@ -123,6 +124,9 @@ async def handle_text_message(client: "WSClient", frame: dict) -> None:
         return
 
     logger.info(f"收到文本消息: user={sender['userid']}, text={text[:100]}")
+
+    # 记录订阅用户
+    add_subscriber(sender['userid'])
 
     stream_id = generate_req_id("stream")
     feedback_id = generate_req_id("fb")
@@ -262,6 +266,9 @@ async def handle_enter_chat(client: "WSClient", frame: dict) -> None:
     """
     sender = _get_sender_info(frame)
     logger.info(f"用户进入会话: user={sender['userid']}")
+
+    # 记录订阅用户
+    add_subscriber(sender['userid'])
 
     try:
         await client.reply_welcome(
