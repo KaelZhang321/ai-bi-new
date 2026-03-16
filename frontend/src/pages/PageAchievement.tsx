@@ -3,8 +3,6 @@ import { motion } from 'framer-motion'
 import AchievementSection from '../components/sections/AchievementSection'
 import ProgressSection from '../components/sections/ProgressSection'
 import ProposalSection from '../components/sections/ProposalSection'
-import SectionTitle from '../components/common/SectionTitle'
-import { theme } from '../styles/theme'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
@@ -17,20 +15,27 @@ const fadeUp = {
 
 const PageAchievement: React.FC = () => (
   <div className="goal-page">
-    <motion.div className="goal-section" custom={0} initial="hidden" animate="visible" variants={fadeUp} style={{ marginBottom: 24 }}>
+    <motion.section className="goal-section goal-panel goal-panel--top" custom={0} initial="hidden" animate="visible" variants={fadeUp}>
       <AchievementSection />
-    </motion.div>
-    <motion.div className="goal-section" custom={1} initial="hidden" animate="visible" variants={fadeUp} style={{ marginBottom: 20 }}>
-      <SectionTitle title="方案目标 VS 达成" subtitle="各成交方案目标与达成" accentColor={theme.colors.accentAmber} />
-    </motion.div>
-    <div className="goal-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch' }}>
-      <motion.div className="goal-section" custom={2} initial="hidden" animate="visible" variants={fadeUp} style={{ height: '100%', display: 'flex' }}>
-        <ProgressSection fill />
-      </motion.div>
-      <motion.div className="goal-section" custom={3} initial="hidden" animate="visible" variants={fadeUp} style={{ height: '100%' }}>
-        <ProposalSection showOverview showCross={false} showSectionTitle={false} />
-      </motion.div>
-    </div>
+    </motion.section>
+
+    <motion.section className="goal-section goal-panel goal-panel--bottom" custom={1} initial="hidden" animate="visible" variants={fadeUp}>
+      <div className="goal-panel-head">
+        <div className="goal-section-heading">
+          <div className="goal-section-heading-title">方案目标 VS 达成</div>
+          <div className="goal-section-heading-subtitle">各成交方案目标与达成</div>
+        </div>
+      </div>
+
+      <div className="goal-grid">
+        <motion.div className="goal-grid-item" custom={2} initial="hidden" animate="visible" variants={fadeUp}>
+          <ProgressSection fill />
+        </motion.div>
+        <motion.div className="goal-grid-item" custom={3} initial="hidden" animate="visible" variants={fadeUp}>
+          <ProposalSection showOverview showCross={false} showSectionTitle={false} />
+        </motion.div>
+      </div>
+    </motion.section>
   </div>
 )
 
