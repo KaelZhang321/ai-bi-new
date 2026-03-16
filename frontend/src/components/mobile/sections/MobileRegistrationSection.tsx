@@ -1,10 +1,10 @@
 import React, { useMemo, useState, useCallback } from 'react'
-import { useRegistrationChart, useRegistrationMatrix } from '../../../hooks/useApi'
+import { useRegistrationMatrix } from '../../../hooks/useApi'
 import MobileCard from '../MobileCard'
 import MobileDataTable from '../MobileDataTable'
 import MobileDrillDrawer from '../MobileDrillDrawer'
 import LoadingSkeleton from '../../common/LoadingSkeleton'
-import StackedBarChart from '../../charts/StackedBarChart'
+import GroupedBarChart from '../../charts/GroupedBarChart'
 import { fetchRegistrationDetail, type RegistrationDetail } from '../../../api/registration'
 import type { MatrixRow } from '../../../api/registration'
 
@@ -31,48 +31,39 @@ const detailColumns = [
 ]
 
 const MobileRegistrationSection: React.FC = () => {
-  const { data: chartData, isLoading: chartLoading } = useRegistrationChart()
   const { data: matrixData, isLoading: matrixLoading } = useRegistrationMatrix()
   const [drillOpen, setDrillOpen] = useState(false)
   const [drillRegion, setDrillRegion] = useState<string>()
-  const [drillLevel, setDrillLevel] = useState<string>()
 
   const { categories, series } = useMemo(() => {
-    if (!chartData) return { categories: [], series: [] }
-    const regionSet = [...new Set(chartData.map((d) => d.region))]
-    const levelSet = [...new Set(chartData.map((d) => d.real_identity || '未分类'))]
-    const registerSeries = levelSet.map((level) => ({
-      name: `${level}(报名)`,
-      stack: 'register',
-      data: regionSet.map((region) => chartData.find((d) => d.region === region && (d.real_identity || '未分类') === level)?.register_count || 0),
-    }))
-    const arriveSeries = levelSet.map((level) => ({
-      name: `${level}(抵达)`,
-      stack: 'arrive',
-      data: regionSet.map((region) => chartData.find((d) => d.region === region && (d.real_identity || '未分类') === level)?.arrive_count || 0),
-    }))
-    return { categories: regionSet, series: [...registerSeries, ...arriveSeries] }
-  }, [chartData])
+    if (!matrixData || matrixData.length === 0) return { categories: [], series: [] as { name: string; data: number[] }[] }
+    return {
+      categories: matrixData.map((item) => item.region),
+      series: [
+        { name: '报名人数', data: matrixData.map((item) => item.total_register) },
+        { name: '抵达人数', data: matrixData.map((item) => item.total_arrive) },
+      ],
+    }
+  }, [matrixData])
 
-  const handleChartClick = useCallback((params: { name?: string; seriesName?: string }) => {
-    if (params.name && params.seriesName) {
+  const handleChartClick = useCallback((params: { name?: string }) => {
+    if (params.name) {
       setDrillRegion(params.name)
-      setDrillLevel(params.seriesName.replace(/\((报名|抵达)\)$/, ''))
       setDrillOpen(true)
     }
   }, [])
 
   const fetchDetail = useCallback(
-    () => fetchRegistrationDetail(drillRegion, drillLevel === '未分类' ? '未分类' : drillLevel),
-    [drillRegion, drillLevel],
+    () => fetchRegistrationDetail(drillRegion),
+    [drillRegion],
   )
 
-  if (chartLoading) return <LoadingSkeleton />
+  if (matrixLoading) return <LoadingSkeleton />
 
   return (
     <div>
-      <MobileCard title="报名/抵达统计" subtitle="按大区·金额等级 | 点击柱体查看明细" glowColor="#3B82F6">
-        <StackedBarChart categories={categories} series={series} height={260} onBarClick={handleChartClick} />
+      <MobileCard title="报名/抵达统计" subtitle="按区域查看报名与抵达人数对比" glowColor="#3B82F6">
+        <GroupedBarChart categories={categories} series={series} height={260} onBarClick={handleChartClick} />
       </MobileCard>
       <div style={{ height: 12 }} />
       <MobileCard title="金额等级矩阵" glowColor="#3B82F6">

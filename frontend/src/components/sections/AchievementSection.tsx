@@ -9,6 +9,15 @@ import { fetchAchievementDetail, type AchievementDetail } from '../../api/achiev
 import type { AchievementRow } from '../../api/achievement'
 import { theme } from '../../styles/theme'
 
+const toNum = (v: unknown) => {
+  if (typeof v === 'number') return Number.isFinite(v) ? v : 0
+  if (typeof v === 'string') {
+    const n = Number(v.replace(/,/g, '').trim())
+    return Number.isFinite(n) ? n : 0
+  }
+  return 0
+}
+
 const tableColumns = [
   { title: '#', dataIndex: 'row_num', key: 'n', width: 40 },
   { title: '区域', dataIndex: 'region', key: 'r' },
@@ -38,12 +47,13 @@ const AchievementSection: React.FC = () => {
 
   const chart = useMemo(() => {
     if (!chartData) return { categories: [], series: [] }
+    const sortedData = [...chartData].sort((a, b) => toNum(b.deal_amount) - toNum(a.deal_amount))
     return {
-      categories: chartData.map((d) => d.region),
+      categories: sortedData.map((d) => d.region),
       series: [
-        { name: '达成金额', data: chartData.map((d) => d.deal_amount) },
-        { name: '成交低限', data: chartData.map((d) => d.low_limit) },
-        { name: '成交高限', data: chartData.map((d) => d.high_limit) },
+        { name: '达成金额', data: sortedData.map((d) => toNum(d.deal_amount)) },
+        { name: '成交低限', data: sortedData.map((d) => toNum(d.low_limit)) },
+        { name: '成交高限', data: sortedData.map((d) => toNum(d.high_limit)) },
       ],
     }
   }, [chartData])

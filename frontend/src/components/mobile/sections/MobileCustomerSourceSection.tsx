@@ -11,7 +11,13 @@ const MobileCustomerSourceSection: React.FC = () => {
 
   const sourceChart = useMemo(() => {
     if (!sourceData) return { categories: [], series: [] }
-    const regions = [...new Set(sourceData.map((d) => d.region))]
+    const regionTotals = sourceData.reduce<Record<string, number>>((acc, item) => {
+      acc[item.region] = (acc[item.region] || 0) + item.customer_count
+      return acc
+    }, {})
+    const regions = Object.entries(regionTotals)
+      .sort((a, b) => b[1] - a[1])
+      .map(([region]) => region)
     const types = [...new Set(sourceData.map((d) => d.source_type))]
     const series = types.map((t) => ({
       name: t,
