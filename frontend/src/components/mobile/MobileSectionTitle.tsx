@@ -1,7 +1,7 @@
 import React from 'react'
 
 interface MobileSectionTitleProps {
-  title: string
+  title?: string
   subtitle?: string
   accentColor?: string
 }
@@ -17,7 +17,7 @@ const MobileSectionTitle: React.FC<MobileSectionTitleProps> = ({
       style={{ background: accentColor }}
     />
     <div>
-      <div className="mobile-section-title__text">{title}</div>
+      {title && <div className="mobile-section-title__text">{title}</div>}
       {subtitle && <div className="mobile-section-title__sub">{subtitle}</div>}
     </div>
   </div>
