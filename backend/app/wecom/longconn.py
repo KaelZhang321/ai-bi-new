@@ -47,6 +47,7 @@ class WeComLongConnManager:
     def __init__(self) -> None:
         self._client = None  # WSClient 实例，延迟初始化
         self._task: Optional[asyncio.Task] = None
+        self._scheduler_task: Optional[asyncio.Task] = None
         self._connected_at: Optional[datetime] = None
         self._last_error: Optional[str] = None
         self._message_count: int = 0
@@ -115,6 +116,10 @@ class WeComLongConnManager:
 
             # 后台启动连接
             self._task = asyncio.create_task(self._connect_with_retry())
+
+            # 启动定时推送调度器
+            from app.wecom.scheduler import start_scheduler
+            self._scheduler_task = start_scheduler(lambda: self._client)
 
             logger.info("企业微信长连接管理器已启动")
 
@@ -218,12 +223,13 @@ class WeComLongConnManager:
             self._client.disconnect()
             logger.info("企业微信长连接已断开")
 
-        if self._task and not self._task.done():
-            self._task.cancel()
-            try:
-                await self._task
-            except asyncio.CancelledError:
-                pass
+        for task in (self._task, self._scheduler_task):
+            if task and not task.done():
+                task.cancel()
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    pass
 
         self._connected_at = None
         self._enabled = False
