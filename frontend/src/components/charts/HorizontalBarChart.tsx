@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import ReactECharts from 'echarts-for-react'
 import { baseOption, axisStyle, chartPalette } from './echarts-config'
 
@@ -10,6 +10,20 @@ interface HorizontalBarChartProps {
 }
 
 const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({ categories, series, height = 350, completionRates }) => {
+  const chartRef = useRef<ReactECharts>(null)
+  const isFluid = height === '100%'
+
+  useEffect(() => {
+    if (!isFluid) return
+    const el = chartRef.current?.getEchartsInstance()?.getDom()
+    if (!el) return
+    const ro = new ResizeObserver(() => {
+      chartRef.current?.getEchartsInstance()?.resize()
+    })
+    ro.observe(el.parentElement || el)
+    return () => ro.disconnect()
+  }, [isFluid])
+
   const option = {
     ...baseOption,
     color: chartPalette,
@@ -75,7 +89,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({ categories, ser
     })),
   }
 
-  return <ReactECharts option={option} notMerge style={{ height }} />
+  return <ReactECharts ref={chartRef} option={option} notMerge style={{ height }} {...(isFluid ? { opts: { height: 'auto' } } : {})} />
 }
 
 export default HorizontalBarChart

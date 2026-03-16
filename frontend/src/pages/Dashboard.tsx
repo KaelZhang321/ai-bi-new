@@ -193,22 +193,19 @@ const Dashboard: React.FC = () => {
     }
   }, [progressData])
 
-  const profileBarHeight = Math.max(220, (customerProfile?.level_distribution.length ?? 0) * 28 + 96)
-  const progressHeight = Math.max(250, (progressData?.items.length ?? 0) * 30 + 110)
-
   return (
     <div className="bigscreen-root">
       <div className="bigscreen-header">
         <div className="bigscreen-brand">
           <div className="bigscreen-brand-dot" />
           <div>
-            <div className="bigscreen-brand-title">罗盘·经营 单店大屏</div>
+            <div className="bigscreen-brand-title">会议数据分析驾驶舱</div>
             <div className="bigscreen-brand-sub">数据更新时间 {updateTime}</div>
           </div>
         </div>
         <div className="bigscreen-center-pill">
           <span className="bigscreen-center-indicator" />
-          318大会
+          318梅赛尔国际健康节
         </div>
         <div className="entry-switch">
           {entryTabs.map((tab) => (
@@ -224,7 +221,12 @@ const Dashboard: React.FC = () => {
       </div>
 
       <div className="bigscreen-grid">
-        <aside className="panel-shell">
+        <motion.aside
+          className="panel-shell"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        >
           <div className="panel-header">
             <div className="panel-title">客户画像分析</div>
             <div className="panel-subtitle">金额等级 / 身份类型 / 新老客户</div>
@@ -234,23 +236,29 @@ const Dashboard: React.FC = () => {
             {profileLoading || !customerProfile ? (
               <LoadingSkeleton />
             ) : (
-              <div className="chart-stack">
+              <div className="chart-stack chart-stack--left">
                 <div className="mini-chart-card">
                   <div className="mini-chart-title">身份类型分布</div>
-                  <PieChart data={customerProfile.role_distribution} height={205} />
+                  <div className="mini-chart-content">
+                    <PieChart data={customerProfile.role_distribution} height="100%" />
+                  </div>
                 </div>
                 <div className="mini-chart-card">
                   <div className="mini-chart-title">新老客户对比</div>
-                  <PieChart data={customerProfile.new_old_distribution} height={205} />
+                  <div className="mini-chart-content">
+                    <PieChart data={customerProfile.new_old_distribution} height="100%" />
+                  </div>
                 </div>
                 <div className="mini-chart-card">
                   <div className="mini-chart-title">金额等级分布</div>
-                  <DistributionBarChart data={customerProfile.level_distribution} height={profileBarHeight} />
+                  <div className="mini-chart-content">
+                    <DistributionBarChart data={customerProfile.level_distribution} height="100%" />
+                  </div>
                 </div>
               </div>
             )}
           </div>
-        </aside>
+        </motion.aside>
 
         <main className="stage-main">
           <motion.section
@@ -350,20 +358,27 @@ const Dashboard: React.FC = () => {
           </section>
         </main>
 
-        <aside className="panel-shell">
+        <motion.aside
+          className="panel-shell"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        >
           <div className="panel-header">
             <div className="panel-title">客户来源 + 任务进展</div>
             <div className="panel-subtitle">来源渠道结构与区域完成度</div>
           </div>
 
           <div className="side-panel-body">
-            <div className="chart-stack">
+            <div className="chart-stack chart-stack--right">
               <div className="mini-chart-card">
                 <div className="mini-chart-title">客户来源分布</div>
                 {sourceLoading ? (
                   <LoadingSkeleton />
                 ) : (
-                  <StackedBarChart categories={sourceChart.categories} series={sourceChart.series} height={300} />
+                  <div className="mini-chart-content">
+                    <StackedBarChart categories={sourceChart.categories} series={sourceChart.series} height="100%" />
+                  </div>
                 )}
               </div>
               <div className="mini-chart-card">
@@ -374,17 +389,19 @@ const Dashboard: React.FC = () => {
                 {progressLoading ? (
                   <LoadingSkeleton />
                 ) : (
-                  <HorizontalBarChart
-                    categories={progressChart.categories}
-                    series={progressChart.series}
-                    completionRates={progressChart.completionRates}
-                    height={progressHeight}
-                  />
+                  <div className="mini-chart-content">
+                    <HorizontalBarChart
+                      categories={progressChart.categories}
+                      series={progressChart.series}
+                      completionRates={progressChart.completionRates}
+                      height="100%"
+                    />
+                  </div>
                 )}
               </div>
             </div>
           </div>
-        </aside>
+        </motion.aside>
       </div>
 
       <motion.button

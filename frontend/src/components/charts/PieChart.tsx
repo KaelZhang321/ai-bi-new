@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import ReactECharts from 'echarts-for-react'
 import { baseOption, chartPalette } from './echarts-config'
 import { theme } from '../../styles/theme'
@@ -6,11 +6,25 @@ import { theme } from '../../styles/theme'
 interface PieChartProps {
   data: { name: string; value: number }[]
   title?: string
-  height?: number
+  height?: number | string
 }
 
 const PieChart: React.FC<PieChartProps> = ({ data, title, height = 260 }) => {
-  const isCompact = height <= 220
+  const chartRef = useRef<ReactECharts>(null)
+  const isFluid = height === '100%'
+  const numericHeight = typeof height === 'number' ? height : 260
+  const isCompact = numericHeight <= 220
+
+  useEffect(() => {
+    if (!isFluid) return
+    const el = chartRef.current?.getEchartsInstance()?.getDom()
+    if (!el) return
+    const ro = new ResizeObserver(() => {
+      chartRef.current?.getEchartsInstance()?.resize()
+    })
+    ro.observe(el.parentElement || el)
+    return () => ro.disconnect()
+  }, [isFluid])
 
   const option = {
     ...baseOption,
@@ -37,8 +51,8 @@ const PieChart: React.FC<PieChartProps> = ({ data, title, height = 260 }) => {
     series: [
       {
         type: 'pie' as const,
-        radius: isCompact ? ['34%', '56%'] : ['38%', '60%'],
-        center: isCompact ? ['50%', '38%'] : ['50%', '42%'],
+        radius: isCompact ? ['40%', '66%'] : ['42%', '68%'],
+        center: isCompact ? ['50%', '44%'] : ['50%', '46%'],
         avoidLabelOverlap: true,
         data,
         label: {
@@ -71,7 +85,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, title, height = 260 }) => {
     ],
   }
 
-  return <ReactECharts option={option} style={{ width: '100%', height }} />
+  return <ReactECharts ref={chartRef} option={option} style={{ width: '100%', height }} {...(isFluid ? { opts: { height: 'auto' } } : {})} />
 }
 
 export default PieChart

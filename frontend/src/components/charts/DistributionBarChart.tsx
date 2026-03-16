@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import ReactECharts from 'echarts-for-react'
 import { axisStyle, baseOption, chartPalette } from './echarts-config'
 import type { PieSlice } from '../../api/customer'
@@ -14,12 +14,25 @@ const DistributionBarChart: React.FC<DistributionBarChartProps> = ({
   height = 280,
   seriesName = '客户数',
 }) => {
+  const chartRef = useRef<ReactECharts>(null)
+  const isFluid = height === '100%'
   const sortedData = [...data].sort((a, b) => b.value - a.value)
   const categories = sortedData.map((item) => item.name)
   const values = sortedData.map((item) => item.value)
   const percentages = sortedData.map((item) => item.percentage)
   const maxValue = Math.max(...values, 0)
   const resolvedHeight = typeof height === 'number' ? Math.max(height, sortedData.length * 28 + 96) : height
+
+  useEffect(() => {
+    if (!isFluid) return
+    const el = chartRef.current?.getEchartsInstance()?.getDom()
+    if (!el) return
+    const ro = new ResizeObserver(() => {
+      chartRef.current?.getEchartsInstance()?.resize()
+    })
+    ro.observe(el.parentElement || el)
+    return () => ro.disconnect()
+  }, [isFluid])
 
   const option = {
     ...baseOption,
@@ -53,10 +66,10 @@ const DistributionBarChart: React.FC<DistributionBarChartProps> = ({
     },
     grid: {
       ...baseOption.grid,
-      left: 148,
-      right: 118,
+      left: 132,
+      right: 92,
       top: 6,
-      bottom: 30,
+      bottom: 16,
       containLabel: false,
     },
     xAxis: {
@@ -151,7 +164,7 @@ const DistributionBarChart: React.FC<DistributionBarChartProps> = ({
     ],
   }
 
-  return <ReactECharts option={option} notMerge style={{ height: resolvedHeight }} />
+  return <ReactECharts ref={chartRef} option={option} notMerge style={{ height: resolvedHeight }} {...(isFluid ? { opts: { height: 'auto' } } : {})} />
 }
 
 export default DistributionBarChart
