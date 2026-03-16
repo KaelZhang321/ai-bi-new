@@ -22,7 +22,7 @@ MOBILE_URL = "https://digital-admin.ssjt101.com/meeting/mobile"
 CST = timezone(timedelta(hours=8))
 
 # 推送时间点（时, 分）
-PUSH_TIMES = [(12, 0), (19, 10)]
+PUSH_TIMES = [(12, 0), (19, 35)]
 
 
 def _now_cst() -> datetime:
