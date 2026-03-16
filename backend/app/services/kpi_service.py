@@ -9,15 +9,25 @@ TOTAL_BUDGET = 600  # 单位：万
 def get_kpi_overview(db: Session) -> KpiOverview:
     # 报名客户
     row = db.execute(
-        text("SELECT COUNT(DISTINCT customer_unique_id) AS cnt FROM meeting_registration")
+        text("""
+            SELECT COUNT(DISTINCT customer_unique_id) AS cnt FROM meeting_registration
+            WHERE real_identity IS NOT NULL
+	        AND real_identity NOT LIKE '%市场%'
+	        AND real_identity NOT LIKE '%陪同%'
+        """)
     ).mappings().first()
     registered = int(row["cnt"])
 
     # 已抵达客户
     row = db.execute(
-        text(
-            "SELECT COUNT(DISTINCT customer_unique_id) AS cnt "
-            "FROM meeting_registration WHERE sign_in_status = '已签到'"
+        text("""
+            SELECT COUNT(DISTINCT customer_unique_id) AS cnt 
+            FROM meeting_registration 
+            WHERE sign_in_status = '已签到'
+            AND real_identity IS NOT NULL
+	        AND real_identity NOT LIKE '%市场%'
+	        AND real_identity NOT LIKE '%陪同%'
+        """
         )
     ).mappings().first()
     arrived = int(row["cnt"])

@@ -9,19 +9,22 @@ def get_region_level_chart(db: Session) -> list[RegionLevelCount]:
     sql = text("""
         SELECT
             SUBSTRING_INDEX(market_service_attribution, ',', 1) AS region,
-            customer_level_name,
+            real_identity,
             COUNT(DISTINCT customer_unique_id) AS register_count,
             COUNT(DISTINCT CASE WHEN sign_in_status = '已签到' THEN customer_unique_id END) AS arrive_count
         FROM meeting_registration
         WHERE market_service_attribution IS NOT NULL
-        GROUP BY region, customer_level_name
+            AND real_identity IS NOT NULL
+	        AND real_identity NOT LIKE '%市场%'
+	        AND real_identity NOT LIKE '%陪同%'
+        GROUP BY region, real_identity
         ORDER BY region
     """)
     rows = db.execute(sql).mappings().all()
     return [
         RegionLevelCount(
             region=r["region"],
-            customer_level_name=r["customer_level_name"],
+            real_identity=r["real_identity"],
             register_count=int(r["register_count"]),
             arrive_count=int(r["arrive_count"]),
         )
@@ -34,16 +37,19 @@ def get_matrix_table(db: Session) -> list[MatrixRow]:
     sql = text("""
         SELECT
             SUBSTRING_INDEX(market_service_attribution, ',', 1) AS region,
-            SUM(CASE WHEN customer_level_name LIKE '%千万%' THEN 1 ELSE 0 END) AS qianwan_register,
-            SUM(CASE WHEN customer_level_name LIKE '%千万%' AND sign_in_status = '已签到' THEN 1 ELSE 0 END) AS qianwan_arrive,
-            SUM(CASE WHEN customer_level_name LIKE '%百万%' OR customer_level_name LIKE '%300万%' THEN 1 ELSE 0 END) AS baiwan_register,
-            SUM(CASE WHEN (customer_level_name LIKE '%百万%' OR customer_level_name LIKE '%300万%') AND sign_in_status = '已签到' THEN 1 ELSE 0 END) AS baiwan_arrive,
-            SUM(CASE WHEN customer_level_name IS NULL OR (customer_level_name NOT LIKE '%千万%' AND customer_level_name NOT LIKE '%百万%' AND customer_level_name NOT LIKE '%300万%') THEN 1 ELSE 0 END) AS putong_register,
-            SUM(CASE WHEN (customer_level_name IS NULL OR (customer_level_name NOT LIKE '%千万%' AND customer_level_name NOT LIKE '%百万%' AND customer_level_name NOT LIKE '%300万%')) AND sign_in_status = '已签到' THEN 1 ELSE 0 END) AS putong_arrive,
+            SUM(CASE WHEN real_identity LIKE '%千万%' THEN 1 ELSE 0 END) AS qianwan_register,
+            SUM(CASE WHEN real_identity LIKE '%千万%' AND sign_in_status = '已签到' THEN 1 ELSE 0 END) AS qianwan_arrive,
+            SUM(CASE WHEN real_identity LIKE '%百万%' OR real_identity LIKE '%300万%' THEN 1 ELSE 0 END) AS baiwan_register,
+            SUM(CASE WHEN (real_identity LIKE '%百万%' OR real_identity LIKE '%300万%') AND sign_in_status = '已签到' THEN 1 ELSE 0 END) AS baiwan_arrive,
+            SUM(CASE WHEN real_identity IS NULL OR (real_identity NOT LIKE '%千万%' AND real_identity NOT LIKE '%百万%' AND real_identity NOT LIKE '%300万%') THEN 1 ELSE 0 END) AS putong_register,
+            SUM(CASE WHEN (real_identity IS NULL OR (real_identity NOT LIKE '%千万%' AND real_identity NOT LIKE '%百万%' AND real_identity NOT LIKE '%300万%')) AND sign_in_status = '已签到' THEN 1 ELSE 0 END) AS putong_arrive,
             COUNT(DISTINCT customer_unique_id) AS total_register,
             COUNT(DISTINCT CASE WHEN sign_in_status = '已签到' THEN customer_unique_id END) AS total_arrive
         FROM meeting_registration
         WHERE market_service_attribution IS NOT NULL
+            AND real_identity IS NOT NULL
+	        AND real_identity NOT LIKE '%市场%'
+	        AND real_identity NOT LIKE '%陪同%'
         GROUP BY region
         ORDER BY total_register DESC
     """)
@@ -60,9 +66,9 @@ def get_registration_detail(db: Session, region: str | None = None, level: str |
         params["region"] = region
     if level:
         if level == "未分类":
-            conditions.append("customer_level_name IS NULL")
+            conditions.append("real_identity IS NULL")
         else:
-            conditions.append("customer_level_name = :level")
+            conditions.append("real_identity = :level")
             params["level"] = level
     where = " AND ".join(conditions)
     sql = text(f"""
@@ -70,7 +76,7 @@ def get_registration_detail(db: Session, region: str | None = None, level: str |
             customer_name,
             sign_in_status,
             customer_category,
-            customer_level_name,
+            real_identity,
             attendee_role,
             store_name,
             SUBSTRING_INDEX(market_service_attribution, ',', 1) AS region

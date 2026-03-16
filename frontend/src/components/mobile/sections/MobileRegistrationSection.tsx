@@ -25,7 +25,7 @@ const detailColumns = [
   { title: '客户姓名', dataIndex: 'customer_name', key: 'name', width: 80 },
   { title: '签到状态', dataIndex: 'sign_in_status', key: 'status', width: 70, render: (v: string) => <span style={{ color: v === '已签到' ? '#10B981' : '#9CA3AF' }}>{v || '-'}</span> },
   { title: '客户类别', dataIndex: 'customer_category', key: 'category', width: 70 },
-  { title: '金额等级', dataIndex: 'customer_level_name', key: 'level', width: 70, render: (v: string | null) => v || '未分类' },
+  { title: '身份类型', dataIndex: 'real_identity', key: 'identity', width: 70, render: (v: string | null) => v || '未分类' },
   { title: '参会角色', dataIndex: 'attendee_role', key: 'role', width: 70 },
   { title: '店铺来源', dataIndex: 'store_name', key: 'store', width: 80 },
 ]
@@ -40,16 +40,16 @@ const MobileRegistrationSection: React.FC = () => {
   const { categories, series } = useMemo(() => {
     if (!chartData) return { categories: [], series: [] }
     const regionSet = [...new Set(chartData.map((d) => d.region))]
-    const levelSet = [...new Set(chartData.map((d) => d.customer_level_name || '未分类'))]
+    const levelSet = [...new Set(chartData.map((d) => d.real_identity || '未分类'))]
     const registerSeries = levelSet.map((level) => ({
       name: `${level}(报名)`,
       stack: 'register',
-      data: regionSet.map((region) => chartData.find((d) => d.region === region && (d.customer_level_name || '未分类') === level)?.register_count || 0),
+      data: regionSet.map((region) => chartData.find((d) => d.region === region && (d.real_identity || '未分类') === level)?.register_count || 0),
     }))
     const arriveSeries = levelSet.map((level) => ({
       name: `${level}(抵达)`,
       stack: 'arrive',
-      data: regionSet.map((region) => chartData.find((d) => d.region === region && (d.customer_level_name || '未分类') === level)?.arrive_count || 0),
+      data: regionSet.map((region) => chartData.find((d) => d.region === region && (d.real_identity || '未分类') === level)?.arrive_count || 0),
     }))
     return { categories: regionSet, series: [...registerSeries, ...arriveSeries] }
   }, [chartData])
@@ -57,7 +57,7 @@ const MobileRegistrationSection: React.FC = () => {
   const handleChartClick = useCallback((params: { name?: string; seriesName?: string }) => {
     if (params.name && params.seriesName) {
       setDrillRegion(params.name)
-      setDrillLevel(params.seriesName)
+      setDrillLevel(params.seriesName.replace(/\((报名|抵达)\)$/, ''))
       setDrillOpen(true)
     }
   }, [])

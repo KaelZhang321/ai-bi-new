@@ -7,16 +7,14 @@ from app.schemas.customer import PieSlice, CustomerProfile
 def get_customer_profile(db: Session) -> CustomerProfile:
     # 金额等级分布 (meeting_customer_analysis)
     level_rows = db.execute(text("""
-        SELECT
-          t.`name`,
-          COUNT(DISTINCT t.customer_unique_id) AS `value`
-        FROM
-          (SELECT
-            IF (TRIM(customer_level_name) = '' OR customer_level_name IS NULL, '未分类', customer_level_name) AS `name`,
-            customer_unique_id
-          FROM
-            meeting_registration) AS t
-        GROUP BY t.`name`
+        SELECT real_identity AS `name`, 
+        COUNT(DISTINCT customer_unique_id) AS `value` 
+        FROM meeting_registration
+        WHERE real_identity IS NOT NULL
+        AND real_identity NOT LIKE '%市场%'
+        AND real_identity NOT LIKE '%陪同%'
+        GROUP BY `name`
+        ORDER BY `value` DESC
     """)).mappings().all()
     total_level = sum(r["value"] for r in level_rows) or 1
     level_dist = [
@@ -33,12 +31,12 @@ def get_customer_profile(db: Session) -> CustomerProfile:
                 WHEN real_identity LIKE '%陪同%' THEN '陪同'
                 WHEN real_identity LIKE '%观摩%' THEN '观摩'
                 WHEN real_identity LIKE '%市场%' THEN '市场'
-                WHEN real_identity LIKE '%家属%' THEN '家属'
                 ELSE '客户'
             END AS `name`,
             COUNT(DISTINCT customer_unique_id) AS `value`
         FROM
             meeting_registration
+        WHERE real_identity IS NOT NULL
         GROUP BY `name`
         ORDER BY `value` DESC
     """)).mappings().all()

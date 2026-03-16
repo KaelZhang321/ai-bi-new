@@ -2,7 +2,7 @@ import client, { type ApiResponse } from './client'
 
 export interface RegionLevelCount {
   region: string
-  customer_level_name: string | null
+  real_identity: string | null
   register_count: number
   arrive_count: number
 }
@@ -29,7 +29,7 @@ export interface RegistrationDetail {
   customer_name: string | null
   sign_in_status: string | null
   customer_category: string | null
-  customer_level_name: string | null
+  real_identity: string | null
   attendee_role: string | null
   store_name: string | null
   region: string | null

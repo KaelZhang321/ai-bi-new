@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class RegionLevelCount(BaseModel):
     region: str
-    customer_level_name: str | None
+    real_identity: str | None
     register_count: int
     arrive_count: int
 
@@ -24,7 +24,7 @@ class RegistrationDetail(BaseModel):
     customer_name: str | None
     sign_in_status: str | None
     customer_category: str | None
-    customer_level_name: str | None
+    real_identity: str | None
     attendee_role: str | None
     store_name: str | None
     region: str | None
