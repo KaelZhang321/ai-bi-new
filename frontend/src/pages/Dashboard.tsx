@@ -6,7 +6,6 @@ import GroupedBarChart from '../components/charts/GroupedBarChart'
 import HorizontalBarChart from '../components/charts/HorizontalBarChart'
 import MultiLineChart from '../components/charts/MultiLineChart'
 import PieChart from '../components/charts/PieChart'
-import StackedBarChart from '../components/charts/StackedBarChart'
 import DataTable from '../components/common/DataTable'
 import LoadingSkeleton from '../components/common/LoadingSkeleton'
 import AiChatPanel from '../components/sections/AiChatPanel'
@@ -140,15 +139,16 @@ const Dashboard: React.FC = () => {
     }
   }, [registrationData])
 
-  const sourceChart = useMemo(() => {
-    if (!sourceData) return { categories: [] as string[], series: [] as { name: string; data: number[] }[] }
-    const regions = [...new Set(sourceData.map((d) => d.region))]
-    const types = [...new Set(sourceData.map((d) => d.source_type))]
-    const series = types.map((type) => ({
-      name: type,
-      data: regions.map((region) => sourceData.find((d) => d.region === region && d.source_type === type)?.customer_count || 0),
-    }))
-    return { categories: regions, series }
+  const sourceDistribution = useMemo(() => {
+    if (!sourceData || sourceData.length === 0) return []
+    const total = sourceData.reduce((sum, item) => sum + item.customer_count, 0) || 1
+    return sourceData
+      .map((item) => ({
+        name: `${item.region} · ${item.source_type}`,
+        value: item.customer_count,
+        percentage: (item.customer_count / total) * 100,
+      }))
+      .sort((a, b) => b.value - a.value)
   }, [sourceData])
 
   const trendChart = useMemo(() => {
@@ -377,7 +377,7 @@ const Dashboard: React.FC = () => {
                   <LoadingSkeleton />
                 ) : (
                   <div className="mini-chart-content">
-                    <StackedBarChart categories={sourceChart.categories} series={sourceChart.series} height="100%" />
+                    <DistributionBarChart data={sourceDistribution} height="100%" seriesName="客户数" />
                   </div>
                 )}
               </div>
