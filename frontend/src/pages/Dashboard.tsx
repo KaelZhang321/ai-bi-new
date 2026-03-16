@@ -1,6 +1,9 @@
 import React, { useMemo, useState } from 'react'
+import { DatePicker, Select } from 'antd'
 import dayjs from 'dayjs'
+import type { Dayjs } from 'dayjs'
 import { AnimatePresence, motion } from 'framer-motion'
+import PageAchievement from './PageAchievement'
 import DistributionBarChart from '../components/charts/DistributionBarChart'
 import GroupedBarChart from '../components/charts/GroupedBarChart'
 import HorizontalBarChart from '../components/charts/HorizontalBarChart'
@@ -13,6 +16,7 @@ import type { MatrixRow } from '../api/registration'
 import {
   useCustomerProfile,
   useKpiOverview,
+  useOperationsKpi,
   useProgress,
   useRegistrationMatrix,
   useSourceDistribution,
@@ -20,6 +24,7 @@ import {
 } from '../hooks/useApi'
 import '../styles/bigscreen.css'
 import aiIcon from '../styles/AI.png'
+import eventLogo from '../styles/logo.png'
 
 const matrixColumns = [
   { title: '大区', dataIndex: 'region', key: 'region', fixed: 'left' as const, width: 80 },
@@ -31,13 +36,6 @@ const matrixColumns = [
   { title: '普通(到)', dataIndex: 'putong_arrive', key: 'putong_arrive', width: 82 },
   { title: '总报名', dataIndex: 'total_register', key: 'total_register', width: 86 },
   { title: '总抵达', dataIndex: 'total_arrive', key: 'total_arrive', width: 86 },
-]
-
-const progressColumns = [
-  { title: '区域', dataIndex: 'region', key: 'region', width: 90 },
-  { title: '达成金额', dataIndex: 'deal_amount', key: 'deal_amount', width: 110, render: (v: number) => formatCurrency(v) },
-  { title: '成交高限', dataIndex: 'high_limit', key: 'high_limit', width: 110, render: (v: number) => formatCurrency(v) },
-  { title: '完成率', dataIndex: 'completion_rate', key: 'completion_rate', width: 90, render: (v: number | null) => (v == null ? '--' : `${v.toFixed(2)}%`) },
 ]
 
 const entryTabs = [
@@ -63,10 +61,13 @@ function formatCurrency(value: number, unit = '万'): string {
 const Dashboard: React.FC = () => {
   const [aiOpen, setAiOpen] = useState(false)
   const [entryTab, setEntryTab] = useState<EntryTab>('customer')
+  const [selectedScene, setSelectedScene] = useState<string>('all')
+  const [selectedDate, setSelectedDate] = useState<string>(dayjs().format('YYYY-MM-DD'))
 
   const updateTime = dayjs().format('YYYY/MM/DD HH:mm:ss')
 
   const { data: kpiData, isLoading: kpiLoading } = useKpiOverview()
+  const { data: operationsData, isLoading: operationsLoading } = useOperationsKpi(selectedDate, selectedDate)
   const { data: registrationData, isLoading: registrationLoading } = useRegistrationMatrix()
   const { data: trendData, isLoading: trendLoading } = useTrendData()
   const { data: customerProfile, isLoading: profileLoading } = useCustomerProfile()
@@ -114,7 +115,7 @@ const Dashboard: React.FC = () => {
     })
   }, [kpiData])
 
-  const topStats = useMemo(() => {
+  const customerStats = useMemo(() => {
     const registeredCustomers = kpiData?.registered_customers.value ?? 0
     const arrivedCustomers = kpiData?.arrived_customers.value ?? 0
     const arrivalRate = registeredCustomers > 0 ? (arrivedCustomers / registeredCustomers) * 100 : 0
@@ -125,6 +126,24 @@ const Dashboard: React.FC = () => {
       { label: '报名抵达率', value: `${arrivalRate.toFixed(2)}%` },
     ]
   }, [kpiData?.arrived_customers.value, kpiData?.registered_customers.value])
+
+  const operationStats = useMemo(() => {
+    const checkin = operationsData?.checkin_count ?? 0
+    const pickup = operationsData?.pickup_count ?? 0
+    const leave = operationsData?.leave_count ?? 0
+    const hospital = operationsData?.hospital_count ?? 0
+
+    return [
+      { label: '签到人数', value: `${formatNumber(checkin)} 人` },
+      { label: '接机人数', value: `${formatNumber(pickup)} 人` },
+      { label: '离开人数', value: `${formatNumber(leave)} 人` },
+      { label: '到院人数', value: `${formatNumber(hospital)} 人` },
+    ]
+  }, [operationsData?.checkin_count, operationsData?.hospital_count, operationsData?.leave_count, operationsData?.pickup_count])
+
+  const handleDateChange = (date: Dayjs | null) => {
+    setSelectedDate(date ? date.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'))
+  }
 
   const registrationChart = useMemo(() => {
     if (!registrationData || registrationData.length === 0) {
@@ -151,33 +170,50 @@ const Dashboard: React.FC = () => {
       .sort((a, b) => b.value - a.value)
   }, [sourceData])
 
+  const sceneOptions = useMemo(() => {
+    if (!trendData || trendData.length === 0) return [{ value: 'all', label: '全部场景' }]
+    const labels = [...new Set(trendData.map((item) => item.scene_label))]
+    return [{ value: 'all', label: '全部场景' }, ...labels.map((label) => ({ value: label, label }))]
+  }, [trendData])
+
   const trendChart = useMemo(() => {
     if (!trendData || trendData.length === 0) {
       return { categories: [] as string[], series: [{ name: '客流趋势', data: [] as number[] }] }
     }
 
     const periodOrder: Record<string, number> = { 上午: 1, 下午: 2, 晚上: 3 }
-    const grouped = new Map<string, number>()
+    const filteredTrendData = selectedScene === 'all'
+      ? trendData
+      : trendData.filter((item) => item.scene_label === selectedScene)
 
-    for (const item of trendData) {
-      const key = `${item.schedule_date} ${item.day_time_period}`
-      grouped.set(key, (grouped.get(key) ?? 0) + item.people_count)
-    }
-
-    const sortedEntries = [...grouped.entries()]
+    const timeLabels = [...new Set(filteredTrendData.map((item) => `${item.schedule_date.slice(5)} ${item.day_time_period}`))]
       .sort((a, b) => {
-        const [aDate, aPeriod] = a[0].split(' ')
-        const [bDate, bPeriod] = b[0].split(' ')
+        const [aDate, aPeriod] = a.split(' ')
+        const [bDate, bPeriod] = b.split(' ')
         if (aDate !== bDate) return aDate.localeCompare(bDate)
         return (periodOrder[aPeriod] ?? 99) - (periodOrder[bPeriod] ?? 99)
       })
       .slice(-16)
 
+    const sceneLabels = selectedScene === 'all'
+      ? [...new Set(filteredTrendData.map((item) => item.scene_label))]
+      : [selectedScene]
+
     return {
-      categories: sortedEntries.map(([key]) => key.slice(5)),
-      series: [{ name: '客流趋势', data: sortedEntries.map(([, value]) => value) }],
+      categories: timeLabels,
+      series: sceneLabels.map((scene) => ({
+        name: scene,
+        data: timeLabels.map((label) => {
+          const [date, period] = label.split(' ')
+          return filteredTrendData.find((item) =>
+            item.schedule_date.slice(5) === date &&
+            item.day_time_period === period &&
+            item.scene_label === scene
+          )?.people_count || 0
+        }),
+      })),
     }
-  }, [trendData])
+  }, [selectedScene, trendData])
 
   const progressChart = useMemo(() => {
     if (!progressData) {
@@ -193,6 +229,8 @@ const Dashboard: React.FC = () => {
     }
   }, [progressData])
 
+  const isGoalView = entryTab === 'goal'
+
   return (
     <div className="bigscreen-root">
       <div className="bigscreen-header">
@@ -204,8 +242,10 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
         <div className="bigscreen-center-pill">
-          <span className="bigscreen-center-indicator" />
-          318梅赛尔国际健康节
+          <div className="bigscreen-center-content">
+            <img className="bigscreen-center-logo" src={eventLogo} alt="318梅赛尔国际健康节 Logo" />
+            <span className="bigscreen-center-text">318梅赛尔国际健康节</span>
+          </div>
         </div>
         <div className="entry-switch">
           {entryTabs.map((tab) => (
@@ -220,7 +260,19 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="bigscreen-grid">
+      {isGoalView ? (
+        <div className="goal-view-shell">
+          <motion.div
+            className="goal-view-main"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <PageAchievement />
+          </motion.div>
+        </div>
+      ) : (
+        <div className="bigscreen-grid">
         <motion.aside
           className="panel-shell"
           initial={{ opacity: 0, x: -20 }}
@@ -286,14 +338,30 @@ const Dashboard: React.FC = () => {
             </div>
           </motion.section>
 
-          <section className="stat-row">
-            {topStats.map((stat) => (
-              <article className="stat-card" key={stat.label}>
-                <div className="stat-label">{stat.label}</div>
-                <div className="stat-value">{stat.value}</div>
-              </article>
-            ))}
-          </section>
+          {entryTab === 'ops' && (
+            <div className="stat-toolbar">
+              <div className="trend-subtitle">按日期查询运营指标</div>
+              <DatePicker
+                value={dayjs(selectedDate)}
+                onChange={handleDateChange}
+                allowClear={false}
+                size="small"
+                style={{ width: 146 }}
+              />
+            </div>
+          )}
+          {(entryTab === 'ops' ? operationsLoading : kpiLoading) ? (
+            <LoadingSkeleton />
+          ) : (
+            <section className={`stat-row ${entryTab === 'ops' ? 'stat-row--four' : 'stat-row--three'}`}>
+              {(entryTab === 'ops' ? operationStats : customerStats).map((stat) => (
+                <article className="stat-card" key={stat.label}>
+                  <div className="stat-label">{stat.label}</div>
+                  <div className="stat-value">{stat.value}</div>
+                </article>
+              ))}
+            </section>
+          )}
 
           <section className="trend-card">
             {entryTab === 'customer' && (
@@ -320,38 +388,23 @@ const Dashboard: React.FC = () => {
             )}
             {entryTab === 'ops' && (
               <>
-                <div className="trend-title">运营趋势</div>
-                <div className="trend-subtitle">按会期时间段聚合 · 近16个时段</div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 6 }}>
+                  <div>
+                    <div className="trend-title">时间维度数据分析</div>
+                    <div className="trend-subtitle">人流热力图 · 会期时间段（上午/下午/晚上）× 关键场景</div>
+                  </div>
+                  <Select
+                    value={selectedScene}
+                    onChange={setSelectedScene}
+                    options={sceneOptions}
+                    size="small"
+                    style={{ width: 138, flexShrink: 0 }}
+                  />
+                </div>
                 {trendLoading ? (
                   <LoadingSkeleton />
                 ) : (
                   <MultiLineChart categories={trendChart.categories} series={trendChart.series} height={420} />
-                )}
-              </>
-            )}
-            {entryTab === 'goal' && (
-              <>
-                <div className="trend-title">目标达成进展</div>
-                <div className="trend-subtitle">各区域达成金额与成交高限对比</div>
-                {progressLoading ? (
-                  <LoadingSkeleton />
-                ) : (
-                  <>
-                    <HorizontalBarChart
-                      categories={progressChart.categories}
-                      series={progressChart.series}
-                      completionRates={progressChart.completionRates}
-                      height={320}
-                    />
-                    <div style={{ marginTop: 16 }}>
-                      <DataTable
-                        columns={progressColumns}
-                        dataSource={progressData?.items || []}
-                        rowKey="region"
-                        pagination={{ pageSize: 8, showSizeChanger: false }}
-                      />
-                    </div>
-                  </>
                 )}
               </>
             )}
@@ -403,6 +456,7 @@ const Dashboard: React.FC = () => {
           </div>
         </motion.aside>
       </div>
+      )}
 
       <motion.button
         className="ai-float-btn"

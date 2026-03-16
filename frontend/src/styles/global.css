@@ -89,6 +89,8 @@ body::after {
   position: fixed;
   inset: 0;
   background:
+    linear-gradient(rgba(5, 15, 36, 0.55), rgba(5, 15, 36, 0.72)),
+    url('./background.png') center center / cover no-repeat,
     radial-gradient(ellipse 120% 90% at 52% -38%, rgba(95, 156, 255, 0.26) 0%, transparent 57%),
     radial-gradient(ellipse 64% 62% at 95% 86%, rgba(66, 136, 255, 0.14) 0%, transparent 64%),
     radial-gradient(ellipse 58% 58% at 3% 86%, rgba(111, 231, 200, 0.1) 0%, transparent 58%);

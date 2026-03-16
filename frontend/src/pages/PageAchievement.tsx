@@ -16,18 +16,18 @@ const fadeUp = {
 }
 
 const PageAchievement: React.FC = () => (
-  <div>
-    <motion.div custom={0} initial="hidden" animate="visible" variants={fadeUp} style={{ marginBottom: 24 }}>
+  <div className="goal-page">
+    <motion.div className="goal-section" custom={0} initial="hidden" animate="visible" variants={fadeUp} style={{ marginBottom: 24 }}>
       <AchievementSection />
     </motion.div>
-    <motion.div custom={1} initial="hidden" animate="visible" variants={fadeUp} style={{ marginBottom: 20 }}>
+    <motion.div className="goal-section" custom={1} initial="hidden" animate="visible" variants={fadeUp} style={{ marginBottom: 20 }}>
       <SectionTitle title="方案目标 VS 达成" subtitle="各成交方案目标与达成" accentColor={theme.colors.accentAmber} />
     </motion.div>
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch' }}>
-      <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp} style={{ height: '100%', display: 'flex' }}>
+    <div className="goal-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch' }}>
+      <motion.div className="goal-section" custom={2} initial="hidden" animate="visible" variants={fadeUp} style={{ height: '100%', display: 'flex' }}>
         <ProgressSection fill />
       </motion.div>
-      <motion.div custom={3} initial="hidden" animate="visible" variants={fadeUp} style={{ height: '100%' }}>
+      <motion.div className="goal-section" custom={3} initial="hidden" animate="visible" variants={fadeUp} style={{ height: '100%' }}>
         <ProposalSection showOverview showCross={false} showSectionTitle={false} />
       </motion.div>
     </div>
