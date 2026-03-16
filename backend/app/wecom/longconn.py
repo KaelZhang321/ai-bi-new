@@ -119,7 +119,7 @@ class WeComLongConnManager:
 
             # 启动定时推送调度器
             from app.wecom.scheduler import start_scheduler
-            self._scheduler_task = start_scheduler(lambda: self._client)
+            self._scheduler_task = start_scheduler()
 
             logger.info("企业微信长连接管理器已启动")
 

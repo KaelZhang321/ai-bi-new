@@ -26,17 +26,11 @@ def wecom_status():
 
 @router.post("/test-push")
 async def test_push():
-    """手动触发一次 KPI 推送（测试用）"""
-    from app.wecom.scheduler import _push_to_subscribers
-    from app.wecom.subscribers import get_all_subscribers
+    """手动触发一次 Webhook 群聊推送（测试用）"""
+    from app.wecom.scheduler import push_via_webhook, WEBHOOK_URL
 
-    client = wecom_manager.client
-    if not client or not client.is_connected:
-        return {"code": -1, "message": "企微长连接未就绪"}
+    if not WEBHOOK_URL:
+        return {"code": -1, "message": "未配置 WECOM_WEBHOOK_URL"}
 
-    subscribers = get_all_subscribers()
-    if not subscribers:
-        return {"code": -1, "message": "暂无订阅用户，请先给 bot 发一条消息"}
-
-    await _push_to_subscribers(client)
-    return {"code": 0, "message": f"推送完成，共 {len(subscribers)} 个用户"}
+    await push_via_webhook()
+    return {"code": 0, "message": "Webhook 推送完成"}

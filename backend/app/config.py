@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     WECOM_HEARTBEAT_INTERVAL_MS: int = 30000
     WECOM_RECONNECT_INTERVAL_MS: int = 1000
     WECOM_MAX_RECONNECT_ATTEMPTS: int = 10
+    WECOM_PUSH_CHATID: str = ""
+    WECOM_WEBHOOK_URL: str = ""
 
     @property
     def database_url(self) -> str:
