@@ -24,7 +24,7 @@ MOBILE_URL = "https://digital-admin.ssjt101.com/meeting/mobile"
 CST = timezone(timedelta(hours=8))
 
 # 推送时间点（时, 分）
-PUSH_TIMES = [(12, 0), (19, 0)]
+PUSH_TIMES = [(12, 0), (18, 0), (21, 0)]
 
 # 群机器人 Webhook 地址
 WEBHOOK_URL = settings.WECOM_WEBHOOK_URL
