@@ -8,7 +8,10 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import fcntl
+import tempfile
 from datetime import datetime, timezone, timedelta
+from pathlib import Path
 
 import aiohttp
 
@@ -28,6 +31,9 @@ PUSH_TIMES = [(12, 0), (18, 0), (21, 0)]
 
 # 群机器人 Webhook 地址
 WEBHOOK_URL = settings.WECOM_WEBHOOK_URL
+
+# 文件锁路径，防止多 worker 重复推送
+_LOCK_DIR = Path(tempfile.gettempdir()) / "wecom_scheduler"
 
 
 def _now_cst() -> datetime:
@@ -108,8 +114,17 @@ async def _scheduler_loop() -> None:
         today_pushed = pushed_today[today_str]
 
         if current_time in PUSH_TIMES and current_time not in today_pushed:
-            logger.info(f"触发定时推送: {now.strftime('%Y-%m-%d %H:%M')} CST")
-            await push_via_webhook()
+            # 文件锁防止多 worker 重复推送
+            _LOCK_DIR.mkdir(parents=True, exist_ok=True)
+            lock_file = _LOCK_DIR / f"push_{today_str}_{current_time[0]:02d}{current_time[1]:02d}.lock"
+            try:
+                fd = open(lock_file, "w")
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                logger.info(f"触发定时推送: {now.strftime('%Y-%m-%d %H:%M')} CST")
+                await push_via_webhook()
+                fd.close()
+            except BlockingIOError:
+                logger.debug("其他 worker 已在推送，跳过")
             today_pushed.add(current_time)
 
         await asyncio.sleep(30)
