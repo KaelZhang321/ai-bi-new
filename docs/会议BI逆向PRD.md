@@ -855,11 +855,11 @@ README 中还提到 `meeting_region_transaction_targets`，但在当前主要业
 
 历史文档 `docs/会议BI看板PRD.md` 仍可作为背景材料，但不能直接视为当前系统真实实现。后续若出现冲突，应以当前代码和接口为准。`已代码验证`
 
-### 11.3 后续建议
+### 11.3 当前配套文档状态
 
-基于本文，后续最自然的动作是：
+当前与本文配套的文档状态如下：
 
-1. 继续拆解 `docs/rag/` 知识卡
-2. 输出指标词典与问题清单
-3. 为关键指标建立统一口径表
+1. 逆向 PRD 主稿：`docs/会议BI逆向PRD.md`
+2. RAG 设计方案：`docs/plans/2026-03-17-meeting-bi-reverse-prd-rag-design.md`
+3. RAG 知识库卡片：`docs/rag/`
 
