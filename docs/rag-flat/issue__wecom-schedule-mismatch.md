@@ -1,0 +1,28 @@
+---
+kb: meeting-bi
+doc_type: issue
+source_path: docs/rag/issues/wecom-schedule-mismatch.md
+source_file: wecom-schedule-mismatch.md
+title: 问题卡：企业微信推送说明与配置不一致
+summary: 企业微信调度器文件头注释与实际推送时间配置不一致，容易造成运维误解。
+language: zh-CN
+version_date: 2026-03-17
+---
+# 问题卡：企业微信推送说明与配置不一致
+
+一句话摘要：企业微信调度器文件头注释与实际推送时间配置不一致，容易造成运维误解。
+
+## 问题信息
+- 类型：文档与代码不一致
+- 影响范围：企业微信定时推送
+- 当前状态：已存在
+
+## 现象描述
+- 注释写“12:00 和 19:00”
+- 实际 `PUSH_TIMES` 为 `12:00 / 18:00 / 21:00`
+
+## 建议后续动作
+- 统一注释、接口说明和运维文档
+
+## 代码锚点
+- `backend/app/wecom/scheduler.py`
