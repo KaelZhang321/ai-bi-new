@@ -297,6 +297,9 @@
 .mobile-kpi-card__label {
   position: relative;
   z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.2px;
@@ -407,10 +410,66 @@
 }
 
 .mobile-card-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 15px;
   font-weight: 700;
   color: #1b2842;
   letter-spacing: 0.28px;
+}
+
+.mobile-metric-info-btn {
+  border: none;
+  background: transparent;
+  color: rgba(107, 129, 170, 0.92);
+  font-size: 12px;
+  line-height: 1;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color .2s ease;
+}
+
+.mobile-metric-info-btn.is-featured {
+  color: rgba(236, 245, 255, 0.9);
+}
+
+.mobile-metric-info-btn:hover {
+  color: #2f6cf1;
+}
+
+.mobile-metric-info-btn.is-featured:hover {
+  color: #ffffff;
+}
+
+.mobile-metric-info-overlay .ant-popover-inner {
+  background: #ffffff;
+  border: 1px solid #d9e3f4;
+  box-shadow: 0 12px 28px rgba(16, 36, 80, 0.16);
+}
+
+.mobile-metric-info-overlay .ant-popover-arrow::before {
+  background: #ffffff !important;
+}
+
+.mobile-metric-info-popover {
+  max-width: min(300px, 76vw);
+  color: #34496f;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.mobile-metric-info-title {
+  color: #1f3154;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.mobile-metric-info-line + .mobile-metric-info-line {
+  margin-top: 2px;
 }
 
 .mobile-card-subtitle {

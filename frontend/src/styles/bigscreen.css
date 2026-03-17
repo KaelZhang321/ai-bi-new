@@ -387,6 +387,103 @@
   text-shadow: 0 0 14px rgba(121, 231, 255, 0.2);
 }
 
+.panel-title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-info-btn {
+  width: auto;
+  height: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #d8efff;
+  font-size: 15px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.panel-info-btn:hover {
+  color: #f4fbff;
+  text-shadow: 0 0 10px rgba(121, 231, 255, 0.4);
+}
+
+.metric-label-with-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.metric-inline-info-btn {
+  border: none;
+  background: transparent;
+  color: rgba(198, 225, 255, 0.86);
+  font-size: 12px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color .2s ease, text-shadow .2s ease;
+}
+
+.metric-inline-info-btn:hover {
+  color: #f4fbff;
+  text-shadow: 0 0 8px rgba(121, 231, 255, 0.35);
+}
+
+.metric-info-overlay .ant-popover-inner {
+  background: linear-gradient(180deg, rgba(16, 34, 78, 0.98), rgba(9, 22, 56, 0.98));
+  border: 1px solid rgba(121, 231, 255, 0.22);
+  box-shadow: 0 14px 36px rgba(0, 6, 20, 0.6);
+}
+
+.metric-info-overlay .ant-popover-arrow::before {
+  background: rgba(13, 30, 70, 0.98) !important;
+}
+
+.metric-info-popover {
+  width: 360px;
+  max-width: 42vw;
+  color: #d6e8ff;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.metric-info-popover--small {
+  width: 260px;
+  max-width: 32vw;
+}
+
+.metric-info-block + .metric-info-block {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(121, 231, 255, 0.12);
+}
+
+.metric-info-title {
+  color: #f4f9ff;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  margin-bottom: 4px;
+}
+
+.metric-info-desc {
+  color: #b9d0ef;
+  margin-bottom: 2px;
+}
+
+.metric-info-formula {
+  color: #9fc8f5;
+}
+
 .panel-subtitle {
   margin-top: 8px;
   color: #afc4e3;

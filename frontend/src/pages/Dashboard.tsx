@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react'
-import { DatePicker, Select } from 'antd'
+import { DatePicker, Popover, Select } from 'antd'
+import { InfoCircleOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -44,6 +45,161 @@ const entryTabs = [
   { id: 'goal', label: '目标达成' },
 ] as const
 
+const customerProfileMetricPopover = (
+  <div className="metric-info-popover">
+    <div className="metric-info-block">
+      <div className="metric-info-title">金额等级分布</div>
+      <div className="metric-info-desc">定义：统计不同金额等级的客户数量分布。</div>
+      <div className="metric-info-desc">口径：按客户等级维度进行分组统计。</div>
+    </div>
+    <div className="metric-info-block">
+      <div className="metric-info-title">身份类型分布</div>
+      <div className="metric-info-desc">定义：统计不同参会身份类型的人数分布。</div>
+      <div className="metric-info-desc">口径：按参会身份类型维度进行分组统计。</div>
+    </div>
+    <div className="metric-info-block">
+      <div className="metric-info-title">新老客户对比</div>
+      <div className="metric-info-desc">定义：统计新顾客、老顾客、陪同等客户类别分布。</div>
+      <div className="metric-info-desc">口径：按客户类别维度进行分组统计。</div>
+    </div>
+  </div>
+)
+
+const rightPanelMetricPopover = (
+  <div className="metric-info-popover metric-info-popover--small">
+    <div className="metric-info-block">
+      <div className="metric-info-title">金额等级分布</div>
+      <div className="metric-info-desc">定义：统计不同金额等级客户的数量分布。</div>
+      <div className="metric-info-desc">口径：按等级分组后进行人数汇总。</div>
+    </div>
+    <div className="metric-info-block">
+      <div className="metric-info-title">任务进展</div>
+      <div className="metric-info-desc">定义：展示各区域达成金额与目标高限的完成情况。</div>
+      <div className="metric-info-desc">口径：按区域进行横向对比排序。</div>
+    </div>
+  </div>
+)
+
+const metricPopoverByLabel: Record<string, React.ReactNode> = {
+  已成交金额: (
+    <div className="metric-info-popover metric-info-popover--small">
+      <div className="metric-info-title">已成交金额</div>
+      <div className="metric-info-desc">定义：会议期间已发生的新成交金额汇总。</div>
+      <div className="metric-info-desc">口径：按成交明细金额累计。</div>
+    </div>
+  ),
+  新规划消耗: (
+    <div className="metric-info-popover metric-info-popover--small">
+      <div className="metric-info-title">新规划消耗</div>
+      <div className="metric-info-desc">定义：会议期间规划消耗金额汇总。</div>
+      <div className="metric-info-desc">口径：按消耗金额字段累计。</div>
+    </div>
+  ),
+  已收款金额: (
+    <div className="metric-info-popover metric-info-popover--small">
+      <div className="metric-info-title">已收款金额</div>
+      <div className="metric-info-desc">定义：会议期间已回款金额汇总。</div>
+      <div className="metric-info-desc">口径：按收款金额字段累计。</div>
+    </div>
+  ),
+  总投资回报率: (
+    <div className="metric-info-popover metric-info-popover--small">
+      <div className="metric-info-title">总投资回报率</div>
+      <div className="metric-info-desc">定义：衡量投入产出效率的结果型指标。</div>
+      <div className="metric-info-desc">预算常量：600（万）。</div>
+      <div className="metric-info-desc">计算公式：ROI = 600 ÷ 已成交金额 × 0.4。</div>
+      <div className="metric-info-desc">展示口径：计算结果 × 100 后按百分比展示。</div>
+    </div>
+  ),
+  报名客户: (
+    <div className="metric-info-popover metric-info-popover--small">
+      <div className="metric-info-title">报名客户</div>
+      <div className="metric-info-desc">定义：已报名客户去重人数。</div>
+      <div className="metric-info-desc">口径：按客户唯一标识去重统计。</div>
+    </div>
+  ),
+  已抵达客户: (
+    <div className="metric-info-popover metric-info-popover--small">
+      <div className="metric-info-title">已抵达客户</div>
+      <div className="metric-info-desc">定义：签到状态为已签到的去重客户人数。</div>
+      <div className="metric-info-desc">口径：在报名客户中按签到状态筛选。</div>
+    </div>
+  ),
+  报名抵达率: (
+    <div className="metric-info-popover metric-info-popover--small">
+      <div className="metric-info-title">报名抵达率</div>
+      <div className="metric-info-desc">定义：报名客户中实际抵达客户的占比。</div>
+      <div className="metric-info-desc">口径：已抵达客户 ÷ 报名客户。</div>
+    </div>
+  ),
+  金额等级分布: (
+    <div className="metric-info-popover metric-info-popover--small">
+      <div className="metric-info-title">金额等级分布</div>
+      <div className="metric-info-desc">定义：统计不同金额等级客户的数量分布。</div>
+      <div className="metric-info-desc">口径：按等级维度分组统计。</div>
+    </div>
+  ),
+  身份类型分布: (
+    <div className="metric-info-popover metric-info-popover--small">
+      <div className="metric-info-title">身份类型分布</div>
+      <div className="metric-info-desc">定义：统计不同参会身份类型的人数分布。</div>
+      <div className="metric-info-desc">口径：按身份类型维度分组统计。</div>
+    </div>
+  ),
+  新老客户对比: (
+    <div className="metric-info-popover metric-info-popover--small">
+      <div className="metric-info-title">新老客户对比</div>
+      <div className="metric-info-desc">定义：统计新顾客、老顾客、陪同等类别分布。</div>
+      <div className="metric-info-desc">口径：按客户类别维度分组统计。</div>
+    </div>
+  ),
+  客户来源分布: (
+    <div className="metric-info-popover metric-info-popover--small">
+      <div className="metric-info-title">客户来源分布</div>
+      <div className="metric-info-desc">定义：统计不同来源渠道的客户数量分布。</div>
+      <div className="metric-info-desc">口径：按区域与来源类型分组统计。</div>
+    </div>
+  ),
+  任务进展: (
+    <div className="metric-info-popover metric-info-popover--small">
+      <div className="metric-info-title">任务进展</div>
+      <div className="metric-info-desc">定义：展示各区域达成金额与目标高限的完成情况。</div>
+      <div className="metric-info-desc">口径：按区域进行横向对比。</div>
+    </div>
+  ),
+  金额等级矩阵: (
+    <div className="metric-info-popover metric-info-popover--small">
+      <div className="metric-info-title">金额等级矩阵</div>
+      <div className="metric-info-desc">定义：展示各区域在不同金额等级下的报名与抵达明细。</div>
+      <div className="metric-info-desc">口径：按区域聚合并分等级统计报名/抵达人数。</div>
+    </div>
+  ),
+  签到人数: (
+    <div className="metric-info-popover metric-info-popover--small">
+      <div className="metric-info-title">签到人数</div>
+      <div className="metric-info-desc">定义：筛选日期内完成签到的去重客户人数。</div>
+    </div>
+  ),
+  接机人数: (
+    <div className="metric-info-popover metric-info-popover--small">
+      <div className="metric-info-title">接机人数</div>
+      <div className="metric-info-desc">定义：筛选日期内具备接机信息并签到的去重客户人数。</div>
+    </div>
+  ),
+  离开人数: (
+    <div className="metric-info-popover metric-info-popover--small">
+      <div className="metric-info-title">离开人数</div>
+      <div className="metric-info-desc">定义：筛选日期内离开场景统计人数。</div>
+    </div>
+  ),
+  到院人数: (
+    <div className="metric-info-popover metric-info-popover--small">
+      <div className="metric-info-title">到院人数</div>
+      <div className="metric-info-desc">定义：筛选日期内到院相关场景统计人数。</div>
+    </div>
+  ),
+}
+
 type EntryTab = (typeof entryTabs)[number]['id']
 
 function formatNumber(value: number): string {
@@ -56,6 +212,26 @@ function formatNumber(value: number): string {
 function formatCurrency(value: number, unit = '万'): string {
   if (!Number.isFinite(value)) return '--'
   return `¥${formatNumber(value)}${unit}`
+}
+
+const renderLabelWithInfo = (label: string, iconAria?: string) => {
+  const content = metricPopoverByLabel[label]
+  if (!content) return <span>{label}</span>
+  return (
+    <span className="metric-label-with-info">
+      <span>{label}</span>
+      <Popover
+        content={content}
+        trigger="click"
+        placement="bottomLeft"
+        overlayClassName="metric-info-overlay"
+      >
+        <button className="metric-inline-info-btn" type="button" aria-label={iconAria || `查看${label}定义`}>
+          <InfoCircleOutlined />
+        </button>
+      </Popover>
+    </span>
+  )
 }
 
 const Dashboard: React.FC = () => {
@@ -272,7 +448,19 @@ const Dashboard: React.FC = () => {
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="panel-header">
-            <div className="panel-title">客户画像分析</div>
+            <div className="panel-title-row">
+              <div className="panel-title">客户画像分析</div>
+              <Popover
+                content={customerProfileMetricPopover}
+                trigger="click"
+                placement="bottomLeft"
+                overlayClassName="metric-info-overlay"
+              >
+                <button className="panel-info-btn" type="button" aria-label="查看指标定义">
+                  <InfoCircleOutlined />
+                </button>
+              </Popover>
+            </div>
             <div className="panel-subtitle">客户来源 / 身份类型 / 新老客户</div>
           </div>
 
@@ -282,19 +470,19 @@ const Dashboard: React.FC = () => {
             ) : (
               <div className="chart-stack chart-stack--left">
                 <div className="mini-chart-card">
-                  <div className="mini-chart-title">身份类型分布</div>
+                  <div className="mini-chart-title">{renderLabelWithInfo('身份类型分布')}</div>
                   <div className="mini-chart-content">
                     <PieChart data={customerProfile.role_distribution} height="100%" legendAlign="center" labelMode="value" />
                   </div>
                 </div>
                 <div className="mini-chart-card">
-                  <div className="mini-chart-title">新老客户对比</div>
+                  <div className="mini-chart-title">{renderLabelWithInfo('新老客户对比')}</div>
                   <div className="mini-chart-content">
                     <PieChart data={customerProfile.new_old_distribution} height="100%" legendAlign="center" labelMode="value" />
                   </div>
                 </div>
                 <div className="mini-chart-card">
-                  <div className="mini-chart-title">客户来源分布</div>
+                  <div className="mini-chart-title">{renderLabelWithInfo('客户来源分布')}</div>
                   {sourceLoading ? (
                     <LoadingSkeleton />
                   ) : (
@@ -316,7 +504,7 @@ const Dashboard: React.FC = () => {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
             <div className="hero-headline">
-              <div className="hero-caption">{dealAmountLabel}</div>
+              <div className="hero-caption">{renderLabelWithInfo(dealAmountLabel)}</div>
               <div className="hero-amount">
                 {kpiLoading ? '--' : centerAmount}
                 <span className="hero-unit">{centerUnit}</span>
@@ -326,7 +514,7 @@ const Dashboard: React.FC = () => {
             <div className="hero-channels">
               {sceneCards.map((item) => (
                 <div className="hero-channel" key={item.label}>
-                  <div className="hero-channel-label">{item.label}</div>
+                  <div className="hero-channel-label">{renderLabelWithInfo(item.label)}</div>
                   <div className="hero-channel-value">{item.value}</div>
                 </div>
               ))}
@@ -351,7 +539,7 @@ const Dashboard: React.FC = () => {
             <section className={`stat-row ${entryTab === 'ops' ? 'stat-row--four' : 'stat-row--three'}`}>
               {(entryTab === 'ops' ? operationStats : customerStats).map((stat) => (
                 <article className="stat-card" key={stat.label}>
-                  <div className="stat-label">{stat.label}</div>
+                  <div className="stat-label">{renderLabelWithInfo(stat.label)}</div>
                   <div className="stat-value">{stat.value}</div>
                 </article>
               ))}
@@ -369,7 +557,7 @@ const Dashboard: React.FC = () => {
                   <>
                     <GroupedBarChart categories={registrationChart.categories} series={registrationChart.series} height={330} />
                     <div style={{ marginTop: 20 }}>
-                      <div className="trend-subtitle" style={{ marginBottom: 8 }}>金额等级矩阵</div>
+                      <div className="trend-subtitle" style={{ marginBottom: 8 }}>{renderLabelWithInfo('金额等级矩阵')}</div>
                       <DataTable<MatrixRow>
                         columns={matrixColumns}
                         dataSource={registrationData || []}
@@ -413,14 +601,26 @@ const Dashboard: React.FC = () => {
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="panel-header">
-            <div className="panel-title">金额等级 + 任务进展</div>
+            <div className="panel-title-row">
+              <div className="panel-title">金额等级 + 任务进展</div>
+              <Popover
+                content={rightPanelMetricPopover}
+                trigger="click"
+                placement="bottomLeft"
+                overlayClassName="metric-info-overlay"
+              >
+                <button className="panel-info-btn" type="button" aria-label="查看金额等级与任务进展指标定义">
+                  <InfoCircleOutlined />
+                </button>
+              </Popover>
+            </div>
             <div className="panel-subtitle">金额等级结构与区域完成度</div>
           </div>
 
           <div className="side-panel-body">
             <div className="chart-stack chart-stack--right">
               <div className="mini-chart-card">
-                <div className="mini-chart-title">金额等级分布</div>
+                <div className="mini-chart-title">{renderLabelWithInfo('金额等级分布')}</div>
                 {profileLoading || !customerProfile ? (
                   <LoadingSkeleton />
                 ) : (
@@ -431,7 +631,7 @@ const Dashboard: React.FC = () => {
               </div>
               <div className="mini-chart-card">
                 <div className="mini-chart-title">
-                  任务进展
+                  {renderLabelWithInfo('任务进展')}
                   {progressData?.avg_completion_rate != null ? ` · 平均完成率 ${progressData.avg_completion_rate.toFixed(2)}%` : ''}
                 </div>
                 {progressLoading ? (
