@@ -41,12 +41,12 @@ def get_achievement_table(db: Session) -> list[AchievementRow]:
 		LEFT JOIN meeting_transaction_details AS t ON p.region = t.region
 		WHERE p.region_owner IS NOT NULL
 		GROUP BY p.region, p.deal_target, p.deal_target_low, p.deal_target_high
-		ORDER BY p.region
+		ORDER BY actual_amount DESC
     """)
     rows = db.execute(sql).mappings().all()
     result = []
     for i, r in enumerate(rows, 1):
-        actual = float(r["actual_amount"] or 0)
+        actual = round(float(r["actual_amount"] or 0), 2)
         target = float(r["target_amount"] or 0)
         rate = round(actual / target * 100, 2) if target else None
         result.append(AchievementRow(

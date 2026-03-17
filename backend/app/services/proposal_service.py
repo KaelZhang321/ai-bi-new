@@ -10,11 +10,11 @@ def get_proposal_overview(db: Session) -> list[ProposalRow]:
                 p.target_count,
                 p.target_amount,
                 COUNT(t.special_remarks) AS actual_count,
-                SUM(t.new_deal_amount) AS actual_amount
+                SUM(t.new_deal_amount) / 10000 AS actual_amount
             FROM meeting_proposal_targets AS p
 			LEFT JOIN meeting_transaction_details AS t ON p.proposal_type = TRIM(t.special_remarks)
 			GROUP BY p.proposal_type, p.target_count, p.target_amount
-            ORDER BY proposal_type;
+            ORDER BY actual_amount DESC;
     """)
     rows = db.execute(sql).mappings().all()
     return [
@@ -23,7 +23,7 @@ def get_proposal_overview(db: Session) -> list[ProposalRow]:
             target_count=int(r["target_count"] or 0),
             target_amount=float(r["target_amount"] or 0),
             actual_count=int(r["actual_count"] or 0),
-            actual_amount=float(r["actual_amount"] or 0) / 10000,
+            actual_amount=round(float(r["actual_amount"] or 0), 2),
         )
         for r in rows
     ]

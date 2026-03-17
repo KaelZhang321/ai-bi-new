@@ -20,7 +20,7 @@ def get_progress(db: Session) -> ProgressSummary:
     items = []
     rates = []
     for r in rows:
-        deal = float(r["deal_amount"] or 0)
+        deal = round(float(r["deal_amount"] or 0), 2)
         high = float(r["high_limit"] or 0)
         rate = round(deal / high * 100, 2) if high else None
         items.append(ProgressItem(
