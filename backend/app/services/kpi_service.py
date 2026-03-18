@@ -47,7 +47,7 @@ def get_kpi_overview(db: Session) -> KpiOverview:
     received = float(row["received"]) / 10000
 
     # ROI = (Budget / Deal) * 0.4. Since budget and deal are both in '万', they cancel out.
-    roi = round(TOTAL_BUDGET / deal * 0.4, 4) if deal else 0
+    roi = round(TOTAL_BUDGET / (deal * 0.4), 4) if deal else 0
 
     return KpiOverview(
         registered_customers=KpiItem(label="报名客户", value=registered, unit="人"),
