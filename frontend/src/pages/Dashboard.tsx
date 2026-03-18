@@ -107,7 +107,7 @@ const metricPopoverByLabel: Record<string, React.ReactNode> = {
       <div className="metric-info-title">总投资回报率</div>
       <div className="metric-info-desc">定义：衡量投入产出效率的结果型指标。</div>
       <div className="metric-info-desc">预算常量：600（万）。</div>
-      <div className="metric-info-desc">计算公式：ROI = 600 ÷ 已成交金额 × 0.4。</div>
+      <div className="metric-info-desc">计算公式：ROI = 600 ÷ (已成交金额 × 0.4)。</div>
       <div className="metric-info-desc">展示口径：计算结果 × 100 后按百分比展示。</div>
     </div>
   ),
